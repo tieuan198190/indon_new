@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cô Mập Fashion - Trung tâm kho</title>
+  <style>
+    :root {
+      font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont,
+        "Helvetica Neue", sans-serif;
+      color: #0f172a;
+      background-color: #f8fafc;
+      line-height: 1.6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #cfe7ff 0%, #f6fbff 55%, #ffffff 100%);
+      display: flex;
+      justify-content: center;
+      padding: clamp(1.5rem, 5vw, 3.5rem);
+    }
+
+    main {
+      width: min(1200px, 100%);
+      background: #ffffff;
+      border-radius: 32px;
+      padding: clamp(1.75rem, 4vw, 3.2rem);
+      border: 1px solid #e3edf7;
+      box-shadow: 0 30px 60px rgba(15, 23, 42, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 2.4rem;
+    }
+
+    .hero {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      padding: clamp(1.2rem, 4vw, 3rem);
+      border-radius: 28px;
+      border: 1px solid #d5e6fb;
+      background: linear-gradient(135deg, rgba(207, 232, 255, 0.75), rgba(255, 255, 255, 0.92));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    }
+
+    .badge {
+      align-self: center;
+      background: rgba(15, 118, 205, 0.12);
+      color: #13597b;
+      font-weight: 600;
+      padding: 0.45rem 1.1rem;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.3rem, 4vw, 3.2rem);
+      color: #0f3050;
+    }
+
+    .logo-mark {
+      width: clamp(110px, 16vw, 180px);
+      height: auto;
+      margin: 0 auto 0.5rem;
+      display: block;
+      border-radius: 999px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+    }
+
+    .tagline {
+      margin: 0;
+      color: #4d617a;
+      font-size: 1.05rem;
+      max-width: 60ch;
+      margin-inline: auto;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.5rem;
+    }
+
+    .tool-card {
+      text-decoration: none;
+      border-radius: 28px;
+      padding: 2rem;
+      background: #ffffff;
+      border: 1px solid #e7eef9;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      box-shadow: 0 25px 50px rgba(15, 23, 42, 0.08);
+    }
+
+    .tool-card:hover,
+    .tool-card:focus-visible {
+      transform: translateY(-6px);
+      border-color: #c8dbf5;
+      box-shadow: 0 40px 70px rgba(15, 23, 42, 0.14);
+    }
+
+    .tool-card .content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      text-align: left;
+    }
+
+    .tool-card h2 {
+      margin: 0;
+      font-size: 1.3rem;
+      color: #0f3050;
+    }
+
+    .tool-card p {
+      margin: 0;
+      color: #5d6c80;
+      font-size: 0.97rem;
+      max-width: 32ch;
+    }
+
+    .icon-circle {
+      flex-shrink: 0;
+      width: 5rem;
+      height: 5rem;
+      border-radius: 50%;
+      background: #f0f7ff;
+      border: 1px solid rgba(15, 23, 42, 0.04);
+      display: grid;
+      place-items: center;
+      font-size: 1.7rem;
+      color: #0f3050;
+    }
+
+    .icon-circle img {
+      width: 80%;
+      height: 80%;
+      object-fit: cover;
+      border-radius: 50%;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.18);
+    }
+
+    .link-label {
+      margin-top: 0.3rem;
+      font-weight: 600;
+      color: #0f6ab5;
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .link-label::after {
+      content: "→";
+      font-size: 1rem;
+    }
+
+    .tool-card.theme-picking .icon-circle {
+      background: #fef2f7;
+    }
+    .tool-card.theme-location .icon-circle {
+      background: #edf4ff;
+    }
+    .tool-card.theme-hangbom .icon-circle {
+      background: #fff4eb;
+    }
+    .tool-card.theme-order .icon-circle {
+      background: #edfcec;
+    }
+
+    .note {
+      text-align: center;
+      font-size: 0.95rem;
+      color: #475569;
+      background: #f1f5f9;
+      padding: 0.75rem 1rem;
+      border-radius: 18px;
+      border: 1px dashed #cbd5f5;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        align-items: flex-start;
+      }
+
+      main {
+        border-radius: 18px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="hero">
+      <img src="logo.jpeg" alt="Logo Cô Mập Fashion" class="logo-mark" />
+      <span class="badge">Cô Mập Fashion - Kho</span>
+    </div>
+
+    <div class="grid" aria-label="Danh sách công cụ kho Cô Mập Fashion">
+       <a class="tool-card theme-location" href="location.html">
+        <div class="icon-circle">
+          <img src="location_logo.jpeg" alt="Logo tra cứu vị trí" />
+        </div>
+        <div class="content">
+          <h2>Vị trí sản phẩm</h2>
+        </div>
+      </a>
+      <a class="tool-card theme-order" href="thongtindonhang.html">
+        <div class="icon-circle">
+          <img src="thongtindonhang_logo.jpeg" alt="Logo thông tin đơn hàng" />
+        </div>
+        <div class="content">
+          <h2>Thông tin đơn hàng</h2>
+        </div>
+      </a>     
+      <a class="tool-card theme-picking" href="bochang.html">
+        <div class="icon-circle">
+          <img src="bochang_logo.jpeg" alt="Logo trình bóc hàng" />
+        </div>
+        <div class="content">
+          <h2>Đóng hàng</h2>
+        </div>
+      </a>
+
+
+
+      <a class="tool-card theme-hangbom" href="hangbom.html">
+        <div class="icon-circle">
+          <img src="hangbom_logo.jpeg" alt="Logo hàng bơm" />
+        </div>
+        <div class="content">
+          <h2>Kiểm tra hàng hoàn</h2>
+        </div>
+      </a>
+
+
+    </div>
+  </main>
+</body>
+</html>

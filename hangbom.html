@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Kiểm Hàng Theo Ngày</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      color-scheme: light;
+    }
+
+    .scroll-shadow {
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.6) 20%, rgba(0, 0, 0, 0.6) 80%, rgba(0, 0, 0, 0.05));
+    }
+
+    @keyframes pulseLine {
+      0%, 100% { opacity: .5; }
+      50% { opacity: 1; }
+    }
+
+    .animate-progress {
+      animation: pulseLine 1.4s ease-in-out infinite;
+    }
+
+    .status-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    body.detail-mode {
+      background: #ffffff;
+      overflow: hidden;
+    }
+    body.detail-mode #app-shell {
+      max-width: 100%;
+      height: 100vh;
+      padding-top: 1.5rem;
+    }
+    body.detail-mode #app-shell > *:not(#detail-section) {
+      display: none;
+    }
+    body.detail-mode #detail-section {
+      position: fixed;
+      inset: 0;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: clamp(1.5rem, 4vw, 3rem);
+      background: #ffffff;
+      overflow-y: auto;
+      z-index: 40;
+      box-shadow: 0 30px 80px rgba(15, 23, 42, 0.2);
+    }
+    body.detail-mode #order-list-pane {
+      display: none;
+    }
+    body.detail-mode #order-detail-pane {
+      grid-column: 1 / -1;
+    }
+    body.detail-mode #detail-close-bar {
+      display: flex !important;
+    }
+
+    .back-home-link {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 1000;
+      padding: 0.45rem 0.9rem;
+      background: rgba(255, 255, 255, 0.94);
+      border-radius: 999px;
+      font-weight: 600;
+      color: #4338ca;
+      text-decoration: none;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.2);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .back-home-link:hover,
+    .back-home-link:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 40px rgba(79, 70, 229, 0.25);
+    }
+
+    .back-home-link:focus-visible {
+      outline: 3px solid rgba(79, 70, 229, 0.45);
+      outline-offset: 3px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+  <a class="back-home-link" href="index.html" aria-label="Quay lại trang chính Cô Mập Fashion">← Trang chính</a>
+  <div id="app-shell" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <header class="space-y-2">
+      <p class="text-sm font-semibold text-indigo-600 uppercase tracking-[0.3em]">Cô Mập Fashion</p>
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <h1 class="text-3xl sm:text-4xl font-bold text-slate-900">Trang Kiểm Hàng</h1>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <div class="bg-white shadow-sm rounded-2xl px-4 py-3 text-right">
+            <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Ngày làm việc</p>
+            <p id="header-day-label" class="text-xl font-semibold text-slate-900">—</p>
+          </div>
+          <div class="bg-white shadow-sm rounded-2xl px-4 py-3 text-right">
+            <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Đơn đã quét</p>
+            <p id="header-done-label" class="text-xl font-semibold text-emerald-600">0</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="bg-white rounded-3xl shadow-sm p-5 sm:p-6 space-y-4">
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <label class="flex flex-col gap-1 text-sm font-medium text-slate-600 w-full md:max-w-xs">
+          <span>Chọn ngày cần kiểm</span>
+          <input id="day-input" type="date" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50" />
+        </label>
+        <div class="flex flex-wrap gap-3 items-center">
+          <button id="load-day-button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold shadow-sm disabled:opacity-60 disabled:cursor-not-allowed">
+            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.477 14.89A6.5 6.5 0 1 1 17.5 10h-2a4.5 4.5 0 1 0-1.615 3.427l-.908-.908H18v4.243l-1.607-1.606a8.5 8.5 0 1 1 2.024-5.614h-2a6.5 6.5 0 0 0-2.94 5.348Z"/></svg>
+            Tải danh sách
+          </button>
+          <button id="clear-day-button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-300 font-semibold text-slate-600 hover:bg-slate-100">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+            Làm mới
+          </button>
+          <button id="upload-open-button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 text-white font-semibold shadow-sm">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5"/><path stroke-linecap="round" stroke-linejoin="round" d="M4 7V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2"/></svg>
+            Upload danh sách
+          </button>
+        </div>
+      </div>
+      <p id="day-helper" class="text-sm text-slate-500">Chưa chọn ngày nào. Vui lòng chọn ngày và bấm “Tải danh sách”.</p>
+      <div id="day-banner" class="hidden rounded-2xl border px-4 py-3 text-sm font-medium"></div>
+    </section>
+
+    <section class="grid lg:grid-cols-3 gap-5">
+      <div class="bg-white rounded-3xl shadow-sm p-5 space-y-5 lg:col-span-1">
+        <div>
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-slate-900">Tiến độ ngày</h2>
+            <span id="day-progress-text" class="text-sm text-slate-500">0 / 0 đơn</span>
+          </div>
+          <div class="mt-4 h-3 rounded-full bg-slate-100 overflow-hidden">
+            <div id="day-progress-bar" class="h-full bg-indigo-500 rounded-full transition-all duration-300 ease-out w-0"></div>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-4">
+          <div class="rounded-2xl border border-slate-100 p-4">
+            <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Tổng đơn</p>
+            <p id="stat-total" class="text-2xl font-bold text-slate-900 mt-2">0</p>
+          </div>
+          <div class="rounded-2xl border border-slate-100 p-4">
+            <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Đã xong</p>
+            <p id="stat-done" class="text-2xl font-bold text-emerald-600 mt-2">0</p>
+          </div>
+          <div class="rounded-2xl border border-slate-100 p-4">
+            <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Còn lại</p>
+            <p id="stat-pending" class="text-2xl font-bold text-amber-600 mt-2">0</p>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-medium text-slate-700">Đơn cần chú ý</p>
+            <button id="toggle-critical" class="text-xs font-semibold text-indigo-600">Ẩn/Hiện</button>
+          </div>
+          <ul id="critical-orders" class="mt-3 space-y-2 text-sm max-h-48 overflow-y-auto pr-2 scroll-shadow"></ul>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl shadow-sm p-5 space-y-4 lg:col-span-2">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-slate-900">Quy trình quét</h2>
+          <span class="text-xs uppercase tracking-[0.3em] text-slate-400">1️⃣ → 3️⃣</span>
+        </div>
+
+        <form id="order-scan-form" autocomplete="off" class="space-y-2">
+          <label class="text-xs font-semibold text-slate-500 uppercase tracking-[0.25em]">2️⃣ Quét mã vận đơn</label>
+          <div class="relative">
+            <input id="order-scan-input" type="text" inputmode="text" placeholder="Quét mã vận đơn (ví dụ NVS637614631)" class="w-full rounded-2xl border border-slate-200 px-4 py-3 pl-12 font-mono text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+            <svg class="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M5 7h2M17 7h2M5 17h2M17 17h2M7 5v2m10-2v2M7 17v2m10-2v2M9 9h6v6H9z"/></svg>
+          </div>
+        </form>
+
+        <div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+          Bước 3 (quét mã sản phẩm) sẽ mở chế độ toàn màn hình sau khi bạn quét mã vận đơn thành công.
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 pt-2">
+          <button id="complete-day-button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-emerald-600 text-white font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4.5 4.5L19 7"/></svg>
+            Hoàn thành ngày
+          </button>
+          <button id="reset-order-button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-slate-300 font-semibold text-slate-700">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M5 19A9 9 0 0 0 19 5"/></svg>
+            Reset đơn hiện tại
+          </button>
+          <button id="toggle-detail-panel" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-100">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            Ẩn danh sách/chi tiết
+          </button>
+          <span id="order-mode-hint" class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">Chưa có đơn nào</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="detail-section" class="grid gap-5 lg:grid-cols-5">
+      <div id="order-list-pane" class="bg-white rounded-3xl shadow-sm p-5 space-y-4 lg:col-span-2">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 class="text-lg font-semibold text-slate-900">1️⃣ Danh sách cần kiểm</h2>
+            <p class="text-sm text-slate-500">Tự động hiển thị khi chọn ngày.</p>
+          </div>
+          <div class="flex flex-col gap-2 sm:items-end">
+            <div class="relative w-full sm:w-56">
+              <input id="order-search-input" type="text" placeholder="Tìm mã đơn..." class="w-full rounded-2xl border border-slate-200 px-4 py-2.5 pl-11 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" />
+              <svg class="h-4 w-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/></svg>
+            </div>
+            <button id="open-detail-button" class="inline-flex items-center gap-2 rounded-2xl border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5h11m0 0v11m0-11-5.5 5.5M7 9v10m0 0H5m2 0 4.5-4.5"/></svg>
+              Mở chế độ chi tiết
+            </button>
+          </div>
+        </div>
+        <div id="order-list" class="space-y-3 max-h-[520px] overflow-y-auto pr-2 scroll-shadow"></div>
+      </div>
+
+      <div id="order-detail-pane" class="bg-white rounded-3xl shadow-sm p-5 space-y-4 lg:col-span-3">
+        <div id="detail-close-bar" class="hidden items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Chế độ toàn màn hình</p>
+            <p class="text-base font-semibold text-slate-900" id="detail-view-title">Đơn đang kiểm</p>
+          </div>
+          <button id="detail-close-button" class="inline-flex items-center gap-2 rounded-2xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m6 18 12-12M6 6l12 12"/></svg>
+            Quay lại trang chính
+          </button>
+        </div>
+        <h2 class="text-lg font-semibold text-slate-900">Chi tiết đơn đang kiểm</h2>
+
+        <form id="product-scan-form" autocomplete="off" class="space-y-2">
+          <label class="text-xs font-semibold text-slate-500 uppercase tracking-[0.25em]">3️⃣ Quét mã sản phẩm</label>
+          <div class="relative">
+            <input id="product-scan-input" type="text" inputmode="text" placeholder="Quét mã sản phẩm (ví dụ A414-XL)" class="w-full rounded-2xl border border-slate-200 px-4 py-3 pl-12 font-mono text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+            <svg class="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7V5a2 2 0 0 1 2-2h2m8 0h2a2 2 0 0 1 2 2v2m0 8v2a2 2 0 0 1-2 2h-2m-8 0H6a2 2 0 0 1-2-2v-2M8 12h8"/></svg>
+          </div>
+        </form>
+
+        <div id="scan-feedback" class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 hidden"></div>
+
+        <div id="order-placeholder" class="rounded-2xl border border-dashed border-slate-300 p-6 text-center text-slate-500">
+          Chưa chọn hoặc quét mã vận đơn nào.
+        </div>
+        <div id="order-panel" class="hidden space-y-4">
+          <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+            <div>
+              <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Mã đơn</p>
+              <p id="detail-order-code" class="text-2xl font-semibold text-slate-900">—</p>
+              <p id="detail-order-note" class="text-sm text-slate-500"></p>
+            </div>
+            <div class="flex flex-wrap gap-3 items-center">
+              <span id="detail-status-badge" class="status-badge px-3 py-1 rounded-full bg-slate-100 text-slate-600">—</span>
+              <span id="detail-qty-badge" class="status-badge px-3 py-1 rounded-full bg-slate-100 text-slate-600">0 / 0 SP</span>
+              <button id="force-complete-button" type="button" class="inline-flex items-center gap-2 rounded-2xl border border-amber-300 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-50 disabled:opacity-40 disabled:cursor-not-allowed">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"/>
+                </svg>
+                Đã quét xong (thủ công)
+              </button>
+              <button id="clear-progress-button" type="button" class="inline-flex items-center gap-2 rounded-2xl border border-rose-300 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 disabled:opacity-40 disabled:cursor-not-allowed">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m6 18 12-12M6 6l12 12"/>
+                </svg>
+                Xóa thông tin đã quét
+              </button>
+            </div>
+          </div>
+
+          <div id="flexible-banner" class="hidden rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            Đơn có hậu tố linh hoạt. Chỉ cần xác nhận thông tin, không bắt buộc quét từng mã sản phẩm.
+          </div>
+
+          <div class="grid gap-4 md:grid-cols-2">
+            <div class="rounded-2xl border border-slate-100 p-4 bg-slate-50">
+              <p class="text-xs uppercase tracking-[0.3em] text-slate-400 mb-1">Description</p>
+              <p id="detail-desc" class="text-sm text-slate-700 min-h-[1.5rem]">—</p>
+            </div>
+            <div class="rounded-2xl border border-slate-100 p-4 bg-slate-50">
+              <p class="text-xs uppercase tracking-[0.3em] text-slate-400 mb-1">Private Note</p>
+              <p id="detail-private" class="text-sm text-slate-700 min-h-[1.5rem]">—</p>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-base font-semibold text-slate-900">Sản phẩm cần kiểm</p>
+              <span id="detail-lines-count" class="text-sm text-slate-500">0 dòng</span>
+            </div>
+            <ul id="line-list" class="space-y-3 max-h-[320px] overflow-y-auto pr-2 scroll-shadow"></ul>
+          </div>
+
+          <div>
+            <p class="text-base font-semibold text-slate-900 mb-2">Sản phẩm còn thiếu</p>
+            <ul id="missing-list" class="text-sm text-slate-600 list-disc pl-5 space-y-1"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="manual-complete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 px-4">
+      <div class="max-w-lg w-full rounded-2xl bg-white p-6 shadow-2xl space-y-4">
+        <div>
+          <p class="text-xs uppercase tracking-[0.3em] text-amber-500 font-semibold">Xác nhận thủ công</p>
+          <h3 class="text-xl font-semibold text-slate-900 mt-1">Đơn vẫn còn thiếu, bạn vẫn muốn đánh dấu hoàn tất?</h3>
+        </div>
+        <p id="manual-complete-message" class="text-sm text-slate-600"></p>
+        <ul id="manual-complete-list" class="max-h-48 overflow-y-auto pr-2 text-sm text-slate-700 list-disc pl-5 space-y-1"></ul>
+        <div class="flex justify-end gap-3 pt-2">
+          <button id="manual-complete-cancel" class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Không, quay lại</button>
+          <button id="manual-complete-confirm" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">Vẫn xác nhận đủ</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="upload-modal" class="hidden fixed inset-0 z-50 bg-slate-900/70 px-4 py-8 overflow-y-auto">
+      <div class="max-w-2xl mx-auto w-full bg-white rounded-3xl shadow-2xl p-6 sm:p-8 space-y-6">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-xs uppercase tracking-[0.3em] text-emerald-500 font-semibold">Upload danh sách</p>
+            <h3 class="text-2xl font-semibold text-slate-900 mt-1">Nạp file đơn hàng mới</h3>
+            <p class="text-sm text-slate-500 mt-1">Nhập ngày làm việc, passkey và danh sách đơn (mỗi dòng một mã).</p>
+          </div>
+          <button id="upload-close-button" class="rounded-full border border-slate-200 p-2 text-slate-500 hover:bg-slate-100" aria-label="Đóng">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <div id="upload-message" class="hidden rounded-2xl border px-4 py-3 text-sm"></div>
+
+        <form id="upload-form" class="space-y-4">
+          <label class="flex flex-col gap-1 text-sm font-medium text-slate-600">
+            <span>Ngày làm việc</span>
+            <input id="upload-day-input" type="date" class="rounded-2xl border border-slate-200 px-4 py-3 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required />
+          </label>
+
+          <label class="flex flex-col gap-1 text-sm font-medium text-slate-600">
+            <span>Passkey bảo mật</span>
+            <input id="upload-passkey-input" type="password" placeholder="Nhập passkey được cấp" class="rounded-2xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required />
+          </label>
+
+          <label class="flex flex-col gap-1 text-sm font-medium text-slate-600">
+            <span>Danh sách mã đơn</span>
+            <textarea id="upload-orders-input" rows="6" placeholder="Mỗi dòng một mã đơn hoặc tách nhau bằng dấu phẩy" class="rounded-2xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required></textarea>
+          </label>
+
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-2">
+            <button type="button" id="upload-back-button" class="rounded-2xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100">Quay lại</button>
+            <button type="submit" id="upload-submit-button" class="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm disabled:opacity-60">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M20 20v-5h-5"/><path stroke-linecap="round" stroke-linejoin="round" d="M4 10V5a1 1 0 0 1 1-1h5m10 10v5a1 1 0 0 1-1 1h-5"/><path stroke-linecap="round" stroke-linejoin="round" d="m5 19 14-14"/></svg>
+              <span id="upload-submit-label">Gửi lên hệ thống</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <footer class="text-center text-sm text-slate-400 pt-8">
+      &copy; <span id="year-label"></span> Kho vận hành. Keep it simple, keep it accurate.
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const LIST_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/nap_danh_sachbom';
+      const ORDER_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/madon_hoan';
+      const PRODUCT_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/mahang_hoan';
+      const COMPLETE_DAY_WEBHOOK_URL = ''; // ← (Tuỳ chọn) Webhook cập nhật trạng thái hoàn tất ngày
+      const UPLOAD_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/upload_file';
+      const RESET_PROGRESS_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/reset_masanpham_daquet';
+      const FLEXIBLE_SUFFIXES = ['DH', '1P1'];
+      const REQ_TIMEOUT_MS = 12000;
+
+      const $ = (id) => document.getElementById(id);
+      const dayInput = $('day-input');
+      const loadDayButton = $('load-day-button');
+      const clearDayButton = $('clear-day-button');
+      const dayHelper = $('day-helper');
+      const dayBanner = $('day-banner');
+      const headerDayLabel = $('header-day-label');
+      const headerDoneLabel = $('header-done-label');
+      const dayProgressText = $('day-progress-text');
+      const dayProgressBar = $('day-progress-bar');
+      const statTotal = $('stat-total');
+      const statDone = $('stat-done');
+      const statPending = $('stat-pending');
+      const criticalOrdersList = $('critical-orders');
+      const toggleCritical = $('toggle-critical');
+      const orderScanForm = $('order-scan-form');
+      const orderScanInput = $('order-scan-input');
+      const productScanForm = $('product-scan-form');
+      const productScanInput = $('product-scan-input');
+      const scanFeedback = $('scan-feedback');
+      const completeDayButton = $('complete-day-button');
+      const resetOrderButton = $('reset-order-button');
+      const toggleDetailPanelButton = $('toggle-detail-panel');
+      const orderModeHint = $('order-mode-hint');
+      const detailSection = $('detail-section');
+      const orderList = $('order-list');
+      const orderPlaceholder = $('order-placeholder');
+      const orderPanel = $('order-panel');
+      const detailOrderCode = $('detail-order-code');
+      const detailOrderNote = $('detail-order-note');
+      const detailStatusBadge = $('detail-status-badge');
+      const detailQtyBadge = $('detail-qty-badge');
+      const detailDesc = $('detail-desc');
+      const detailPrivate = $('detail-private');
+      const detailLinesCount = $('detail-lines-count');
+      const lineList = $('line-list');
+      const missingList = $('missing-list');
+      const flexibleBanner = $('flexible-banner');
+      const orderSearchInput = $('order-search-input');
+      const detailCloseButton = $('detail-close-button');
+      const detailViewTitle = $('detail-view-title');
+      const openDetailButton = $('open-detail-button');
+      const manualCompleteButton = $('force-complete-button');
+      const clearProgressButton = $('clear-progress-button');
+      const manualCompleteModal = $('manual-complete-modal');
+      const manualCompleteMessage = $('manual-complete-message');
+      const manualCompleteList = $('manual-complete-list');
+      const manualCompleteConfirm = $('manual-complete-confirm');
+      const manualCompleteCancel = $('manual-complete-cancel');
+      const uploadOpenButton = $('upload-open-button');
+      const uploadModal = $('upload-modal');
+      const uploadForm = $('upload-form');
+      const uploadDayInput = $('upload-day-input');
+      const uploadPasskeyInput = $('upload-passkey-input');
+      const uploadOrdersInput = $('upload-orders-input');
+      const uploadMessageBox = $('upload-message');
+      const uploadBackButton = $('upload-back-button');
+      const uploadSubmitButton = $('upload-submit-button');
+      const uploadSubmitLabel = $('upload-submit-label');
+      const uploadCloseButton = $('upload-close-button');
+
+      $('year-label').textContent = new Date().getFullYear();
+
+      const initialState = {
+        currentDate: '',
+        orders: [],
+        filter: '',
+        selectedOrderCode: null,
+        loadingDay: false,
+        shippingLoading: false,
+        productLoading: false,
+        completingDay: false,
+        expandedCritical: true,
+        scanMessage: '',
+        scanMessageType: 'info',
+        dayMessage: '',
+        dayMessageType: 'info',
+        detailLoading: false,
+        viewMode: 'main', // main | detail
+        manualCompleteVisible: false,
+        manualCompleteTargets: [],
+        uploadVisible: false,
+        uploadLoading: false,
+        uploadMessage: '',
+        uploadMessageType: 'info',
+        uploadSuccess: false,
+        clearingOrder: false,
+        showDetailPanel: false,
+      };
+
+      const state = { ...initialState };
+
+      const coalesce = (...values) => {
+        for (const value of values) {
+          if (value !== undefined && value !== null && value !== '') return value;
+        }
+        return '';
+      };
+
+      const appendNote = (text, note) => {
+        if (!note) return text || '';
+        if (!text) return note;
+        if (text.includes(note)) return text;
+        return `${text} • ${note}`;
+      };
+
+      const normalizeProductKey = (value = '') => value.toString().trim().toLowerCase();
+      const extractBaseProduct = (code = '') => {
+        const sanitized = code.split('#')[0];
+        const parts = sanitized.split('-').filter(Boolean);
+        if (parts.length >= 2) return `${parts[0]}-${parts[1]}`;
+        return sanitized;
+      };
+      const getLineKey = (line) => {
+        if (!line) return '';
+        const preferred = line.productCode || [line.sku, line.size].filter(Boolean).join('-') || line.lineId;
+        return normalizeProductKey(preferred || '');
+      };
+      const findLineByKey = (order, key) => order?.lines?.find((line) => getLineKey(line) === key) || null;
+      const recomputeOrderFromLines = (order) => {
+        const total = order.lines.reduce((sum, line) => sum + (Number(line.qty) || 0), 0);
+        const scanned = order.lines.reduce((sum, line) => sum + (Number(line.scanned) || 0), 0);
+        order.totalQty = total;
+        order.scannedQty = Math.min(total, scanned);
+        if (total === 0) {
+          order.status = 'pending';
+        } else if (scanned >= total) {
+          order.status = 'done';
+        } else if (scanned > 0) {
+          order.status = 'progress';
+        } else {
+          order.status = 'pending';
+        }
+      };
+
+      const normalizeLine = (raw, idx) => {
+        const sku = coalesce(raw?.sku, raw?.SanPham, raw?.product_code, raw?.ma_san_pham);
+        const size = coalesce(raw?.size, raw?.KichThuoc, raw?.Size, raw?.variant);
+        const productCode = coalesce(raw?.product_code, raw?.mahang, raw?.SanPham, sku);
+        const qty = Number(coalesce(raw?.qty, raw?.quantity, raw?.SoLuong, raw?.target_qty, raw?.required_qty, 0)) || 0;
+        const scanned = Number(coalesce(raw?.picked_qty, raw?.scanned_qty, raw?.DaQuet, raw?.picked, qty - raw?.remaining_qty, 0)) || 0;
+        const description = coalesce(raw?.description, raw?.note, raw?.Description, '');
+        const privateNote = coalesce(raw?.private_description, raw?.private_note, '');
+        const remaining = Math.max(0, qty - scanned);
+        const status = remaining === 0 ? 'complete' : scanned > 0 ? 'progress' : 'pending';
+        return {
+          lineId: raw?.line_id || raw?.id || `${productCode || sku}-${size || idx}`,
+          sku,
+          size,
+          productCode,
+          qty,
+          scanned,
+          remaining,
+          description,
+          privateNote,
+          status,
+        };
+      };
+
+      const parseProductCodes = (input) => {
+        if (!input) return [];
+        if (Array.isArray(input)) return input;
+        if (typeof input === 'string') {
+          try {
+            const parsed = JSON.parse(input);
+            return Array.isArray(parsed) ? parsed : [];
+          } catch {
+            return input.split(',').map((item) => item.trim()).filter(Boolean);
+          }
+        }
+        return [];
+      };
+
+      const buildLinesFromProducts = (products = []) => {
+        const list = parseProductCodes(products);
+        return list.map((code, idx) => {
+          const [sku = code, size = ''] = (code || '').split('-');
+          return normalizeLine({
+            line_id: `${code || 'SKU'}-${idx}`,
+            sku,
+            size,
+            product_code: code,
+            qty: 1,
+            picked_qty: 0,
+          }, idx);
+        });
+      };
+
+      const parseOrdersList = (input = '') => {
+        if (Array.isArray(input)) return input.map((item) => item.toString().trim()).filter(Boolean);
+        return input
+          .split(/[\n,]/)
+          .map((item) => item.trim())
+          .filter(Boolean);
+      };
+
+      const normalizeOrder = (raw) => {
+        const code = coalesce(raw?.order_code, raw?.MaDon, raw?.code, raw?.madon, raw?.tracking_code);
+        let description = coalesce(raw?.description, raw?.ghi_chu, raw?.note, '');
+        let privateNote = coalesce(raw?.private_description, raw?.private_note, raw?.internal_note, '');
+        const enforcementRaw = (raw?.enforcement || '').toString().toLowerCase();
+        let lines = Array.isArray(raw?.lines) ? raw.lines.map(normalizeLine) : Array.isArray(raw?.items) ? raw.items.map(normalizeLine) : [];
+        if (!lines.length && raw?.product_codes) lines = buildLinesFromProducts(raw.product_codes);
+        const linesTotal = lines.reduce((sum, line) => sum + line.qty, 0);
+        const linesScanned = lines.reduce((sum, line) => sum + line.scanned, 0);
+        let totalQty = Number(coalesce(raw?.total_qty, raw?.SoLuong, raw?.qty, raw?.required_qty, linesTotal)) || linesTotal;
+        let scannedQty = Number(coalesce(raw?.scanned_qty, raw?.DaQuet, raw?.picked_qty, raw?.scanned_total, linesScanned)) || linesScanned;
+        const explicitRemaining = Number(raw?.remaining_qty);
+        if (Number.isFinite(explicitRemaining)) {
+          if (!totalQty && explicitRemaining && linesScanned) {
+            totalQty = explicitRemaining + linesScanned;
+          }
+          const computedScanned = Math.max(0, totalQty - explicitRemaining);
+          if (!Number.isNaN(computedScanned)) scannedQty = computedScanned;
+        }
+        const remainingQty = Number.isFinite(explicitRemaining)
+          ? Math.max(0, explicitRemaining)
+          : Math.max(0, totalQty - scannedQty);
+        const statusRaw = (raw?.status || '').toString().toLowerCase();
+        const suffixFlexible = FLEXIBLE_SUFFIXES.some((suffix) => code?.toUpperCase()?.endsWith(suffix));
+        const flagFlexible = enforcementRaw === 'flexible' || enforcementRaw === 'relaxed';
+        const flexible = flagFlexible || (!enforcementRaw && suffixFlexible);
+        let status = 'pending';
+        if (statusRaw.includes('done') || statusRaw.includes('đã') || (scannedQty >= totalQty && totalQty > 0) || remainingQty === 0 && totalQty > 0) status = 'done';
+        else if (scannedQty > 0) status = 'progress';
+        if (remainingQty === 0) {
+          description = appendNote(description, 'Đã quét xong');
+          privateNote = appendNote(privateNote, 'Đơn đã hoàn thành');
+        }
+        return {
+          orderCode: code,
+          status,
+          description,
+          privateNote,
+          lines,
+          totalQty,
+          scannedQty,
+          remainingQty,
+          flexible,
+          enforcement: enforcementRaw || (flexible ? 'flexible' : 'strict'),
+          lastUpdated: raw?.last_updated || null,
+        };
+      };
+
+      const normalizeOrders = (payload) => {
+        if (!Array.isArray(payload)) return [];
+        return payload
+          .map((item) => {
+            const raw = item?.json ?? item;
+            return normalizeOrder(raw);
+          })
+          .filter((order) => order.orderCode);
+      };
+
+      const unwrapWebhookPayload = (payload) => {
+        if (payload?.json !== undefined) return unwrapWebhookPayload(payload.json);
+        if (Array.isArray(payload) && payload.length === 1) return unwrapWebhookPayload(payload[0]);
+        return payload;
+      };
+
+      const fetchWithTimeout = async (url, options = {}, timeoutMs = REQ_TIMEOUT_MS) => {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+          const response = await fetch(url, { ...options, signal: controller.signal });
+          return response;
+        } finally {
+          clearTimeout(timeout);
+        }
+      };
+
+      const postJSON = async (url, body, retries = 2) => {
+        if (!url) throw new Error('Chưa cấu hình webhook.');
+        try {
+          const response = await fetchWithTimeout(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(data?.message || `${response.status} ${response.statusText}`);
+          return data;
+        } catch (err) {
+          if (retries > 0) {
+            await new Promise((resolve) => setTimeout(resolve, 350));
+            return postJSON(url, body, retries - 1);
+          }
+          throw err;
+        }
+      };
+
+      const setState = (partial) => {
+        Object.assign(state, partial);
+        render();
+      };
+
+      const formatDateLabel = (dateStr) => {
+        if (!dateStr) return '—';
+        const date = new Date(dateStr);
+        if (Number.isNaN(date.getTime())) return dateStr;
+        return date.toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' });
+      };
+
+      const summarizeOrders = () => {
+        const total = state.orders.length;
+        const done = state.orders.filter((o) => o.status === 'done').length;
+        const pending = total - done;
+        return { total, done, pending, progress: total ? Math.round((done / total) * 100) : 0 };
+      };
+
+      const findOrder = (code) => state.orders.find((order) => order.orderCode === code);
+
+      const upsertOrder = (updated) => {
+        const index = state.orders.findIndex((o) => o.orderCode === updated.orderCode);
+        if (index === -1) {
+          state.orders.push(updated);
+        } else {
+          state.orders[index] = { ...state.orders[index], ...updated };
+        }
+      };
+
+      const renderOrdersList = () => {
+        orderList.innerHTML = '';
+        const filtered = state.orders.filter((order) => {
+          if (!state.filter) return true;
+          return order.orderCode?.toLowerCase().includes(state.filter.toLowerCase());
+        });
+
+        if (!state.currentDate) {
+          orderList.innerHTML = '<p class="text-sm text-slate-500">Chọn ngày để xem danh sách.</p>';
+          return;
+        }
+
+        if (state.loadingDay) {
+          orderList.innerHTML = `
+            <div class="flex items-center gap-3 text-slate-500 text-sm">
+              <div class="h-4 w-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+              Đang tải dữ liệu...
+            </div>`;
+          return;
+        }
+
+        if (!filtered.length) {
+          orderList.innerHTML = '<p class="text-sm text-slate-500">Không tìm thấy mã đơn nào cho ngày này.</p>';
+          return;
+        }
+
+        filtered.forEach((order) => {
+          const li = document.createElement('button');
+          li.type = 'button';
+          const isActive = state.selectedOrderCode === order.orderCode;
+          li.className = [
+            'w-full text-left rounded-2xl border p-4 transition focus:outline-none focus:ring-2 focus:ring-indigo-500',
+            isActive ? 'border-indigo-300 bg-indigo-50 shadow-sm' : 'border-slate-200 bg-white hover:border-indigo-200'
+          ].join(' ');
+
+          const statusColor = order.status === 'done'
+            ? 'bg-emerald-100 text-emerald-700'
+            : order.status === 'progress'
+              ? 'bg-amber-100 text-amber-700'
+              : 'bg-slate-100 text-slate-600';
+
+          li.innerHTML = `
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-semibold text-slate-900">${order.orderCode}</span>
+              <span class="status-badge px-3 py-1 rounded-full ${statusColor}">
+                ${order.status === 'done' ? 'Đã xong' : order.status === 'progress' ? 'Đang quét' : 'Chưa quét'}
+              </span>
+            </div>
+            <div class="flex items-center justify-between text-xs text-slate-500">
+              <span>${order.scannedQty} / ${order.totalQty || '—'} sản phẩm</span>
+              ${order.flexible ? '<span class="font-semibold text-indigo-500">Linh hoạt</span>' : ''}
+            </div>
+          `;
+
+          li.addEventListener('click', () => setSelectedOrder(order.orderCode));
+          orderList.appendChild(li);
+        });
+      };
+
+      const shouldHydrateOrder = (order) => {
+        if (!order) return false;
+        const lacksNotes = !order.description && !order.privateNote;
+        const lacksLines = !order.lines || order.lines.length === 0;
+        return lacksNotes || lacksLines;
+      };
+
+      const hydrateOrderDetails = async (orderCode) => {
+        if (!orderCode || !ORDER_WEBHOOK_URL) return;
+        const current = findOrder(orderCode);
+        if (!current) return;
+        setState({ detailLoading: true });
+        try {
+          const response = await postJSON(ORDER_WEBHOOK_URL, { order_code: orderCode, date: state.currentDate });
+          const payload = unwrapWebhookPayload(response);
+          const enriched = normalizeOrder(payload);
+          if (!enriched.orderCode) throw new Error('Webhook không trả về mã đơn.');
+          upsertOrder({
+            ...current,
+            ...enriched,
+            lines: enriched.lines.length ? enriched.lines : current.lines,
+            totalQty: enriched.totalQty || current.totalQty,
+            scannedQty: typeof enriched.scannedQty === 'number' ? enriched.scannedQty : current.scannedQty,
+            description: enriched.description || current.description,
+            privateNote: enriched.privateNote || current.privateNote,
+          });
+          setState({});
+        } catch (err) {
+          setState({
+            scanMessage: err.message || 'Không thể tải mô tả/ghi chú đơn.',
+            scanMessageType: 'error',
+          });
+        } finally {
+          setState({ detailLoading: false });
+        }
+      };
+
+      const setSelectedOrder = (orderCode) => {
+        const order = findOrder(orderCode);
+        if (!order) return;
+        setState({ selectedOrderCode: orderCode });
+        if (shouldHydrateOrder(order)) hydrateOrderDetails(order.orderCode);
+      };
+
+      const renderOrderDetail = () => {
+        const order = findOrder(state.selectedOrderCode);
+        if (!order) {
+          orderPanel.classList.add('hidden');
+          orderPlaceholder.classList.remove('hidden');
+          orderModeHint.textContent = 'Chưa có đơn nào';
+          return;
+        }
+
+        orderPanel.classList.remove('hidden');
+        orderPlaceholder.classList.add('hidden');
+        orderModeHint.textContent = state.viewMode === 'detail'
+          ? `Chế độ chi tiết: ${order.orderCode}`
+          : `Đang kiểm: ${order.orderCode}`;
+
+        detailOrderCode.textContent = order.orderCode;
+        detailOrderNote.textContent = state.detailLoading
+          ? 'Đang tải mô tả & ghi chú...'
+          : order.lastUpdated
+            ? `Cập nhật: ${order.lastUpdated}`
+            : '';
+        detailDesc.textContent = order.description || '—';
+        detailPrivate.textContent = order.privateNote || '—';
+        detailLinesCount.textContent = `${order.lines.length} dòng sản phẩm`;
+        detailQtyBadge.textContent = `${order.scannedQty} / ${order.totalQty || order.lines.reduce((s, l) => s + l.qty, 0)} SP`;
+
+        const statusLabel = order.status === 'done' ? 'ĐÃ ĐỦ' : order.status === 'progress' ? 'ĐANG QUÉT' : 'CHƯA QUÉT';
+        const statusClass = order.status === 'done'
+          ? 'bg-emerald-100 text-emerald-700'
+          : order.status === 'progress'
+            ? 'bg-amber-100 text-amber-700'
+            : 'bg-slate-100 text-slate-600';
+        detailStatusBadge.className = `status-badge px-3 py-1 rounded-full ${statusClass}`;
+        detailStatusBadge.textContent = statusLabel;
+
+        flexibleBanner.classList.toggle('hidden', !order.flexible);
+
+        lineList.innerHTML = '';
+        order.lines.forEach((line) => {
+          const li = document.createElement('li');
+          const done = line.remaining === 0;
+          li.className = [
+            'p-4 rounded-2xl border transition',
+            done ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200 bg-white'
+          ].join(' ');
+          li.innerHTML = `
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-semibold text-slate-900">${line.sku || line.productCode}</p>
+                <p class="text-xs text-slate-500">${line.size || ''}</p>
+              </div>
+              <div class="text-right">
+                <p class="font-mono text-lg text-slate-900">${line.scanned} / ${line.qty}</p>
+                <p class="text-xs text-slate-500">${line.remaining === 0 ? 'Đủ' : `${line.remaining} thiếu`}</p>
+              </div>
+            </div>
+            ${line.description ? `<p class="text-xs text-slate-500 mt-2">${line.description}</p>` : ''}
+          `;
+          lineList.appendChild(li);
+        });
+
+        missingList.innerHTML = '';
+        const missing = order.lines.filter((line) => line.remaining > 0);
+        if (!missing.length) {
+          missingList.innerHTML = '<li class="text-emerald-600 list-none">Tất cả sản phẩm đã đủ.</li>';
+        } else {
+          missing.forEach((line) => {
+            const li = document.createElement('li');
+            li.textContent = `${line.sku || line.productCode} (${line.size || 'Size ?'}) - còn thiếu ${line.remaining}`;
+            missingList.appendChild(li);
+          });
+        }
+
+        if (manualCompleteButton) {
+          const disabled = order.status === 'done' || !missing.length;
+          manualCompleteButton.disabled = disabled;
+          manualCompleteButton.title = disabled
+            ? 'Đơn đã đủ hoặc không còn sản phẩm thiếu.'
+            : 'Đánh dấu hoàn tất dù còn thiếu sản phẩm.';
+        }
+        if (clearProgressButton) {
+          clearProgressButton.disabled = state.clearingOrder;
+          clearProgressButton.title = 'Xóa toàn bộ dữ liệu quét của đơn này.';
+        }
+      };
+
+      const renderStats = () => {
+        const { total, done, pending, progress } = summarizeOrders();
+        headerDayLabel.textContent = state.currentDate ? formatDateLabel(state.currentDate) : '—';
+        headerDoneLabel.textContent = done.toString();
+        dayProgressText.textContent = `${done} / ${total} đơn`;
+        dayProgressBar.style.width = `${progress}%`;
+        statTotal.textContent = total.toString();
+        statDone.textContent = done.toString();
+        statPending.textContent = pending.toString();
+
+        const critical = state.orders.filter((o) => o.status !== 'done');
+        criticalOrdersList.innerHTML = '';
+        if (!critical.length) {
+          criticalOrdersList.innerHTML = '<li class="text-xs text-emerald-600">Không còn đơn nào.</li>';
+        } else {
+          critical.slice(0, state.expandedCritical ? undefined : 3).forEach((order) => {
+            const li = document.createElement('li');
+            li.className = 'flex items-center justify-between rounded-xl border border-slate-100 px-3 py-2';
+            li.innerHTML = `
+              <span class="text-sm font-medium">${order.orderCode}</span>
+              <span class="text-xs text-slate-500">${order.scannedQty}/${order.totalQty || '—'}</span>
+            `;
+            li.addEventListener('click', () => setSelectedOrder(order.orderCode));
+            criticalOrdersList.appendChild(li);
+          });
+        }
+      };
+
+      const renderMessages = () => {
+        if (state.dayMessage) {
+          dayBanner.textContent = state.dayMessage;
+          const styles = state.dayMessageType === 'error'
+            ? 'border-red-200 bg-red-50 text-red-700'
+            : state.dayMessageType === 'success'
+              ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+              : 'border-slate-200 bg-slate-50 text-slate-600';
+          dayBanner.className = `rounded-2xl border px-4 py-3 text-sm font-medium ${styles}`;
+          dayBanner.classList.remove('hidden');
+        } else {
+          dayBanner.classList.add('hidden');
+        }
+
+        if (state.scanMessage) {
+          const styles = state.scanMessageType === 'error'
+            ? 'border-red-200 bg-red-50 text-red-700'
+            : state.scanMessageType === 'success'
+              ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+              : 'border-slate-200 bg-slate-50 text-slate-600';
+          scanFeedback.textContent = state.scanMessage;
+          scanFeedback.className = `rounded-2xl border px-4 py-3 text-sm ${styles}`;
+          scanFeedback.classList.remove('hidden');
+        } else {
+          scanFeedback.classList.add('hidden');
+        }
+
+        dayHelper.textContent = state.currentDate
+          ? 'Danh sách tự động cập nhật khi tải lại webhook.'
+          : 'Chưa chọn ngày nào. Vui lòng chọn ngày và bấm “Tải danh sách”.';
+
+        loadDayButton.disabled = state.loadingDay;
+        clearDayButton.disabled = state.loadingDay;
+        orderScanInput.disabled = state.shippingLoading;
+        const productDisabled = state.productLoading || state.viewMode !== 'detail';
+        productScanInput.disabled = productDisabled;
+        productScanInput.placeholder = productDisabled
+          ? 'Chế độ chi tiết sẽ mở sau khi quét mã vận đơn'
+          : 'Quét mã sản phẩm (ví dụ A414-XL)';
+        completeDayButton.disabled = state.completingDay || !state.currentDate;
+      };
+
+      const render = () => {
+        renderStats();
+        renderOrdersList();
+        renderOrderDetail();
+        renderMessages();
+        openDetailButton.disabled = !state.selectedOrderCode;
+        if (toggleDetailPanelButton) {
+          toggleDetailPanelButton.innerHTML = state.showDetailPanel
+            ? '<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg> Ẩn danh sách/chi tiết'
+            : '<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg> Hiện danh sách/chi tiết';
+        }
+        detailViewTitle.textContent = state.selectedOrderCode ? `Đơn ${state.selectedOrderCode}` : 'Đơn đang kiểm';
+        document.body.classList.toggle('detail-mode', state.viewMode === 'detail');
+        document.body.classList.toggle('overflow-hidden', state.viewMode === 'detail' || state.uploadVisible);
+        if (detailSection) {
+          const shouldHide = !state.showDetailPanel && state.viewMode !== 'detail';
+          detailSection.classList.toggle('hidden', shouldHide);
+        }
+        if (manualCompleteModal) {
+          const show = state.manualCompleteVisible;
+          manualCompleteModal.classList.toggle('hidden', !show);
+          if (show) {
+            const totalMissing = state.manualCompleteTargets.reduce((sum, item) => sum + (Number(item.remaining) || 0), 0);
+            manualCompleteMessage.textContent = totalMissing
+              ? `Đơn còn thiếu ${totalMissing} sản phẩm. Bạn chắc chắn muốn đánh dấu hoàn tất?`
+              : 'Đơn còn sản phẩm chưa xác nhận. Vẫn tiếp tục đánh dấu hoàn tất?';
+            manualCompleteList.innerHTML = '';
+            if (state.manualCompleteTargets.length) {
+              state.manualCompleteTargets.forEach((item) => {
+                const li = document.createElement('li');
+                li.textContent = `${item.sku || 'SKU ?'} ${item.size ? `(${item.size})` : ''} - thiếu ${item.remaining || 0}`;
+                manualCompleteList.appendChild(li);
+              });
+            } else {
+              manualCompleteList.innerHTML = '<li class="list-none text-slate-500">Không có danh sách cụ thể.</li>';
+            }
+          }
+        }
+        if (uploadModal) {
+          const showUpload = state.uploadVisible;
+          uploadModal.classList.toggle('hidden', !showUpload);
+          if (uploadMessageBox) {
+            if (state.uploadMessage) {
+              const styles = state.uploadMessageType === 'error'
+                ? 'border-red-200 bg-red-50 text-red-700'
+                : state.uploadMessageType === 'success'
+                  ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                  : 'border-slate-200 bg-slate-50 text-slate-600';
+              uploadMessageBox.textContent = state.uploadMessage;
+              uploadMessageBox.className = `rounded-2xl border px-4 py-3 text-sm ${styles}`;
+              uploadMessageBox.classList.remove('hidden');
+            } else {
+              uploadMessageBox.classList.add('hidden');
+            }
+          }
+          if (uploadSubmitButton) uploadSubmitButton.disabled = state.uploadLoading;
+          if (uploadSubmitLabel) uploadSubmitLabel.textContent = state.uploadLoading ? 'Đang gửi…' : 'Gửi lên hệ thống';
+          if (uploadBackButton) uploadBackButton.textContent = state.uploadSuccess ? 'Quay lại trang chính' : 'Hủy / quay lại';
+        }
+      };
+
+      const clearDayData = () => {
+        setState({
+          currentDate: '',
+          orders: [],
+          selectedOrderCode: null,
+          filter: '',
+          dayMessage: '',
+          scanMessage: '',
+          viewMode: 'main',
+        });
+        dayInput.value = '';
+        orderScanInput.value = '';
+        productScanInput.value = '';
+      };
+
+      const focusProductInput = () => {
+        requestAnimationFrame(() => {
+          productScanInput?.focus();
+        });
+      };
+
+      const enterDetailMode = () => {
+        if (!state.selectedOrderCode) return;
+        setState({ viewMode: 'detail' });
+        focusProductInput();
+      };
+
+      const exitDetailMode = () => {
+        setState({ viewMode: 'main' });
+        requestAnimationFrame(() => orderScanInput.focus());
+      };
+
+      const openManualCompleteModal = () => {
+        const order = findOrder(state.selectedOrderCode);
+        if (!order) {
+          setState({ scanMessage: 'Chưa có đơn để xác nhận.', scanMessageType: 'error' });
+          return;
+        }
+        if (order.status === 'done') {
+          setState({ scanMessage: 'Đơn này đã hoàn tất.', scanMessageType: 'info' });
+          return;
+        }
+        const missing = order.lines.filter((line) => line.remaining > 0 || line.scanned < line.qty);
+        if (!missing.length) {
+          setState({ scanMessage: 'Tất cả sản phẩm đã đủ, không cần xác nhận thủ công.', scanMessageType: 'info' });
+          return;
+        }
+        setState({
+          manualCompleteVisible: true,
+          manualCompleteTargets: missing.map((line) => ({
+            sku: line.sku || line.productCode,
+            size: line.size,
+            remaining: line.remaining ?? Math.max(0, line.qty - line.scanned),
+          })),
+        });
+      };
+
+      const closeManualCompleteModal = () => {
+        setState({ manualCompleteVisible: false, manualCompleteTargets: [] });
+      };
+
+      const confirmManualComplete = () => {
+        const order = findOrder(state.selectedOrderCode);
+        if (!order) {
+          closeManualCompleteModal();
+          return;
+        }
+        order.lines = order.lines.map((line) => ({
+          ...line,
+          scanned: line.qty,
+          remaining: 0,
+          status: 'complete',
+        }));
+        recomputeOrderFromLines(order);
+        order.status = 'done';
+        upsertOrder(order);
+        setState({
+          manualCompleteVisible: false,
+          manualCompleteTargets: [],
+          scanMessage: `Đã xác nhận thủ công đơn ${order.orderCode}.`,
+          scanMessageType: 'success',
+        });
+        setTimeout(() => exitDetailMode(), 400);
+      };
+
+      const clearOrderProgress = async () => {
+        const targetCode = (state.selectedOrderCode || '').trim();
+        if (!targetCode) {
+          setState({ scanMessage: 'Hãy chọn một đơn trước khi xóa dữ liệu.', scanMessageType: 'error' });
+          return;
+        }
+        const order = findOrder(targetCode);
+        if (!order) {
+          setState({ scanMessage: `Không tìm thấy đơn ${targetCode}.`, scanMessageType: 'error' });
+          return;
+        }
+        const confirmReset = window.confirm(`Xóa toàn bộ thông tin đã quét của đơn ${order.orderCode}?`);
+        if (!confirmReset) return;
+        setState({ clearingOrder: true, scanMessage: 'Đang xóa dữ liệu quét...', scanMessageType: 'info' });
+        let webhookMessage = '';
+        if (RESET_PROGRESS_WEBHOOK_URL) {
+          try {
+            const response = await postJSON(RESET_PROGRESS_WEBHOOK_URL, {
+              order_code: order.orderCode,
+              date: state.currentDate,
+              products: order.lines.map((line) => ({
+                sku: line.sku,
+                product_code: line.productCode,
+                size: line.size,
+                qty: line.qty,
+                scanned: line.scanned,
+              })),
+            });
+            const payload = unwrapWebhookPayload(response);
+            webhookMessage = payload?.answer || payload?.message || '';
+          } catch (err) {
+            setState({
+              clearingOrder: false,
+              scanMessage: err.message || 'Không thể xóa dữ liệu từ webhook.',
+              scanMessageType: 'error',
+            });
+            return;
+          }
+        }
+        order.lines = order.lines.map((line) => ({
+          ...line,
+          scanned: 0,
+          remaining: line.qty,
+          status: 'pending',
+        }));
+        recomputeOrderFromLines(order);
+        upsertOrder(order);
+        const updatedOrders = state.orders.map((o) => (o.orderCode === order.orderCode ? order : o));
+        setState({
+          clearingOrder: false,
+          orders: updatedOrders,
+          scanMessage: webhookMessage || `Đã xóa thông tin đã quét của đơn ${order.orderCode}.`,
+          scanMessageType: 'success',
+        });
+      };
+
+      const openUploadModal = () => {
+        if (!uploadModal) return;
+        uploadDayInput.value = state.currentDate || '';
+        uploadPasskeyInput.value = '';
+        uploadOrdersInput.value = '';
+        setState({ uploadVisible: true, uploadMessage: '', uploadMessageType: 'info', uploadSuccess: false });
+        requestAnimationFrame(() => uploadDayInput.focus());
+      };
+
+      const closeUploadModal = () => {
+        if (!uploadModal) return;
+        setState({ uploadVisible: false, uploadLoading: false, uploadMessage: '', uploadSuccess: false });
+      };
+
+      const handleUploadSubmit = async (event) => {
+        event?.preventDefault();
+        if (!UPLOAD_WEBHOOK_URL) {
+          setState({ uploadMessage: 'Chưa cấu hình webhook upload.', uploadMessageType: 'error' });
+          return;
+        }
+        const dayValue = uploadDayInput.value?.trim();
+        const passkeyValue = uploadPasskeyInput.value?.trim();
+        const ordersRaw = uploadOrdersInput.value?.trim();
+        if (!dayValue || !passkeyValue || !ordersRaw) {
+          setState({ uploadMessage: 'Vui lòng điền đầy đủ thông tin.', uploadMessageType: 'error' });
+          return;
+        }
+        const orders = parseOrdersList(ordersRaw);
+        if (!orders.length) {
+          setState({ uploadMessage: 'Danh sách đơn trống.', uploadMessageType: 'error' });
+          return;
+        }
+        setState({ uploadLoading: true, uploadMessage: '', uploadMessageType: 'info', uploadSuccess: false });
+        try {
+          const response = await postJSON(UPLOAD_WEBHOOK_URL, {
+            day: dayValue,
+            passkey: passkeyValue,
+            orders,
+            raw_orders: ordersRaw,
+          });
+          const payload = unwrapWebhookPayload(response);
+          const message = payload?.answer || payload?.message || 'Tải file thành công.';
+          setState({ uploadLoading: false, uploadMessage: message, uploadMessageType: 'success', uploadSuccess: true });
+        } catch (err) {
+          setState({ uploadLoading: false, uploadMessage: err.message || 'Không thể upload file.', uploadMessageType: 'error', uploadSuccess: false });
+        }
+      };
+
+      const loadOrdersForDate = async (dateStr) => {
+        if (!dateStr) {
+          setState({ dayMessage: 'Chưa chọn ngày.', dayMessageType: 'error' });
+          return;
+        }
+        setState({ loadingDay: true, dayMessage: '', currentDate: dateStr });
+        try {
+          const response = await postJSON(LIST_WEBHOOK_URL, { day: dateStr, date: dateStr });
+          const payload = unwrapWebhookPayload(response);
+          const resolveRecords = (pack) => normalizeOrders(Array.isArray(pack?.records) ? pack.records : []);
+          let orders = [];
+          let infoMessage = '';
+          if (Array.isArray(payload)) {
+            const foundRecordPack = payload.find((item) => item?.records);
+            if (foundRecordPack) {
+              orders = resolveRecords(foundRecordPack);
+              infoMessage = `Webhook trả về ${foundRecordPack.count ?? orders.length} đơn cho ${formatDateLabel(foundRecordPack.day || dateStr)}.`;
+            } else {
+              orders = normalizeOrders(payload);
+            }
+          } else if (payload?.records) {
+            orders = resolveRecords(payload);
+            infoMessage = `Webhook trả về ${payload.count ?? orders.length} đơn cho ${formatDateLabel(payload.day || dateStr)}.`;
+          } else if (payload?.orders) {
+            orders = normalizeOrders(payload.orders);
+          } else {
+            orders = normalizeOrders(Array.isArray(payload) ? payload : [payload]);
+          }
+          setState({
+            orders,
+            selectedOrderCode: orders[0]?.orderCode || null,
+            dayMessage: infoMessage || `Đã tải ${orders.length} đơn cho ngày ${formatDateLabel(dateStr)}.`,
+            dayMessageType: 'success',
+          });
+        } catch (err) {
+          setState({
+            dayMessage: err.message || 'Không thể tải danh sách.',
+            dayMessageType: 'error',
+          });
+        } finally {
+          setState({ loadingDay: false });
+        }
+      };
+
+      const mergeLines = (order, details, scannedKey) => {
+        const detailMap = new Map();
+        details.forEach((d) => {
+          const main = d?.product_code || d?.SanPham || d?.sku;
+          if (main) detailMap.set(main.toLowerCase(), d);
+        });
+        let matchedLine = null;
+        order.lines = order.lines.map((line) => {
+          const key = (line.productCode || line.sku || '').toLowerCase();
+          const raw = detailMap.get(key);
+          if (!raw) return line;
+          const info = normalizeLine(raw, line.lineId);
+          if (key === scannedKey) matchedLine = info;
+          return { ...line, ...info };
+        });
+
+        order.totalQty = order.lines.reduce((sum, line) => sum + line.qty, 0);
+        order.scannedQty = order.lines.reduce((sum, line) => sum + line.scanned, 0);
+        order.status = order.scannedQty >= order.totalQty && order.totalQty > 0 ? 'done' : order.scannedQty > 0 ? 'progress' : 'pending';
+        return matchedLine;
+      };
+
+      const applyAcceptedProduct = (order, payload, fallbackKey) => {
+        const preferred = payload?.base_product_code || payload?.product_code || fallbackKey;
+        const baseKey = normalizeProductKey(preferred || fallbackKey);
+        let line = findLineByKey(order, baseKey);
+
+        if (!line) {
+          const [skuPart = preferred || '', sizePart = ''] = (preferred || '').split('-');
+          line = {
+            lineId: `${preferred || fallbackKey || 'LINE'}-${Date.now()}`,
+            sku: skuPart || preferred || fallbackKey,
+            size: sizePart,
+            productCode: preferred || fallbackKey,
+            qty: 1,
+            scanned: 0,
+            remaining: 1,
+            description: '',
+            privateNote: '',
+            status: 'pending',
+          };
+          order.lines.push(line);
+        }
+
+        line.scanned = Math.min(line.qty, line.scanned + 1);
+        line.remaining = Math.max(0, line.qty - line.scanned);
+        line.status = line.remaining === 0 ? 'complete' : 'progress';
+
+        if (typeof payload?.target_qty === 'number') order.totalQty = payload.target_qty;
+        if (typeof payload?.scanned_qty === 'number') order.scannedQty = payload.scanned_qty;
+        else recomputeOrderFromLines(order);
+
+        if (typeof payload?.remaining_qty === 'number') {
+          order.status = payload.remaining_qty <= 0 ? 'done' : 'progress';
+        } else if (order.status !== 'done') {
+          const allDone = order.lines.every((l) => l.remaining === 0);
+          order.status = allDone ? 'done' : order.scannedQty > 0 ? 'progress' : 'pending';
+        }
+
+        return line;
+      };
+
+      const handleOrderScan = async (codeRaw) => {
+        const code = codeRaw.trim();
+        if (!code) return;
+        if (!state.currentDate) {
+          setState({ scanMessage: 'Hãy chọn ngày trước khi quét.', scanMessageType: 'error' });
+          return;
+        }
+        setState({ shippingLoading: true, scanMessage: '', selectedOrderCode: null });
+        try {
+          const response = await postJSON(ORDER_WEBHOOK_URL, { order_code: code, date: state.currentDate });
+          const payload = unwrapWebhookPayload(response);
+          const orderDetails = normalizeOrder(payload);
+          if (!orderDetails.orderCode) throw new Error('Webhook không trả về mã đơn.');
+          upsertOrder(orderDetails);
+          setSelectedOrder(orderDetails.orderCode);
+          setState({
+            scanMessage: `Đã tải thông tin đơn ${orderDetails.orderCode}.`,
+            scanMessageType: 'success',
+          });
+          enterDetailMode();
+        } catch (err) {
+          setState({
+            scanMessage: err.message || 'Không tìm thấy mã vận đơn.',
+            scanMessageType: 'error',
+          });
+        } finally {
+          setState({ shippingLoading: false });
+          orderScanInput.value = '';
+        }
+      };
+
+      const handleProductScan = async (codeRaw) => {
+        const code = codeRaw.trim();
+        const order = findOrder(state.selectedOrderCode);
+        if (!order) {
+          setState({ scanMessage: 'Hãy chọn hoặc quét mã vận đơn trước.', scanMessageType: 'error' });
+          return;
+        }
+        if (order.flexible) {
+          setState({ scanMessage: 'Đơn linh hoạt không cần quét sản phẩm.', scanMessageType: 'info' });
+          return;
+        }
+        if (!code) return;
+
+        setState({ productLoading: true, scanMessage: '' });
+        const baseProduct = extractBaseProduct(code) || code;
+        const normalizedKey = normalizeProductKey(baseProduct);
+        try {
+          const response = await postJSON(PRODUCT_WEBHOOK_URL, { product_code: code, order_code: order.orderCode });
+          const payload = unwrapWebhookPayload(response);
+          const status = (payload?.status || '').toString().toUpperCase();
+          const ok = payload?.success ?? payload?.ok ?? status === 'ACCEPTED';
+
+          if (status === 'ORDER_NOT_FOUND') {
+            throw new Error(`Không tìm thấy đơn ${order.orderCode} trong dữ liệu kiểm.`);
+          }
+
+          if (status === 'WRONG_PRODUCT') {
+            const allowedList = parseProductCodes(payload?.allowed_product_codes || payload?.allowed || []);
+            const allowedMsg = allowedList.length ? `Chỉ chấp nhận: ${allowedList.join(', ')}` : 'Sản phẩm này không thuộc đơn.';
+            setState({ scanMessage: allowedMsg, scanMessageType: 'error' });
+            return;
+          }
+
+          if (status === 'FINISHED') {
+            if (typeof payload?.scanned_qty === 'number') order.scannedQty = payload.scanned_qty;
+            order.status = 'done';
+            upsertOrder(order);
+            setState({
+              scanMessage: payload?.message || 'Đơn này đã đủ, không cần quét thêm.',
+              scanMessageType: 'info',
+            });
+            setTimeout(() => exitDetailMode(), 500);
+            return;
+          }
+
+          let updatedLine = null;
+          const details = Array.isArray(payload?.details) ? payload.details : [];
+          if (details.length) {
+            updatedLine = mergeLines(order, details, normalizedKey);
+          } else if (ok) {
+            updatedLine = applyAcceptedProduct(order, payload, normalizedKey);
+          }
+
+          if (!updatedLine) {
+            throw new Error(payload?.message || 'Không thể xác nhận sản phẩm trong đơn.');
+          }
+
+          upsertOrder(order);
+          const orderCompleted = order.status === 'done' || (typeof payload?.remaining_qty === 'number' && payload.remaining_qty <= 0);
+          setState({
+            scanMessage: payload?.message || `Đã cập nhật ${payload?.base_product_code || baseProduct}.`,
+            scanMessageType: 'success',
+          });
+          if (orderCompleted) {
+            setTimeout(() => exitDetailMode(), 500);
+          }
+        } catch (err) {
+          setState({
+            scanMessage: err.message || 'Không thể xác thực mã sản phẩm.',
+            scanMessageType: 'error',
+          });
+        } finally {
+          setState({ productLoading: false });
+          productScanInput.value = '';
+        }
+      };
+
+      const attemptCompleteDay = async () => {
+        if (!state.currentDate) {
+          setState({ scanMessage: 'Chưa chọn ngày.', scanMessageType: 'error' });
+          return;
+        }
+        const incomplete = state.orders.filter((order) => order.status !== 'done');
+        if (incomplete.length) {
+          const list = incomplete.slice(0, 5).map((order) => order.orderCode).join(', ');
+          setState({
+            scanMessage: `Còn ${incomplete.length} đơn chưa hoàn tất: ${list}${incomplete.length > 5 ? '...' : ''}`,
+            scanMessageType: 'error',
+          });
+          return;
+        }
+        if (!COMPLETE_DAY_WEBHOOK_URL) {
+          setState({
+            scanMessage: `Tất cả đơn ngày ${formatDateLabel(state.currentDate)} đã đủ.`,
+            scanMessageType: 'success',
+          });
+          return;
+        }
+        setState({ completingDay: true, scanMessage: '' });
+        try {
+          const response = await postJSON(COMPLETE_DAY_WEBHOOK_URL, { date: state.currentDate, orders: state.orders.map((o) => o.orderCode) });
+          const payload = unwrapWebhookPayload(response);
+          const message = payload?.message || `Đã xác nhận hoàn tất ngày ${formatDateLabel(state.currentDate)}.`;
+          setState({ scanMessage: message, scanMessageType: 'success' });
+        } catch (err) {
+          setState({ scanMessage: err.message || 'Không thể hoàn tất ngày.', scanMessageType: 'error' });
+        } finally {
+          setState({ completingDay: false });
+        }
+      };
+
+      loadDayButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        const value = dayInput.value || state.currentDate;
+        if (!value) {
+          setState({ dayMessage: 'Chưa chọn ngày.', dayMessageType: 'error' });
+          return;
+        }
+        loadOrdersForDate(value);
+      });
+      clearDayButton.addEventListener('click', clearDayData);
+
+      orderScanForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        handleOrderScan(orderScanInput.value || '');
+      });
+
+      productScanForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        handleProductScan(productScanInput.value || '');
+      });
+
+      completeDayButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        attemptCompleteDay();
+      });
+
+      resetOrderButton.addEventListener('click', () => {
+        exitDetailMode();
+        setState({ selectedOrderCode: null, scanMessage: 'Đã bỏ chọn đơn hiện tại.', scanMessageType: 'info' });
+      });
+
+      orderSearchInput.addEventListener('input', (event) => {
+        setState({ filter: event.target.value });
+      });
+
+      toggleCritical.addEventListener('click', () => {
+        setState({ expandedCritical: !state.expandedCritical });
+      });
+
+      detailCloseButton.addEventListener('click', () => exitDetailMode());
+      openDetailButton.addEventListener('click', () => {
+        if (!state.selectedOrderCode) return;
+        enterDetailMode();
+      });
+      if (manualCompleteButton) manualCompleteButton.addEventListener('click', openManualCompleteModal);
+      if (clearProgressButton) clearProgressButton.addEventListener('click', () => clearOrderProgress());
+      if (toggleDetailPanelButton) {
+        toggleDetailPanelButton.addEventListener('click', () => {
+          setState({ showDetailPanel: !state.showDetailPanel });
+        });
+      }
+      if (manualCompleteCancel) manualCompleteCancel.addEventListener('click', (event) => {
+        event.preventDefault();
+        closeManualCompleteModal();
+      });
+      if (manualCompleteConfirm) manualCompleteConfirm.addEventListener('click', (event) => {
+        event.preventDefault();
+        confirmManualComplete();
+      });
+      if (uploadForm) uploadForm.addEventListener('submit', handleUploadSubmit);
+      if (uploadOpenButton) uploadOpenButton.addEventListener('click', () => openUploadModal());
+      if (uploadBackButton) uploadBackButton.addEventListener('click', () => closeUploadModal());
+      if (uploadCloseButton) uploadCloseButton.addEventListener('click', () => closeUploadModal());
+
+      render();
+    });
+  </script>
+</body>
+</html>

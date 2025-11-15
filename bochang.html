@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Trình Bóc Hàng</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes fadeIn { from { opacity:0; transform: translateY(-8px);} to { opacity:1; transform: translateY(0);} }
+    .animate-fade-in { animation: fadeIn .35s ease-out forwards; }
+    @keyframes pulse-scale { 0%,100% { transform: scale(1);} 50% { transform: scale(1.05);} }
+    .animate-pulse-scale { animation: pulse-scale .8s ease-in-out infinite; }
+    .visually-hidden { position:absolute !important; height:1px; width:1px; overflow:hidden; clip:rect(1px,1px,1px,1px); white-space:nowrap; }
+    .back-home-link {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 1000;
+      padding: 0.45rem 0.95rem;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 999px;
+      font-weight: 600;
+      color: #4338ca;
+      text-decoration: none;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .back-home-link:hover,
+    .back-home-link:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 15px 40px rgba(79, 70, 229, 0.25);
+    }
+    .back-home-link:focus-visible {
+      outline: 3px solid rgba(79, 70, 229, 0.4);
+      outline-offset: 3px;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <a class="back-home-link" href="index.html" aria-label="Quay lại trang chính Cô Mập Fashion">← Trang chính</a>
+  <div class="min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="w-full max-w-2xl mx-auto">
+      <header class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-800 tracking-tight">Trình Bóc Hàng</h1>
+        <p class="mt-2 text-lg text-gray-500">Quét mã QR để tự động xử lý đơn hàng.</p>
+      </header>
+
+      <main class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+        <form id="scan-form" class="flex flex-col sm:flex-row gap-4 mb-8" autocomplete="off">
+          <div class="relative flex-grow">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.5a.75.75 0 0 0-.75.75v13.5a.75.75 0 0 0 .75.75h13.5a.75.75 0 0 0 .75-.75V5.25a.75.75 0 0 0-.75-.75H3.75Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 8.25v.01M12 8.25v.01M15.75 8.25v.01M8.25 12v.01M12 12v.01M15.75 12v.01M8.25 15.75v.01M12 15.75v.01M15.75 15.75v.01"/></svg>
+            </div>
+            <input
+              id="scan-input"
+              type="text"
+              inputmode="text"
+              enterkeyhint="done"
+              placeholder="Quét mã QR đơn hàng..."
+              class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out"
+              autocomplete="off"
+              autofocus
+            />
+          </div>
+          <button
+            id="submit-button"
+            type="submit"
+            class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300 disabled:cursor-not-allowed transition duration-150 ease-in-out"
+          >
+            Gửi
+          </button>
+        </form>
+
+        <div id="content-container" class="min-h-[300px]">
+          <!-- Idle -->
+          <div id="idle-view" class="text-center text-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.5a.75.75 0 0 0-.75.75v13.5a.75.75 0 0 0 .75.75h13.5a.75.75 0 0 0 .75-.75V5.25a.75.75 0 0 0-.75-.75H3.75Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 8.25v.01M12 8.25v.01M15.75 8.25v.01M8.25 12v.01M12 12v.01M15.75 12v.01M8.25 15.75v.01M12 15.75v.01M15.75 15.75v.01"/></svg>
+            <h2 class="text-xl font-medium text-gray-700">Sẵn sàng quét đơn hàng</h2>
+            <p>Quét mã QR trên phiếu đơn hàng để bắt đầu.</p>
+            <div id="idle-error-container" class="mt-4" aria-live="polite"></div>
+          </div>
+
+          <!-- Loading -->
+          <div id="loading-view" class="hidden">
+            <div class="flex flex-col items-center justify-center gap-4">
+              <div class="w-12 h-12 rounded-full animate-spin border-4 border-solid border-indigo-500 border-t-transparent"></div>
+              <p class="text-gray-600">Đang tải chi tiết đơn hàng...</p>
+            </div>
+          </div>
+
+          <!-- Order -->
+          <div id="order-view" class="w-full hidden animate-fade-in">
+            <div class="w-full bg-white rounded-lg border border-gray-200 shadow-sm">
+              <div class="p-4 sm:p-6 border-b border-gray-200 flex items-start justify-between">
+                <div>
+                  <h2 class="text-2xl font-semibold text-gray-800">Đơn hàng</h2>
+                  <p id="order-code-badge" class="mt-1 text-lg font-mono text-indigo-600 bg-indigo-50 inline-block px-2 py-1 rounded"></p>
+                </div>
+                <div class="text-right">
+                  <p class="text-sm text-gray-500">Tổng cộng</p>
+                  <p id="order-progress" class="text-xl font-bold text-gray-800">0 / 0</p>
+                  <span id="order-progress-live" class="visually-hidden" aria-live="polite"></span>
+                </div>
+              </div>
+              <div class="p-4 sm:p-6">
+                <h3 id="order-lines-title" class="text-lg font-medium text-gray-700 mb-4">Các sản phẩm cần bóc (0)</h3>
+                <ul id="lines-list" class="space-y-3"></ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Complete -->
+          <div id="complete-view" class="hidden text-center text-green-600 animate-fade-in p-8">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+            <h2 class="text-3xl font-bold">Đã bóc đủ đơn</h2>
+            <p id="complete-order-code" class="text-2xl font-mono mt-2"></p>
+            <button id="reset-button" class="mt-8 px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              Quét đơn tiếp theo
+            </button>
+          </div>
+        </div>
+
+        <div id="global-error-container" class="mt-4" aria-live="polite"></div>
+      </main>
+
+      <footer class="text-center mt-8">
+        <p class="text-sm text-gray-400">&copy; <span id="year"></span> Warehouse Operations</p>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // ---------- CONSTANTS ----------
+      const ORDER_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/hook/order/resolve';
+      const PICK_WEBHOOK_URL  = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/hook/pick/verify';
+      const REQ_TIMEOUT_MS = 8000;
+      const RETRY_LIMIT = 1;
+
+      // ---------- DOM ----------
+      const scanForm = document.getElementById('scan-form');
+      const scanInput = document.getElementById('scan-input');
+      const submitButton = document.getElementById('submit-button');
+
+      const idleView = document.getElementById('idle-view');
+      const loadingView = document.getElementById('loading-view');
+      const orderView = document.getElementById('order-view');
+      const completeView = document.getElementById('complete-view');
+
+      const idleErrorContainer = document.getElementById('idle-error-container');
+      const globalErrorContainer = document.getElementById('global-error-container');
+
+      const orderCodeBadge = document.getElementById('order-code-badge');
+      const orderProgress = document.getElementById('order-progress');
+      const orderProgressLive = document.getElementById('order-progress-live');
+      const linesList = document.getElementById('lines-list');
+      const linesTitle = document.getElementById('order-lines-title');
+      const completeOrderCode = document.getElementById('complete-order-code');
+      const resetButton = document.getElementById('reset-button');
+
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      // ---------- STATE ----------
+      let appState = 'IDLE'; // IDLE | LOADING_ORDER | ORDER_LOADED | VALIDATING_PRODUCT | ORDER_COMPLETE | ERROR
+      let order = null;
+      let lineDomMap = new Map();  // line_id -> {rootEl, qtyEl, badgeEl}
+      let audioContext = null;
+      let autoResetTimer = null;
+
+      // Enable audio after first interaction
+      const enableAudio = () => {
+        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        document.body.removeEventListener('click', enableAudio);
+      };
+      document.body.addEventListener('click', enableAudio);
+
+      const playSound = (type) => {
+        if (!audioContext) return;
+        if (audioContext.state === 'suspended') audioContext.resume();
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain); gain.connect(audioContext.destination);
+        gain.gain.setValueAtTime(0, audioContext.currentTime);
+        gain.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + 0.01);
+
+        if (type === 'scan') { osc.type = 'sine';   osc.frequency.setValueAtTime(880, audioContext.currentTime); }
+        else if (type === 'success') { osc.type = 'sine'; osc.frequency.setValueAtTime(1046.5, audioContext.currentTime); }
+        else { osc.type = 'square'; osc.frequency.setValueAtTime(220, audioContext.currentTime); }
+
+        osc.start(); gain.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.15);
+        osc.stop(audioContext.currentTime + 0.15);
+      };
+
+      // ---------- HELPERS ----------
+      const renderError = (message, container) => {
+        container.innerHTML = `
+          <div class="w-full bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg" role="alert">
+            <strong class="font-bold">Lỗi: </strong>
+            <span class="block sm:inline">${message}</span>
+          </div>
+        `;
+      };
+      const clearErrors = () => { idleErrorContainer.innerHTML = ''; globalErrorContainer.innerHTML = ''; };
+
+      const scheduleAutoReset = () => {
+        if (autoResetTimer) clearTimeout(autoResetTimer);
+        autoResetTimer = setTimeout(() => {
+          autoResetTimer = null;
+          resetState();
+        }, 1000);
+      };
+
+      const setState = (s) => {
+        if (autoResetTimer && s !== 'ORDER_COMPLETE') {
+          clearTimeout(autoResetTimer);
+          autoResetTimer = null;
+        }
+        appState = s;
+        render();
+        if (s === 'ORDER_COMPLETE') scheduleAutoReset();
+      };
+
+      const statusClass = (status) => {
+        if (status === 'processing') return 'bg-yellow-100 ring-2 ring-yellow-400 animate-pulse-scale';
+        if (status === 'success') return 'bg-green-100';
+        if (status === 'error') return 'bg-red-100 ring-2 ring-red-400';
+        if (status === 'complete') return 'bg-green-100';
+        return 'bg-gray-50';
+      };
+
+      const buildLineItem = (line) => {
+        const li = document.createElement('li');
+        li.id = `line-${line.line_id}`;
+        li.className = `flex items-center p-3 rounded-lg space-x-4 transition-all duration-200 ease-in-out ${statusClass(line.status)}`;
+
+        const iconWrap = document.createElement('div');
+        iconWrap.className = 'flex-shrink-0 h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center';
+        iconWrap.innerHTML = line.picked_qty === line.qty
+          ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>`
+          : `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/></svg>`;
+        li.appendChild(iconWrap);
+
+        const info = document.createElement('div');
+        info.className = 'flex-grow grid grid-cols-2 gap-2 text-sm';
+        info.innerHTML = `
+          <div>
+            <span class="font-semibold text-gray-800">SKU</span>
+            <p class="text-gray-600 font-mono">${line.sku}</p>
+          </div>
+          <div>
+            <span class="font-semibold text-gray-800">Size</span>
+            <p class="text-gray-600 font-mono">${line.size}</p>
+          </div>`;
+        li.appendChild(info);
+
+        const qty = document.createElement('div');
+        qty.className = 'flex-shrink-0 text-right';
+        qty.innerHTML = `
+          <span class="font-semibold text-gray-800">Số lượng</span>
+          <p class="font-bold text-lg ${line.picked_qty === line.qty ? 'text-green-600' : 'text-gray-700'}">
+            <span class="picked">${line.picked_qty}</span>
+            <span class="text-gray-400 text-base font-medium">/ ${line.qty}</span>
+          </p>`;
+        li.appendChild(qty);
+
+        lineDomMap.set(line.line_id, { rootEl: li, qtyEl: qty.querySelector('.picked'), iconWrap });
+        return li;
+      };
+
+      const recomputeProgress = () => {
+        const picked = order.lines.reduce((s, l) => s + l.picked_qty, 0);
+        const total  = order.lines.reduce((s, l) => s + l.qty, 0);
+        orderProgress.textContent = `${picked} / ${total}`;
+        orderProgressLive.textContent = `Đã bóc ${picked} trên ${total}`;
+      };
+
+      const renderOrderStatic = () => {
+        // once per order load
+        orderCodeBadge.textContent = order.order_code;
+        linesTitle.textContent = `Các sản phẩm cần bóc (${order.lines.length})`;
+
+        lineDomMap.clear();
+        linesList.innerHTML = '';
+        const frag = document.createDocumentFragment();
+        for (const line of order.lines) frag.appendChild(buildLineItem(line));
+        linesList.appendChild(frag);
+        recomputeProgress();
+      };
+
+      const updateLineStatus = (line) => {
+        const dom = lineDomMap.get(line.line_id);
+        if (!dom) return;
+        // class
+        dom.rootEl.className = dom.rootEl.className.replace(/bg-\w+-\d+\s?(ring-2\sring-\w+-\d+)?(\sanimate-pulse-scale)?/g, '').trim();
+        dom.rootEl.classList.add(...statusClass(line.status).split(' '));
+        // qty text & color
+        dom.qtyEl.textContent = line.picked_qty;
+        const qtyText = dom.rootEl.querySelector('p.font-bold');
+        qtyText.classList.toggle('text-green-600', line.picked_qty === line.qty);
+        qtyText.classList.toggle('text-gray-700', line.picked_qty !== line.qty);
+        // icon
+        dom.iconWrap.innerHTML = (line.picked_qty === line.qty)
+          ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>`
+          : `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/></svg>`;
+      };
+
+      const showOnly = (view) => {
+        idleView.classList.toggle('hidden', view !== 'idle');
+        loadingView.classList.toggle('hidden', view !== 'loading');
+        orderView.classList.toggle('hidden', view !== 'order');
+        completeView.classList.toggle('hidden', view !== 'complete');
+        scanForm.classList.toggle('hidden', view === 'complete');
+      };
+
+      const render = () => {
+        clearErrors();
+        const isLoading = (appState === 'LOADING_ORDER' || appState === 'VALIDATING_PRODUCT');
+        scanInput.disabled = isLoading;
+        submitButton.disabled = isLoading;
+        submitButton.textContent = isLoading ? 'Đang xử lý...' : 'Gửi';
+
+        if (appState === 'IDLE' || appState === 'ERROR') {
+          showOnly('idle');
+          scanInput.placeholder = 'Quét mã QR đơn hàng...';
+        } else if (appState === 'LOADING_ORDER') {
+          showOnly('loading');
+        } else if (appState === 'ORDER_LOADED' || appState === 'VALIDATING_PRODUCT') {
+          showOnly('order');
+          scanInput.placeholder = 'Quét mã QR sản phẩm...';
+        } else if (appState === 'ORDER_COMPLETE') {
+          showOnly('complete');
+          completeOrderCode.textContent = order?.order_code || '';
+        }
+        // keep focus for scanner
+        requestAnimationFrame(() => scanInput.focus());
+      };
+
+      const resetState = () => {
+        if (autoResetTimer) {
+          clearTimeout(autoResetTimer);
+          autoResetTimer = null;
+        }
+        order = null;
+        setState('IDLE');
+      };
+
+      const fetchWithTimeout = async (url, options, timeoutMs = REQ_TIMEOUT_MS) => {
+        const controller = new AbortController();
+        const t = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+          return await fetch(url, { ...options, signal: controller.signal });
+        } finally {
+          clearTimeout(t);
+        }
+      };
+
+      const postJSON = async (url, body, attempt = 0) => {
+        try {
+          const res = await fetchWithTimeout(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            const msg = data?.message || `${res.status} ${res.statusText}`;
+            throw new Error(msg);
+          }
+          return data;
+        } catch (e) {
+          if (attempt < RETRY_LIMIT) {
+            await new Promise(r => setTimeout(r, 300));
+            return postJSON(url, body, attempt + 1);
+          }
+          throw e;
+        }
+      };
+
+      const unwrapWebhookPayload = (payload) => {
+        if (!payload) return null;
+        if (Array.isArray(payload)) return payload.length ? unwrapWebhookPayload(payload[0]) : null;
+        if (payload.json) return unwrapWebhookPayload(payload.json);
+        return payload;
+      };
+
+      const handleResolveOrder = async (orderCodeRaw) => {
+        const orderCode = orderCodeRaw.trim();
+        if (!orderCode) return;
+        setState('LOADING_ORDER');
+        try {
+          const data = await postJSON(ORDER_WEBHOOK_URL, { order_code: orderCode });
+          if (!Array.isArray(data) || data.length === 0) throw new Error('Định dạng phản hồi không hợp lệ.');
+          const resolved = data[0];
+          if (!resolved.ok) throw new Error(`Không thể tìm thấy đơn hàng ${resolved.order_code}.`);
+
+          // Normalize & init
+          order = {
+            order_code: resolved.order_code,
+            lines: (resolved.lines || []).map(l => ({
+              line_id: l.line_id,
+              sku: l.sku,
+              size: l.size,
+              qty: Number(l.qty) || 0,
+              picked_qty: 0,
+              status: 'idle'
+            })),
+          };
+          playSound('success');
+          renderOrderStatic();
+          setState('ORDER_LOADED');
+        } catch (err) {
+          playSound('error');
+          renderError(err.message || 'Không thể tải đơn hàng.', idleErrorContainer);
+          setState('ERROR');
+        }
+      };
+
+      const parseProduct = (code) => {
+        // Accept patterns: SKU-SIZE-... (ignore tail like #hash)
+        const main = code.split('#')[0].trim();
+        const parts = main.split('-');
+        const sku = parts[0] || '';
+        const size = parts[1] || '';
+        return { sku, size };
+      };
+
+      const normalizeProductKey = (value) => (value || '').toString().trim().toLowerCase();
+      const getLineKey = (line) => normalizeProductKey(`${line.sku}-${line.size}`);
+
+      const syncLinesFromDetails = (details, scannedKey) => {
+        const detailMap = new Map();
+        details.forEach(d => {
+          const key = normalizeProductKey(d?.SanPham || d?.product_code || d?.sku);
+          if (key) detailMap.set(key, d);
+        });
+
+        let scannedLineRef = null;
+
+        order.lines.forEach(line => {
+          const key = getLineKey(line);
+          const detail = detailMap.get(key);
+
+          const targetQtyNum = Number(detail?.target_qty);
+          const targetQty = Number.isFinite(targetQtyNum) ? targetQtyNum : line.qty;
+          const scannedQtyNum = Number(detail?.scanned_qty);
+          const remainingQtyNum = Number(detail?.remaining_qty);
+
+          let pickedQty = line.picked_qty;
+          if (detail) {
+            if (Number.isFinite(scannedQtyNum)) {
+              pickedQty = scannedQtyNum;
+            } else if (Number.isFinite(remainingQtyNum)) {
+              pickedQty = targetQty - remainingQtyNum;
+            }
+          } else {
+            pickedQty = line.qty;
+          }
+          pickedQty = Math.max(0, Math.min(line.qty, pickedQty));
+          line.picked_qty = pickedQty;
+
+          if (line.picked_qty >= line.qty) {
+            line.status = 'complete';
+          } else if (key === scannedKey) {
+            line.status = 'success';
+            scannedLineRef = line;
+          } else {
+            line.status = 'idle';
+          }
+          updateLineStatus(line);
+        });
+
+        recomputeProgress();
+        return scannedLineRef;
+      };
+
+      const handleProductScan = async (productRaw) => {
+        if (!order) return;
+        const product = productRaw.trim();
+        if (!product) return;
+
+        setState('VALIDATING_PRODUCT');
+        playSound('scan');
+
+        const { sku, size } = parseProduct(product);
+        const target = order.lines.find(l => l.sku === sku && l.size === size && l.picked_qty < l.qty);
+
+        if (!target) {
+          playSound('error');
+          const anyMatch = order.lines.find(l => l.sku === sku && l.size === size);
+          const msg = anyMatch ? `Đã bóc đủ ${sku} - ${size}` : `Sai sản phẩm: ${sku} - ${size}`;
+          renderError(msg, globalErrorContainer);
+          setTimeout(() => setState('ORDER_LOADED'), 800);
+          return;
+        }
+
+        // mark processing quickly (optimistic UI)
+        target.status = 'processing';
+        updateLineStatus(target);
+
+        try {
+          const rawValidation = await postJSON(PICK_WEBHOOK_URL, { product_code: product, order_code: order.order_code });
+          const validation = unwrapWebhookPayload(rawValidation);
+          const validationOk = (typeof validation?.success === 'boolean') ? validation.success : validation?.ok;
+          const reason = validation?.reason;
+          const remainingItems = Number(validation?.remaining_items);
+          const treatAsComplete = reason === 'ALL_COMPLETED' || (Number.isFinite(remainingItems) && remainingItems === 0);
+
+          if (!validationOk && !treatAsComplete) throw new Error(validation?.message || 'Mã Đã Bóc Rồi');
+
+          const details = Array.isArray(validation?.details) ? validation.details : [];
+          const productKey = normalizeProductKey(`${sku}-${size}`);
+          const scannedLine = syncLinesFromDetails(details, productKey);
+          playSound('success');
+
+          const isOrderDone = treatAsComplete || order.lines.every(l => l.picked_qty === l.qty);
+
+          setTimeout(() => {
+            if (!isOrderDone && scannedLine && scannedLine.status === 'success') {
+              scannedLine.status = 'idle';
+              updateLineStatus(scannedLine);
+            }
+            if (isOrderDone) {
+              playSound('success');
+              setState('ORDER_COMPLETE');
+            } else {
+              setState('ORDER_LOADED');
+            }
+          }, 300);
+
+        } catch (err) {
+          playSound('error');
+          // revert processing -> error -> idle
+          target.status = 'error';
+          updateLineStatus(target);
+          renderError(err.message || 'Lỗi xác thực sản phẩm.', globalErrorContainer);
+          setTimeout(() => {
+            target.status = 'idle';
+            updateLineStatus(target);
+            setState('ORDER_LOADED');
+          }, 900);
+        }
+      };
+
+      // ---------- EVENTS ----------
+      // Giữ focus cho input đối với máy quét barcode (thường gửi Enter)
+      window.addEventListener('visibilitychange', () => {
+        if (!document.hidden) requestAnimationFrame(() => scanInput.focus());
+      });
+
+      // Nếu máy quét gửi rất nhanh có thể có ký tự xuống dòng
+      const cleanScanValue = (v) => v.replace(/\r?\n/g, '').trim();
+
+      scanForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        let value = cleanScanValue(scanInput.value || '');
+        if (!value) return;
+
+        if (appState === 'IDLE' || appState === 'ERROR') {
+          handleResolveOrder(value);
+        } else if (appState === 'ORDER_LOADED') {
+          handleProductScan(value);
+        }
+        // Reset input để sẵn sàng cho lần quét tiếp theo
+        scanInput.value = '';
+        requestAnimationFrame(() => scanInput.focus());
+      });
+
+      resetButton.addEventListener('click', resetState);
+
+      // ---------- INIT ----------
+      setState('IDLE');
+      scanInput.addEventListener('keydown', (ev) => {
+        // Tránh submit đúp khi scanner gửi Enter nhiều lần
+        if (ev.key === 'Enter' && submitButton.disabled) ev.preventDefault();
+      });
+    });
+  </script>
+</body>
+</html>
