@@ -92,15 +92,25 @@
           <!-- Order -->
           <div id="order-view" class="w-full hidden animate-fade-in">
             <div class="w-full bg-white rounded-lg border border-gray-200 shadow-sm">
-              <div class="p-4 sm:p-6 border-b border-gray-200 flex items-start justify-between">
+              <div class="p-4 sm:p-6 border-b border-gray-200 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <h2 class="text-2xl font-semibold text-gray-800">Đơn hàng</h2>
                   <p id="order-code-badge" class="mt-1 text-lg font-mono text-indigo-600 bg-indigo-50 inline-block px-2 py-1 rounded"></p>
                 </div>
-                <div class="text-right">
-                  <p class="text-sm text-gray-500">Tổng cộng</p>
-                  <p id="order-progress" class="text-xl font-bold text-gray-800">0 / 0</p>
-                  <span id="order-progress-live" class="visually-hidden" aria-live="polite"></span>
+                <div class="flex flex-col gap-3 sm:items-end">
+                  <div class="text-right">
+                    <p class="text-sm text-gray-500">Tổng cộng</p>
+                    <p id="order-progress" class="text-xl font-bold text-gray-800">0 / 0</p>
+                    <span id="order-progress-live" class="visually-hidden" aria-live="polite"></span>
+                  </div>
+                  <button
+                    type="button"
+                    id="order-reset-button"
+                    data-reset-button
+                    class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg border border-gray-200 text-gray-700 hover:text-indigo-700 hover:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-60"
+                  >
+                    Reset đơn
+                  </button>
                 </div>
               </div>
               <div class="p-4 sm:p-6">
@@ -115,7 +125,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
             <h2 class="text-3xl font-bold">Đã bóc đủ đơn</h2>
             <p id="complete-order-code" class="text-2xl font-mono mt-2"></p>
-            <button id="reset-button" class="mt-8 px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <button id="complete-reset-button" data-reset-button class="mt-8 px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
               Quét đơn tiếp theo
             </button>
           </div>
@@ -135,6 +145,7 @@
       // ---------- CONSTANTS ----------
       const ORDER_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/hook/order/resolve';
       const PICK_WEBHOOK_URL  = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/hook/pick/verify';
+      const RESET_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/reset_bochang';
       const REQ_TIMEOUT_MS = 8000;
       const RETRY_LIMIT = 1;
 
@@ -157,7 +168,7 @@
       const linesList = document.getElementById('lines-list');
       const linesTitle = document.getElementById('order-lines-title');
       const completeOrderCode = document.getElementById('complete-order-code');
-      const resetButton = document.getElementById('reset-button');
+      const resetButtons = Array.from(document.querySelectorAll('[data-reset-button]'));
 
       document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -167,6 +178,7 @@
       let lineDomMap = new Map();  // line_id -> {rootEl, qtyEl, badgeEl}
       let audioContext = null;
       let autoResetTimer = null;
+      const scannedProducts = [];
 
       // Enable audio after first interaction
       const enableAudio = () => {
@@ -341,6 +353,7 @@
           clearTimeout(autoResetTimer);
           autoResetTimer = null;
         }
+        scannedProducts.length = 0;
         order = null;
         setState('IDLE');
       };
@@ -406,6 +419,7 @@
               status: 'idle'
             })),
           };
+          scannedProducts.length = 0;
           playSound('success');
           renderOrderStatic();
           setState('ORDER_LOADED');
@@ -414,6 +428,40 @@
           renderError(err.message || 'Không thể tải đơn hàng.', idleErrorContainer);
           setState('ERROR');
         }
+      };
+
+      const buildResetPayload = () => {
+        if (!order) return null;
+        return {
+          order_code: order.order_code,
+          scanned_products: [...scannedProducts],
+        };
+      };
+
+      const setResetButtonsLoading = (isLoading) => {
+        resetButtons.forEach(btn => {
+          if (!btn.dataset.defaultText) {
+            btn.dataset.defaultText = btn.textContent.trim();
+          }
+          btn.disabled = isLoading;
+          btn.textContent = isLoading ? 'Đang gửi...' : btn.dataset.defaultText;
+        });
+      };
+
+      const handleResetAndReport = async () => {
+        const payload = buildResetPayload();
+        setResetButtonsLoading(true);
+
+        if (payload) {
+          try {
+            await postJSON(RESET_WEBHOOK_URL, payload);
+          } catch (err) {
+            renderError(err.message || 'Không thể gửi dữ liệu reset.', globalErrorContainer);
+          }
+        }
+
+        setResetButtonsLoading(false);
+        resetState();
       };
 
       const parseProduct = (code) => {
@@ -512,6 +560,7 @@
           const productKey = normalizeProductKey(`${sku}-${size}`);
           const scannedLine = syncLinesFromDetails(details, productKey);
           playSound('success');
+          scannedProducts.push(product);
 
           const isOrderDone = treatAsComplete || order.lines.every(l => l.picked_qty === l.qty);
 
@@ -566,7 +615,7 @@
         requestAnimationFrame(() => scanInput.focus());
       });
 
-      resetButton.addEventListener('click', resetState);
+      resetButtons.forEach(btn => btn.addEventListener('click', handleResetAndReport));
 
       // ---------- INIT ----------
       setState('IDLE');
