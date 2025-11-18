@@ -39,7 +39,7 @@
       height: 100vh;
       padding-top: 1.5rem;
     }
-    body.detail-mode #app-shell > *:not(#detail-section) {
+    body.detail-mode #app-shell > *:not(#detail-section):not(#manual-complete-modal):not(#upload-modal):not(#complete-status-modal) {
       display: none;
     }
     body.detail-mode #detail-section {
@@ -326,6 +326,19 @@
       </div>
     </div>
 
+    <div id="complete-status-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 px-4">
+      <div class="max-w-md w-full rounded-2xl bg-white p-6 shadow-2xl space-y-6 text-center">
+        <div class="space-y-3">
+          <div id="complete-status-icon" class="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 7"/></svg>
+          </div>
+          <h3 id="complete-status-title" class="text-xl font-semibold text-slate-900">Hoàn thành ngày</h3>
+          <p id="complete-status-message" class="text-sm text-slate-600"></p>
+        </div>
+        <button id="complete-status-close" class="w-full rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800">Đã hiểu</button>
+      </div>
+    </div>
+
     <div id="upload-modal" class="hidden fixed inset-0 z-50 bg-slate-900/70 px-4 py-8 overflow-y-auto">
       <div class="max-w-2xl mx-auto w-full bg-white rounded-3xl shadow-2xl p-6 sm:p-8 space-y-6">
         <div class="flex items-start justify-between gap-3">
@@ -378,7 +391,7 @@
       const LIST_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/nap_danh_sachbom';
       const ORDER_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/madon_hoan';
       const PRODUCT_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/mahang_hoan';
-      const COMPLETE_DAY_WEBHOOK_URL = ''; // ← (Tuỳ chọn) Webhook cập nhật trạng thái hoàn tất ngày
+      const COMPLETE_DAY_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/bom-hoanthanh'; // Webhook cập nhật trạng thái hoàn tất ngày
       const UPLOAD_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/upload_file';
       const RESET_PROGRESS_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/reset_masanpham_daquet';
       const FLEXIBLE_SUFFIXES = ['DH', '1P1'];
@@ -433,6 +446,11 @@
       const manualCompleteList = $('manual-complete-list');
       const manualCompleteConfirm = $('manual-complete-confirm');
       const manualCompleteCancel = $('manual-complete-cancel');
+      const completeStatusModal = $('complete-status-modal');
+      const completeStatusIcon = $('complete-status-icon');
+      const completeStatusTitle = $('complete-status-title');
+      const completeStatusMessage = $('complete-status-message');
+      const completeStatusClose = $('complete-status-close');
       const uploadOpenButton = $('upload-open-button');
       const uploadModal = $('upload-modal');
       const uploadForm = $('upload-form');
@@ -472,6 +490,9 @@
         uploadSuccess: false,
         clearingOrder: false,
         showDetailPanel: false,
+        completeStatusVisible: false,
+        completeStatusMessage: '',
+        completeStatusType: 'info',
       };
 
       const state = { ...initialState };
@@ -882,10 +903,19 @@
         }
 
         if (manualCompleteButton) {
-          const disabled = order.status === 'done' || !missing.length;
+          const hasLineItems = order.lines.length > 0;
+          const scannedAny = order.lines.some((line) => Number(line.scanned) > 0);
+          const advisoryRequiresScan = order.enforcement === 'advisory';
+          const disabled = order.status === 'done'
+            || (hasLineItems && !missing.length)
+            || (advisoryRequiresScan && !scannedAny);
           manualCompleteButton.disabled = disabled;
           manualCompleteButton.title = disabled
-            ? 'Đơn đã đủ hoặc không còn sản phẩm thiếu.'
+            ? order.status === 'done'
+              ? 'Đơn này đã hoàn tất.'
+              : (advisoryRequiresScan && !scannedAny)
+                ? 'Đơn chế độ advisory cần quét ít nhất 1 sản phẩm trước khi xác nhận.'
+                : 'Đơn đã đủ hoặc không còn sản phẩm thiếu.'
             : 'Đánh dấu hoàn tất dù còn thiếu sản phẩm.';
         }
         if (clearProgressButton) {
@@ -977,7 +1007,8 @@
         }
         detailViewTitle.textContent = state.selectedOrderCode ? `Đơn ${state.selectedOrderCode}` : 'Đơn đang kiểm';
         document.body.classList.toggle('detail-mode', state.viewMode === 'detail');
-        document.body.classList.toggle('overflow-hidden', state.viewMode === 'detail' || state.uploadVisible);
+        const lockScroll = state.viewMode === 'detail' || state.uploadVisible || state.manualCompleteVisible || state.completeStatusVisible;
+        document.body.classList.toggle('overflow-hidden', lockScroll);
         if (detailSection) {
           const shouldHide = !state.showDetailPanel && state.viewMode !== 'detail';
           detailSection.classList.toggle('hidden', shouldHide);
@@ -987,11 +1018,14 @@
           manualCompleteModal.classList.toggle('hidden', !show);
           if (show) {
             const totalMissing = state.manualCompleteTargets.reduce((sum, item) => sum + (Number(item.remaining) || 0), 0);
-            manualCompleteMessage.textContent = totalMissing
-              ? `Đơn còn thiếu ${totalMissing} sản phẩm. Bạn chắc chắn muốn đánh dấu hoàn tất?`
-              : 'Đơn còn sản phẩm chưa xác nhận. Vẫn tiếp tục đánh dấu hoàn tất?';
+            const hasTargets = state.manualCompleteTargets.length > 0;
+            manualCompleteMessage.textContent = hasTargets
+              ? (totalMissing
+                ? `Đơn còn thiếu ${totalMissing} sản phẩm. Bạn chắc chắn muốn đánh dấu hoàn tất?`
+                : 'Đơn còn sản phẩm chưa xác nhận. Vẫn tiếp tục đánh dấu hoàn tất?')
+              : 'Đơn này không có danh sách sản phẩm. Bạn chắc chắn muốn đánh dấu hoàn tất?';
             manualCompleteList.innerHTML = '';
-            if (state.manualCompleteTargets.length) {
+            if (hasTargets) {
               state.manualCompleteTargets.forEach((item) => {
                 const li = document.createElement('li');
                 li.textContent = `${item.sku || 'SKU ?'} ${item.size ? `(${item.size})` : ''} - thiếu ${item.remaining || 0}`;
@@ -1000,6 +1034,34 @@
             } else {
               manualCompleteList.innerHTML = '<li class="list-none text-slate-500">Không có danh sách cụ thể.</li>';
             }
+          }
+        }
+        if (completeStatusModal) {
+          const showStatus = state.completeStatusVisible;
+          completeStatusModal.classList.toggle('hidden', !showStatus);
+          if (showStatus) {
+            const type = state.completeStatusType;
+            const isSuccess = type === 'success';
+            const isError = type === 'error';
+            const iconClasses = isSuccess
+              ? 'bg-emerald-50 text-emerald-600'
+              : isError
+                ? 'bg-rose-50 text-rose-600'
+                : 'bg-slate-100 text-slate-600';
+            const iconSvg = isSuccess
+              ? '<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 7"/></svg>'
+              : isError
+                ? '<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M6 18 18 6"/></svg>'
+                : '<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/><circle cx="12" cy="12" r="9"/></svg>';
+            const title = isSuccess
+              ? 'Hoàn thành ngày'
+              : isError
+                ? 'Không thể hoàn tất ngày'
+                : 'Thông báo';
+            completeStatusIcon.className = `mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full ${iconClasses}`;
+            completeStatusIcon.innerHTML = iconSvg;
+            completeStatusTitle.textContent = title;
+            completeStatusMessage.textContent = state.completeStatusMessage || '';
           }
         }
         if (uploadModal) {
@@ -1057,6 +1119,19 @@
         requestAnimationFrame(() => orderScanInput.focus());
       };
 
+      const showCompleteStatus = (message, type = 'info') => {
+        setState({
+          scanMessage: '',
+          completeStatusVisible: true,
+          completeStatusMessage: message,
+          completeStatusType: type,
+        });
+      };
+
+      const closeCompleteStatusModal = () => {
+        setState({ completeStatusVisible: false, completeStatusMessage: '', completeStatusType: 'info' });
+      };
+
       const openManualCompleteModal = () => {
         const order = findOrder(state.selectedOrderCode);
         if (!order) {
@@ -1067,8 +1142,18 @@
           setState({ scanMessage: 'Đơn này đã hoàn tất.', scanMessageType: 'info' });
           return;
         }
-        const missing = order.lines.filter((line) => line.remaining > 0 || line.scanned < line.qty);
-        if (!missing.length) {
+        const scannedAny = order.lines.some((line) => Number(line.scanned) > 0);
+        if (order.enforcement === 'advisory' && !scannedAny) {
+          setState({
+            scanMessage: 'Đơn chế độ advisory cần quét ít nhất 1 sản phẩm trước khi xác nhận.',
+            scanMessageType: 'info',
+          });
+          return;
+        }
+        const missing = order.lines.length
+          ? order.lines.filter((line) => line.remaining > 0 || line.scanned < line.qty)
+          : [];
+        if (!missing.length && order.lines.length) {
           setState({ scanMessage: 'Tất cả sản phẩm đã đủ, không cần xác nhận thủ công.', scanMessageType: 'info' });
           return;
         }
@@ -1430,33 +1515,34 @@
 
       const attemptCompleteDay = async () => {
         if (!state.currentDate) {
-          setState({ scanMessage: 'Chưa chọn ngày.', scanMessageType: 'error' });
+          showCompleteStatus('Chưa chọn ngày.', 'error');
           return;
         }
         const incomplete = state.orders.filter((order) => order.status !== 'done');
         if (incomplete.length) {
           const list = incomplete.slice(0, 5).map((order) => order.orderCode).join(', ');
-          setState({
-            scanMessage: `Còn ${incomplete.length} đơn chưa hoàn tất: ${list}${incomplete.length > 5 ? '...' : ''}`,
-            scanMessageType: 'error',
-          });
+          showCompleteStatus(`Còn ${incomplete.length} đơn chưa hoàn tất: ${list}${incomplete.length > 5 ? '...' : ''}`, 'error');
           return;
         }
         if (!COMPLETE_DAY_WEBHOOK_URL) {
-          setState({
-            scanMessage: `Tất cả đơn ngày ${formatDateLabel(state.currentDate)} đã đủ.`,
-            scanMessageType: 'success',
-          });
+          showCompleteStatus(`Tất cả đơn ngày ${formatDateLabel(state.currentDate)} đã đủ.`, 'success');
           return;
         }
         setState({ completingDay: true, scanMessage: '' });
+        const completedOrders = state.orders
+          .filter((order) => order.status === 'done')
+          .map((order) => order.orderCode);
         try {
-          const response = await postJSON(COMPLETE_DAY_WEBHOOK_URL, { date: state.currentDate, orders: state.orders.map((o) => o.orderCode) });
+          const response = await postJSON(COMPLETE_DAY_WEBHOOK_URL, {
+            date: state.currentDate,
+            orders: completedOrders,
+            completed_orders: completedOrders,
+          });
           const payload = unwrapWebhookPayload(response);
           const message = payload?.message || `Đã xác nhận hoàn tất ngày ${formatDateLabel(state.currentDate)}.`;
-          setState({ scanMessage: message, scanMessageType: 'success' });
+          showCompleteStatus(message, 'success');
         } catch (err) {
-          setState({ scanMessage: err.message || 'Không thể hoàn tất ngày.', scanMessageType: 'error' });
+          showCompleteStatus(err.message || 'Không thể hoàn tất ngày.', 'error');
         } finally {
           setState({ completingDay: false });
         }
@@ -1520,6 +1606,15 @@
       if (manualCompleteConfirm) manualCompleteConfirm.addEventListener('click', (event) => {
         event.preventDefault();
         confirmManualComplete();
+      });
+      if (completeStatusClose) completeStatusClose.addEventListener('click', (event) => {
+        event.preventDefault();
+        closeCompleteStatusModal();
+      });
+      if (completeStatusModal) completeStatusModal.addEventListener('click', (event) => {
+        if (event.target === completeStatusModal) {
+          closeCompleteStatusModal();
+        }
       });
       if (uploadForm) uploadForm.addEventListener('submit', handleUploadSubmit);
       if (uploadOpenButton) uploadOpenButton.addEventListener('click', () => openUploadModal());
