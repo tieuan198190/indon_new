@@ -3,8 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-  <meta name="theme-color" content="#0f3050" />
-  <link rel="manifest" href="manifest.json" />
   <title>Kiểm Hàng Theo Ngày</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -464,8 +462,6 @@
       const uploadSubmitButton = $('upload-submit-button');
       const uploadSubmitLabel = $('upload-submit-label');
       const uploadCloseButton = $('upload-close-button');
-      const advisoryScanAttempts = new Map();
-      let homeRedirectTimer = null;
 
       $('year-label').textContent = new Date().getFullYear();
 
@@ -910,18 +906,15 @@
           const hasLineItems = order.lines.length > 0;
           const scannedAny = order.lines.some((line) => Number(line.scanned) > 0);
           const advisoryRequiresScan = order.enforcement === 'advisory';
-          const advisoryAttempted = advisoryRequiresScan
-            ? advisoryScanAttempts.get(order.orderCode) || scannedAny
-            : true;
           const disabled = order.status === 'done'
             || (hasLineItems && !missing.length)
-            || (advisoryRequiresScan && !advisoryAttempted);
+            || (advisoryRequiresScan && !scannedAny);
           manualCompleteButton.disabled = disabled;
           manualCompleteButton.title = disabled
             ? order.status === 'done'
               ? 'Đơn này đã hoàn tất.'
-              : (advisoryRequiresScan && !advisoryAttempted)
-                ? 'Đơn chế độ advisory cần có ít nhất một lần quét trước khi xác nhận.'
+              : (advisoryRequiresScan && !scannedAny)
+                ? 'Đơn chế độ advisory cần quét ít nhất 1 sản phẩm trước khi xác nhận.'
                 : 'Đơn đã đủ hoặc không còn sản phẩm thiếu.'
             : 'Đánh dấu hoàn tất dù còn thiếu sản phẩm.';
         }
@@ -1107,7 +1100,6 @@
         dayInput.value = '';
         orderScanInput.value = '';
         productScanInput.value = '';
-        advisoryScanAttempts.clear();
       };
 
       const focusProductInput = () => {
@@ -1125,13 +1117,6 @@
       const exitDetailMode = () => {
         setState({ viewMode: 'main' });
         requestAnimationFrame(() => orderScanInput.focus());
-      };
-
-      const scheduleHomeRedirect = (delay = 1000) => {
-        if (homeRedirectTimer) clearTimeout(homeRedirectTimer);
-        homeRedirectTimer = window.setTimeout(() => {
-          window.location.href = 'index.html';
-        }, delay);
       };
 
       const showCompleteStatus = (message, type = 'info') => {
@@ -1158,15 +1143,12 @@
           return;
         }
         const scannedAny = order.lines.some((line) => Number(line.scanned) > 0);
-        if (order.enforcement === 'advisory') {
-          const advisoryAttempted = advisoryScanAttempts.get(order.orderCode) || scannedAny;
-          if (!advisoryAttempted) {
-            setState({
-              scanMessage: 'Đơn chế độ advisory cần quét ít nhất 1 sản phẩm trước khi xác nhận.',
-              scanMessageType: 'info',
-            });
-            return;
-          }
+        if (order.enforcement === 'advisory' && !scannedAny) {
+          setState({
+            scanMessage: 'Đơn chế độ advisory cần quét ít nhất 1 sản phẩm trước khi xác nhận.',
+            scanMessageType: 'info',
+          });
+          return;
         }
         const missing = order.lines.length
           ? order.lines.filter((line) => line.remaining > 0 || line.scanned < line.qty)
@@ -1204,7 +1186,6 @@
         recomputeOrderFromLines(order);
         order.status = 'done';
         upsertOrder(order);
-        advisoryScanAttempts.delete(order.orderCode);
         setState({
           manualCompleteVisible: false,
           manualCompleteTargets: [],
@@ -1212,7 +1193,6 @@
           scanMessageType: 'success',
         });
         setTimeout(() => exitDetailMode(), 400);
-        scheduleHomeRedirect();
       };
 
       const clearOrderProgress = async () => {
@@ -1269,7 +1249,6 @@
           scanMessage: webhookMessage || `Đã xóa thông tin đã quét của đơn ${order.orderCode}.`,
           scanMessageType: 'success',
         });
-        advisoryScanAttempts.delete(order.orderCode);
       };
 
       const openUploadModal = () => {
@@ -1367,44 +1346,30 @@
       const mergeLines = (order, details, scannedKey) => {
         const detailMap = new Map();
         details.forEach((d) => {
-          const rawKey = d?.product_code || d?.SanPham || d?.sku || '';
-          const keys = [
-            normalizeProductKey(rawKey),
-            normalizeProductKey(extractBaseProduct(rawKey)),
-          ].filter(Boolean);
-          keys.forEach((key) => {
-            if (!detailMap.has(key)) detailMap.set(key, d);
-          });
+          const main = d?.product_code || d?.SanPham || d?.sku;
+          if (main) detailMap.set(main.toLowerCase(), d);
         });
         let matchedLine = null;
         order.lines = order.lines.map((line) => {
-          const productIdentifier = line.productCode || line.sku || '';
-          const baseKey = normalizeProductKey(productIdentifier);
-          const scanKey = normalizeProductKey(extractBaseProduct(productIdentifier));
-          const raw = detailMap.get(baseKey) || detailMap.get(scanKey);
+          const key = (line.productCode || line.sku || '').toLowerCase();
+          const raw = detailMap.get(key);
           if (!raw) return line;
           const info = normalizeLine(raw, line.lineId);
-          const qty = info.qty || line.qty || 0;
-          const existingScanned = Number(line.scanned) || 0;
-          let mergedScanned = typeof info.scanned === 'number' ? info.scanned : existingScanned;
-          const isScannedLine = baseKey === scannedKey || scanKey === scannedKey;
-          if (isScannedLine) {
-            mergedScanned = Math.min(qty, Math.max(existingScanned + 1, mergedScanned || 0));
+          const merged = { ...line, ...info };
+          merged.qty = Number(info.qty) || Number(line.qty) || 0;
+          merged.scanned = Math.max(Number(line.scanned) || 0, Number(info.scanned) || 0);
+          if (key === scannedKey) {
+            merged.scanned = Math.min(merged.qty, merged.scanned + 1);
+            matchedLine = merged;
           }
-          const remaining = Math.max(0, qty - mergedScanned);
-          const mergedLine = {
-            ...line,
-            ...info,
-            qty,
-            scanned: mergedScanned,
-            remaining,
-            status: remaining === 0 ? 'complete' : mergedScanned > 0 ? 'progress' : 'pending',
-          };
-          if (isScannedLine) matchedLine = mergedLine;
-          return mergedLine;
+          merged.remaining = Math.max(0, merged.qty - merged.scanned);
+          merged.status = merged.remaining === 0 ? 'complete' : merged.scanned > 0 ? 'progress' : 'pending';
+          return merged;
         });
 
-        recomputeOrderFromLines(order);
+        order.totalQty = order.lines.reduce((sum, line) => sum + line.qty, 0);
+        order.scannedQty = order.lines.reduce((sum, line) => sum + line.scanned, 0);
+        order.status = order.scannedQty >= order.totalQty && order.totalQty > 0 ? 'done' : order.scannedQty > 0 ? 'progress' : 'pending';
         return matchedLine;
       };
 
@@ -1434,16 +1399,8 @@
         line.remaining = Math.max(0, line.qty - line.scanned);
         line.status = line.remaining === 0 ? 'complete' : 'progress';
 
-        if (typeof payload?.target_qty === 'number') order.totalQty = payload.target_qty;
-        if (typeof payload?.scanned_qty === 'number') order.scannedQty = payload.scanned_qty;
-        else recomputeOrderFromLines(order);
-
-        if (typeof payload?.remaining_qty === 'number') {
-          order.status = payload.remaining_qty <= 0 ? 'done' : 'progress';
-        } else if (order.status !== 'done') {
-          const allDone = order.lines.every((l) => l.remaining === 0);
-          order.status = allDone ? 'done' : order.scannedQty > 0 ? 'progress' : 'pending';
-        }
+        // Recompute totals strictly from current line data to avoid auto-completing prematurely
+        recomputeOrderFromLines(order);
 
         return line;
       };
@@ -1490,9 +1447,6 @@
           setState({ scanMessage: 'Đơn linh hoạt không cần quét sản phẩm.', scanMessageType: 'info' });
           return;
         }
-        if (order.enforcement === 'advisory') {
-          advisoryScanAttempts.set(order.orderCode, true);
-        }
         if (!code) return;
 
         setState({ productLoading: true, scanMessage: '' });
@@ -1524,7 +1478,6 @@
               scanMessageType: 'info',
             });
             setTimeout(() => exitDetailMode(), 500);
-            scheduleHomeRedirect();
             return;
           }
 
@@ -1540,28 +1493,14 @@
             throw new Error(payload?.message || 'Không thể xác nhận sản phẩm trong đơn.');
           }
 
-          const matchedAdvisory = order.enforcement === 'advisory';
-          if (matchedAdvisory) {
-            order.lines = order.lines.map((line) => ({
-              ...line,
-              scanned: line.qty,
-              remaining: 0,
-              status: 'complete',
-            }));
-            order.status = 'done';
-            order.scannedQty = order.lines.reduce((sum, line) => sum + line.qty, 0);
-            advisoryScanAttempts.delete(order.orderCode);
-          }
-
           upsertOrder(order);
-          const orderCompleted = order.status === 'done' || (typeof payload?.remaining_qty === 'number' && payload.remaining_qty <= 0);
+          const orderCompleted = order.status === 'done';
           setState({
             scanMessage: payload?.message || `Đã cập nhật ${payload?.base_product_code || baseProduct}.`,
             scanMessageType: 'success',
           });
-          if (matchedAdvisory || orderCompleted) {
+          if (orderCompleted) {
             setTimeout(() => exitDetailMode(), 500);
-            scheduleHomeRedirect();
           }
         } catch (err) {
           setState({
@@ -1684,15 +1623,6 @@
 
       render();
     });
-  </script>
-  <script>
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker
-          .register("./service-worker.js")
-          .catch((error) => console.error("SW registration failed", error));
-      });
-    }
   </script>
 </body>
 </html>
