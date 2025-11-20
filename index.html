@@ -3,14 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f3050" />
+  <link rel="manifest" href="manifest.json" />
   <title>Cô Mập Fashion - Trung tâm kho</title>
   <style>
     :root {
       font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont,
         "Helvetica Neue", sans-serif;
       color: #0f172a;
-      background-color: #f8fafc;
+      background-color: #f5f7fb;
       line-height: 1.6;
+      --page-bg: #f5f7fb;
+      --card-bg: #ffffff;
+      --accent: #0f3050;
+      --muted: #5b6b7d;
+      --border: #e2e8f0;
     }
 
     * {
@@ -20,176 +27,149 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background: linear-gradient(180deg, #cfe7ff 0%, #f6fbff 55%, #ffffff 100%);
+      background: var(--page-bg);
       display: flex;
       justify-content: center;
       padding: clamp(1.5rem, 5vw, 3.5rem);
     }
 
     main {
-      width: min(1200px, 100%);
-      background: #ffffff;
-      border-radius: 32px;
-      padding: clamp(1.75rem, 4vw, 3.2rem);
-      border: 1px solid #e3edf7;
-      box-shadow: 0 30px 60px rgba(15, 23, 42, 0.08);
+      width: min(1100px, 100%);
+      background: var(--card-bg);
+      border-radius: 28px;
+      padding: clamp(1.75rem, 4vw, 3rem);
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
       display: flex;
       flex-direction: column;
-      gap: 2.4rem;
+      gap: 2.5rem;
     }
 
     .hero {
-      text-align: center;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding: clamp(1rem, 3vw, 2rem);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: #f9fbff;
+    }
+
+    .hero-content {
+      flex: 1 1 320px;
       display: flex;
       flex-direction: column;
-      gap: 0.85rem;
-      padding: clamp(1.2rem, 4vw, 3rem);
-      border-radius: 28px;
-      border: 1px solid #d5e6fb;
-      background: linear-gradient(135deg, rgba(207, 232, 255, 0.75), rgba(255, 255, 255, 0.92));
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+      gap: 0.75rem;
     }
 
     .badge {
-      align-self: center;
-      background: rgba(15, 118, 205, 0.12);
-      color: #13597b;
+      background: rgba(15, 48, 80, 0.08);
+      color: var(--accent);
       font-weight: 600;
-      padding: 0.45rem 1.1rem;
+      padding: 0.35rem 0.9rem;
       border-radius: 999px;
-      font-size: 0.95rem;
-      letter-spacing: 0.05em;
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+      width: fit-content;
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(2.3rem, 4vw, 3.2rem);
-      color: #0f3050;
-    }
-
-    .logo-mark {
-      width: clamp(110px, 16vw, 180px);
-      height: auto;
-      margin: 0 auto 0.5rem;
-      display: block;
-      border-radius: 999px;
-      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+      font-size: clamp(2.1rem, 4vw, 2.8rem);
+      color: var(--accent);
     }
 
     .tagline {
       margin: 0;
-      color: #4d617a;
+      color: var(--muted);
       font-size: 1.05rem;
-      max-width: 60ch;
-      margin-inline: auto;
+      max-width: 48ch;
+    }
+
+    .hero-logo {
+      flex-shrink: 0;
+      width: clamp(120px, 20vw, 180px);
+      border-radius: 20px;
+      border: 1px solid rgba(15, 48, 80, 0.1);
+      background: #fff;
+      padding: 0.5rem;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1.25rem;
     }
 
     .tool-card {
       text-decoration: none;
-      border-radius: 28px;
-      padding: 2rem;
-      background: #ffffff;
-      border: 1px solid #e7eef9;
+      border-radius: 18px;
+      padding: 1.75rem 1.5rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
       color: inherit;
       display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-      box-shadow: 0 25px 50px rgba(15, 23, 42, 0.08);
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
     }
 
     .tool-card:hover,
     .tool-card:focus-visible {
-      transform: translateY(-6px);
-      border-color: #c8dbf5;
-      box-shadow: 0 40px 70px rgba(15, 23, 42, 0.14);
+      border-color: rgba(15, 48, 80, 0.45);
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+      transform: translateY(-2px);
     }
 
     .tool-card .content {
       display: flex;
       flex-direction: column;
-      gap: 0.45rem;
-      text-align: left;
+      gap: 0.4rem;
     }
 
     .tool-card h2 {
       margin: 0;
-      font-size: 1.3rem;
-      color: #0f3050;
+      font-size: 1.15rem;
+      color: var(--accent);
     }
 
     .tool-card p {
       margin: 0;
-      color: #5d6c80;
-      font-size: 0.97rem;
-      max-width: 32ch;
+      color: var(--muted);
+      font-size: 0.95rem;
     }
 
     .icon-circle {
-      flex-shrink: 0;
-      width: 5rem;
-      height: 5rem;
-      border-radius: 50%;
-      background: #f0f7ff;
-      border: 1px solid rgba(15, 23, 42, 0.04);
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      background: #f0f4ff;
+      border: 1px solid rgba(15, 48, 80, 0.08);
       display: grid;
       place-items: center;
-      font-size: 1.7rem;
-      color: #0f3050;
     }
 
     .icon-circle img {
-      width: 80%;
-      height: 80%;
-      object-fit: cover;
-      border-radius: 50%;
-      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.18);
-    }
-
-    .link-label {
-      margin-top: 0.3rem;
-      font-weight: 600;
-      color: #0f6ab5;
-      font-size: 0.9rem;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-    }
-
-    .link-label::after {
-      content: "→";
-      font-size: 1rem;
+      width: 60%;
+      height: 60%;
+      object-fit: contain;
+      border-radius: 12px;
     }
 
     .tool-card.theme-picking .icon-circle {
-      background: #fef2f7;
+      background: #fff4f8;
     }
     .tool-card.theme-location .icon-circle {
-      background: #edf4ff;
+      background: #eef4ff;
     }
     .tool-card.theme-hangbom .icon-circle {
-      background: #fff4eb;
+      background: #fff5ec;
     }
     .tool-card.theme-order .icon-circle {
-      background: #edfcec;
-    }
-
-    .note {
-      text-align: center;
-      font-size: 0.95rem;
-      color: #475569;
-      background: #f1f5f9;
-      padding: 0.75rem 1rem;
-      border-radius: 18px;
-      border: 1px dashed #cbd5f5;
+      background: #f0fbf4;
     }
 
     @media (max-width: 640px) {
@@ -201,6 +181,14 @@
         border-radius: 18px;
       }
 
+      .hero {
+        flex-direction: column;
+      }
+
+      .hero-logo {
+        width: 120px;
+      }
+
       .grid {
         grid-template-columns: 1fr;
       }
@@ -210,17 +198,24 @@
 <body>
   <main>
     <div class="hero">
-      <img src="logo.jpeg" alt="Logo Cô Mập Fashion" class="logo-mark" />
-      <span class="badge">Cô Mập Fashion - Kho</span>
+      <div class="hero-content">
+        <span class="badge">Cô Mập Fashion - Kho</span>
+        <h1>Trung tâm vận hành kho</h1>
+        <p class="tagline">
+          Chọn nhanh công cụ cần dùng để tra cứu vị trí, cập nhật đơn và xử lý đóng gói trong cùng một giao diện.
+        </p>
+      </div>
+      <img src="logo.jpeg" alt="Logo Cô Mập Fashion" class="hero-logo" />
     </div>
 
     <div class="grid" aria-label="Danh sách công cụ kho Cô Mập Fashion">
-       <a class="tool-card theme-location" href="location.html">
+      <a class="tool-card theme-location" href="location.html">
         <div class="icon-circle">
           <img src="location_logo.jpeg" alt="Logo tra cứu vị trí" />
         </div>
         <div class="content">
           <h2>Vị trí sản phẩm</h2>
+          <p>Nhập mã sản phẩm để biết chính xác vị trí sắp xếp.</p>
         </div>
       </a>
       <a class="tool-card theme-order" href="thongtindonhang.html">
@@ -229,30 +224,37 @@
         </div>
         <div class="content">
           <h2>Thông tin đơn hàng</h2>
+          <p>Tìm kiếm đơn và xem ghi chú nội bộ ngay lập tức.</p>
         </div>
-      </a>     
+      </a>
       <a class="tool-card theme-picking" href="bochang.html">
         <div class="icon-circle">
           <img src="bochang_logo.jpeg" alt="Logo trình bóc hàng" />
         </div>
         <div class="content">
           <h2>Đóng hàng</h2>
+          <p>Quét mã để tạo checklist đóng gói rõ ràng.</p>
         </div>
       </a>
-
-
-
       <a class="tool-card theme-hangbom" href="hangbom.html">
         <div class="icon-circle">
           <img src="hangbom_logo.jpeg" alt="Logo hàng bơm" />
         </div>
         <div class="content">
           <h2>Kiểm tra hàng hoàn</h2>
+          <p>Theo dõi tiến độ hàng hoàn và xử lý nhanh.</p>
         </div>
       </a>
-
-
     </div>
   </main>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("./service-worker.js")
+          .catch((error) => console.error("SW registration failed", error));
+      });
+    }
+  </script>
 </body>
 </html>

@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="theme-color" content="#0f3050" />
+  <link rel="manifest" href="manifest.json" />
   <title>Kiểm Hàng Theo Ngày</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -1623,6 +1625,15 @@
 
       render();
     });
+  </script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("./service-worker.js")
+          .catch((error) => console.error("SW registration failed", error));
+      });
+    }
   </script>
 </body>
 </html>

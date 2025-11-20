@@ -1,0 +1,23 @@
+{
+  "name": "Cô Mập Fashion - Trung tâm kho",
+  "short_name": "Cô Mập Kho",
+  "lang": "vi",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6fbff",
+  "theme_color": "#0f3050",
+  "description": "Bộ công cụ hỗ trợ kho của Cô Mập Fashion hoạt động ổn định cả khi offline.",
+  "icons": [
+    {
+      "src": "logo.jpeg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "logo.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
