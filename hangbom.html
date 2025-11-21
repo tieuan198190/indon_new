@@ -146,7 +146,6 @@
           </button>
         </div>
       </div>
-      <p id="day-helper" class="text-sm text-slate-500">Chưa chọn ngày nào. Vui lòng chọn ngày và bấm “Tải danh sách”.</p>
       <div id="day-banner" class="hidden rounded-2xl border px-4 py-3 text-sm font-medium"></div>
     </section>
 
@@ -1115,10 +1114,6 @@
           scanFeedback.classList.add('hidden');
         }
 
-        dayHelper.textContent = state.currentDate
-          ? 'Danh sách tự động cập nhật khi tải lại webhook.'
-          : 'Chưa chọn ngày nào. Vui lòng chọn ngày và bấm “Tải danh sách”.';
-
         loadDayButton.disabled = state.loadingDay;
         if (clearDayButton) clearDayButton.disabled = true; // luôn tắt nút làm mới
         orderScanInput.disabled = state.shippingLoading;
@@ -1510,13 +1505,13 @@
             const foundRecordPack = payload.find((item) => item?.records);
             if (foundRecordPack) {
               orders = resolveRecords(foundRecordPack);
-              infoMessage = `Webhook trả về ${foundRecordPack.count ?? orders.length} đơn cho ${formatDateLabel(foundRecordPack.day || dateStr)}.`;
+              infoMessage = `${foundRecordPack.count ?? orders.length} đơn cho ${formatDateLabel(foundRecordPack.day || dateStr)}.`;
             } else {
               orders = normalizeOrders(payload);
             }
           } else if (payload?.records) {
             orders = resolveRecords(payload);
-            infoMessage = `Webhook trả về ${payload.count ?? orders.length} đơn cho ${formatDateLabel(payload.day || dateStr)}.`;
+            infoMessage = `${payload.count ?? orders.length} đơn cho ${formatDateLabel(payload.day || dateStr)}.`;
           } else if (payload?.orders) {
             orders = normalizeOrders(payload.orders);
           } else {
