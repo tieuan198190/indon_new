@@ -1,0 +1,23 @@
+{
+  "name": "Cô Mập Fashion - Trung tâm kho",
+  "short_name": "Cô Mập",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eff6ff",
+  "theme_color": "#0f6ab5",
+  "description": "Cổng thông tin kho vận cho đội ngũ Cô Mập Fashion.",
+  "icons": [
+    {
+      "src": "logo.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "logo.jpeg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    }
+  ]
+}

@@ -3,21 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0f3050" />
-  <link rel="manifest" href="manifest.json" />
   <title>Cô Mập Fashion - Trung tâm kho</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0f6ab5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
   <style>
     :root {
-      font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont,
-        "Helvetica Neue", sans-serif;
-      color: #0f172a;
-      background-color: #f5f7fb;
-      line-height: 1.6;
-      --page-bg: #f5f7fb;
-      --card-bg: #ffffff;
-      --accent: #0f3050;
-      --muted: #5b6b7d;
-      --border: #e2e8f0;
+      --primary-color: #0f6ab5;
+      --primary-dark: #093b6b;
+      --bg-gradient-start: #e0f2fe;
+      --bg-gradient-end: #f0f9ff;
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(255, 255, 255, 0.6);
+      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      --shadow-md: 0 10px 25px -5px rgba(15, 60, 100, 0.1);
+      --shadow-hover: 0 20px 35px -5px rgba(15, 60, 100, 0.15);
+      --radius-lg: 24px;
+      --radius-xl: 32px;
     }
 
     * {
@@ -27,170 +34,341 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background: var(--page-bg);
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 50%, #fff 100%);
+      color: #1e293b;
       display: flex;
       justify-content: center;
-      padding: clamp(1.5rem, 5vw, 3.5rem);
+      align-items: center;
+      padding: 1.5rem;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    /* Hiệu ứng nền trang trí */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -10%;
+      left: -10%;
+      width: 50vw;
+      height: 50vw;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      z-index: -1;
+      animation: floatingBlob 18s ease-in-out infinite;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -10%;
+      right: -10%;
+      width: 40vw;
+      height: 40vw;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      z-index: -1;
+      animation: floatingBlobReverse 18s ease-in-out infinite;
     }
 
     main {
-      width: min(1100px, 100%);
-      background: var(--card-bg);
-      border-radius: 28px;
-      padding: clamp(1.75rem, 4vw, 3rem);
-      border: 1px solid var(--border);
-      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+      width: 100%;
+      max-width: 1000px;
       display: flex;
       flex-direction: column;
       gap: 2.5rem;
     }
 
+    /* --- HERO SECTION --- */
     .hero {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1.5rem;
-      padding: clamp(1rem, 3vw, 2rem);
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      background: #f9fbff;
-    }
-
-    .hero-content {
-      flex: 1 1 320px;
+      text-align: center;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      align-items: center;
+      gap: 1rem;
+      padding: 2rem 1rem 1rem;
+      animation: fadeInDown 0.8s ease-out;
+    }
+
+    .logo-wrapper {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      margin-bottom: 0.5rem;
+      animation: floatPulse 4s ease-in-out infinite;
+    }
+
+    .logo-mark {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 4px solid #fff;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .logo-wrapper:hover .logo-mark,
+    .logo-wrapper:focus-within .logo-mark {
+      transform: scale(1.05) rotate(2deg);
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.02em;
     }
 
     .badge {
-      background: rgba(15, 48, 80, 0.08);
-      color: var(--accent);
-      font-weight: 600;
-      padding: 0.35rem 0.9rem;
-      border-radius: 999px;
-      font-size: 0.9rem;
-      letter-spacing: 0.04em;
-      width: fit-content;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(2.1rem, 4vw, 2.8rem);
-      color: var(--accent);
-    }
-
-    .tagline {
-      margin: 0;
-      color: var(--muted);
-      font-size: 1.05rem;
-      max-width: 48ch;
-    }
-
-    .hero-logo {
-      flex-shrink: 0;
-      width: clamp(120px, 20vw, 180px);
-      border-radius: 20px;
-      border: 1px solid rgba(15, 48, 80, 0.1);
       background: #fff;
-      padding: 0.5rem;
+      color: var(--primary-color);
+      font-weight: 600;
+      padding: 0.5rem 1.25rem;
+      border-radius: 99px;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 12px rgba(15, 106, 181, 0.1);
+      border: 1px solid #e2e8f0;
+      display: inline-block;
+      margin-top: -20px; /* Chồng lên logo một chút hoặc nằm ngay dưới */
+      z-index: 2;
+      position: relative;
+      animation: badgeGlow 3.5s ease-in-out infinite;
     }
 
+    /* --- GRID SECTION --- */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 1.25rem;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      padding-bottom: 2rem;
+      animation: fadeInUp 0.8s ease-out 0.2s backwards;
     }
 
+    /* --- CARD DESIGN --- */
     .tool-card {
+      position: relative;
       text-decoration: none;
-      border-radius: 18px;
-      padding: 1.75rem 1.5rem;
       background: var(--card-bg);
-      border: 1px solid var(--border);
-      color: inherit;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 1rem;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      align-items: center;
+      gap: 1.5rem;
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+      min-height: 110px;
+      transform-style: preserve-3d;
     }
 
+    /* Hiệu ứng hover xịn hơn */
     .tool-card:hover,
     .tool-card:focus-visible {
-      border-color: rgba(15, 48, 80, 0.45);
-      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
-      transform: translateY(-2px);
+      transform: translateY(-5px) scale(1.01);
+      box-shadow: var(--shadow-hover);
+      border-color: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.95);
     }
 
-    .tool-card .content {
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
+    /* Gradient border ẩn khi hover */
+    .tool-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-lg);
+      padding: 2px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.5), rgba(255,255,255,0));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
     }
 
-    .tool-card h2 {
-      margin: 0;
-      font-size: 1.15rem;
-      color: var(--accent);
+    .tool-card:focus-visible::before {
+      opacity: 1;
     }
 
-    .tool-card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.95rem;
+    .tool-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(15,106,181,0.12), transparent 65%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+
+    .tool-card:hover::after,
+    .tool-card:focus-visible::after {
+      opacity: 1;
     }
 
     .icon-circle {
-      width: 64px;
-      height: 64px;
-      border-radius: 16px;
-      background: #f0f4ff;
-      border: 1px solid rgba(15, 48, 80, 0.08);
-      display: grid;
-      place-items: center;
+      flex-shrink: 0;
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.5);
     }
 
     .icon-circle img {
-      width: 60%;
-      height: 60%;
-      object-fit: contain;
-      border-radius: 12px;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
-    .tool-card.theme-picking .icon-circle {
-      background: #fff4f8;
-    }
-    .tool-card.theme-location .icon-circle {
-      background: #eef4ff;
-    }
-    .tool-card.theme-hangbom .icon-circle {
-      background: #fff5ec;
-    }
-    .tool-card.theme-order .icon-circle {
-      background: #f0fbf4;
+    .tool-card:hover .icon-circle,
+    .tool-card:focus-visible .icon-circle {
+      transform: scale(1.1);
     }
 
+    .content {
+      flex: 1;
+    }
+
+    .tool-card h2 {
+      margin: 0 0 0.35rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #334155;
+      transition: color 0.2s;
+    }
+
+    .tool-card:hover h2,
+    .tool-card:focus-visible h2 {
+      color: var(--primary-color);
+    }
+
+    .desc {
+      margin: 0;
+      font-size: 0.925rem;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    .arrow-icon {
+      width: 24px;
+      height: 24px;
+      color: #cbd5e1;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    .tool-card:hover .arrow-icon,
+    .tool-card:focus-visible .arrow-icon {
+      color: var(--primary-color);
+      transform: translateX(4px);
+    }
+
+    .tool-card:active {
+      transform: translateY(-2px) scale(0.99);
+    }
+
+    .tool-card:active::after {
+      opacity: 1;
+    }
+
+    /* Màu sắc riêng cho từng theme (tùy chọn nếu muốn giữ style cũ) */
+    .theme-picking .icon-circle { background: #fff1f2; }
+    .theme-location .icon-circle { background: #eff6ff; }
+    .theme-hangbom .icon-circle { background: #fff7ed; }
+    .theme-order .icon-circle { background: #f0fdf4; }
+
+    /* --- ANIMATIONS --- */
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes floatingBlob {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, -20px) scale(1.08); }
+      100% { transform: translate(-10px, 10px) scale(1); }
+    }
+    @keyframes floatingBlobReverse {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-25px, 25px) scale(1.05); }
+      100% { transform: translate(20px, -15px) scale(1); }
+    }
+    @keyframes floatPulse {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+      100% { transform: translateY(0); }
+    }
+    @keyframes badgeGlow {
+      0%, 100% { box-shadow: 0 4px 12px rgba(15, 106, 181, 0.1); }
+      50% { box-shadow: 0 8px 24px rgba(15, 106, 181, 0.25); }
+    }
+
+    /* --- RESPONSIVE --- */
     @media (max-width: 640px) {
       body {
-        align-items: flex-start;
+        padding: 1rem;
+        display: block; /* Để cuộn tự nhiên trên mobile */
       }
-
-      main {
-        border-radius: 18px;
-      }
-
-      .hero {
-        flex-direction: column;
-      }
-
-      .hero-logo {
-        width: 120px;
-      }
-
+      
       .grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr; /* 1 cột trên mobile */
+        gap: 1rem;
+      }
+
+      .tool-card {
+        padding: 1.25rem;
+        border-radius: 20px;
+        min-height: 100px;
+      }
+
+      .icon-circle {
+        width: 60px;
+        height: 60px;
+      }
+
+      .tool-card h2 {
+        font-size: 1.1rem;
+      }
+    }
+
+    @media (hover: none) {
+      .tool-card {
+        transition-duration: 0.2s;
+      }
+
+      .tool-card:hover,
+      .tool-card:focus-visible {
+        transform: none;
+      }
+
+      .tool-card:active {
+        transform: scale(0.98);
+      }
+
+      .tool-card::after {
+        background: radial-gradient(circle at center, rgba(15,106,181,0.2), transparent 70%);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
       }
     }
   </style>
@@ -198,54 +376,70 @@
 <body>
   <main>
     <div class="hero">
-      <div class="hero-content">
-        <span class="badge">Cô Mập Fashion - Kho</span>
-        <h1>Trung tâm vận hành kho</h1>
+      <div class="logo-wrapper">
+        <img src="logo.jpeg" alt="Logo Cô Mập Fashion" class="logo-mark" />
       </div>
-      <img src="logo.jpeg" alt="Logo Cô Mập Fashion" class="hero-logo" />
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+        <h1>Cô Mập Fashion</h1>
+      </div>
     </div>
 
-    <div class="grid" aria-label="Danh sách công cụ kho Cô Mập Fashion">
+    <div class="grid" aria-label="Danh sách công cụ kho">
       <a class="tool-card theme-location" href="location.html">
         <div class="icon-circle">
-          <img src="location_logo.jpeg" alt="Logo tra cứu vị trí" />
+          <img src="location_logo.jpeg" alt="Icon vị trí" />
         </div>
         <div class="content">
           <h2>Vị trí sản phẩm</h2>
         </div>
+        <svg class="arrow-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
       </a>
+
       <a class="tool-card theme-order" href="thongtindonhang.html">
         <div class="icon-circle">
-          <img src="thongtindonhang_logo.jpeg" alt="Logo thông tin đơn hàng" />
+          <img src="thongtindonhang_logo.jpeg" alt="Icon đơn hàng" />
         </div>
         <div class="content">
-          <h2>Thông tin đơn hàng</h2>
+          <h2>Thông Tin Đơn</h2>
         </div>
-      </a>
+        <svg class="arrow-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>     
+
       <a class="tool-card theme-picking" href="bochang.html">
         <div class="icon-circle">
-          <img src="bochang_logo.jpeg" alt="Logo trình bóc hàng" />
+          <img src="bochang_logo.jpeg" alt="Icon đóng hàng" />
         </div>
         <div class="content">
           <h2>Đóng hàng</h2>
         </div>
+        <svg class="arrow-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
       </a>
+
       <a class="tool-card theme-hangbom" href="hangbom.html">
         <div class="icon-circle">
-          <img src="hangbom_logo.jpeg" alt="Logo hàng bơm" />
+          <img src="hangbom_logo.jpeg" alt="Icon hàng hoàn" />
         </div>
         <div class="content">
           <h2>Kiểm tra hàng hoàn</h2>
         </div>
+        <svg class="arrow-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
       </a>
     </div>
   </main>
   <script>
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker
-          .register("./service-worker.js")
-          .catch((error) => console.error("SW registration failed", error));
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').catch(function (error) {
+          console.error('Service worker đăng ký thất bại:', error);
+        });
       });
     }
   </script>
