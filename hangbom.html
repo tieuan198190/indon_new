@@ -89,6 +89,18 @@
       outline: 3px solid rgba(79, 70, 229, 0.45);
       outline-offset: 3px;
     }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      background: #edf2ff;
+      color: #1e1b4b;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
@@ -124,7 +136,7 @@
             <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.477 14.89A6.5 6.5 0 1 1 17.5 10h-2a4.5 4.5 0 1 0-1.615 3.427l-.908-.908H18v4.243l-1.607-1.606a8.5 8.5 0 1 1 2.024-5.614h-2a6.5 6.5 0 0 0-2.94 5.348Z"/></svg>
             Tải danh sách
           </button>
-          <button id="clear-day-button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-300 font-semibold text-slate-600 hover:bg-slate-100">
+          <button id="clear-day-button" class="hidden inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-300 font-semibold text-slate-600 hover:bg-slate-100" aria-hidden="true" tabindex="-1" disabled>
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
             Làm mới
           </button>
@@ -173,22 +185,13 @@
       </div>
 
       <div class="bg-white rounded-3xl shadow-sm p-5 space-y-4 lg:col-span-2">
-        <div class="flex items-center justify-between">
-          <h2 class="text-lg font-semibold text-slate-900">Quy trình quét</h2>
-          <span class="text-xs uppercase tracking-[0.3em] text-slate-400">1️⃣ → 3️⃣</span>
-        </div>
-
         <form id="order-scan-form" autocomplete="off" class="space-y-2">
-          <label class="text-xs font-semibold text-slate-500 uppercase tracking-[0.25em]">2️⃣ Quét mã vận đơn</label>
+          <label class="text-xs font-semibold text-slate-500 uppercase tracking-[0.25em]">Quét mã vận đơn</label>
           <div class="relative">
             <input id="order-scan-input" type="text" inputmode="text" placeholder="Quét mã vận đơn (ví dụ NVS637614631)" class="w-full rounded-2xl border border-slate-200 px-4 py-3 pl-12 font-mono text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
             <svg class="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M5 7h2M17 7h2M5 17h2M17 17h2M7 5v2m10-2v2M7 17v2m10-2v2M9 9h6v6H9z"/></svg>
           </div>
         </form>
-
-        <div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-          Bước 3 (quét mã sản phẩm) sẽ mở chế độ toàn màn hình sau khi bạn quét mã vận đơn thành công.
-        </div>
 
         <div class="flex flex-wrap items-center gap-3 pt-2">
           <button id="complete-day-button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-emerald-600 text-white font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
@@ -212,7 +215,7 @@
       <div id="order-list-pane" class="bg-white rounded-3xl shadow-sm p-5 space-y-4 lg:col-span-2">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 class="text-lg font-semibold text-slate-900">1️⃣ Danh sách cần kiểm</h2>
+            <h2 class="text-lg font-semibold text-slate-900">Danh sách cần kiểm</h2>
             <p class="text-sm text-slate-500">Tự động hiển thị khi chọn ngày.</p>
           </div>
           <div class="flex flex-col gap-2 sm:items-end">
@@ -243,7 +246,7 @@
         <h2 class="text-lg font-semibold text-slate-900">Chi tiết đơn đang kiểm</h2>
 
         <form id="product-scan-form" autocomplete="off" class="space-y-2">
-          <label class="text-xs font-semibold text-slate-500 uppercase tracking-[0.25em]">3️⃣ Quét mã sản phẩm</label>
+          <label class="text-xs font-semibold text-slate-500 uppercase tracking-[0.25em]">Quét mã sản phẩm</label>
           <div class="relative">
             <input id="product-scan-input" type="text" inputmode="text" placeholder="Quét mã sản phẩm (ví dụ A414-XL)" class="w-full rounded-2xl border border-slate-200 px-4 py-3 pl-12 font-mono text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
             <svg class="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7V5a2 2 0 0 1 2-2h2m8 0h2a2 2 0 0 1 2 2v2m0 8v2a2 2 0 0 1-2 2h-2m-8 0H6a2 2 0 0 1-2-2v-2M8 12h8"/></svg>
@@ -285,13 +288,13 @@
           </div>
 
           <div class="grid gap-4 md:grid-cols-2">
-            <div class="rounded-2xl border border-slate-100 p-4 bg-slate-50">
-              <p class="text-xs uppercase tracking-[0.3em] text-slate-400 mb-1">Description</p>
-              <p id="detail-desc" class="text-sm text-slate-700 min-h-[1.5rem]">—</p>
+            <div class="rounded-2xl border-2 border-indigo-100 bg-indigo-50/80 p-4 shadow-sm">
+              <p class="text-xs uppercase tracking-[0.3em] text-indigo-600 font-semibold mb-1">Description</p>
+              <p id="detail-desc" class="text-sm font-semibold text-slate-900 min-h-[1.5rem]">—</p>
             </div>
-            <div class="rounded-2xl border border-slate-100 p-4 bg-slate-50">
-              <p class="text-xs uppercase tracking-[0.3em] text-slate-400 mb-1">Private Note</p>
-              <p id="detail-private" class="text-sm text-slate-700 min-h-[1.5rem]">—</p>
+            <div class="rounded-2xl border-2 border-emerald-100 bg-emerald-50/80 p-4 shadow-sm">
+              <p class="text-xs uppercase tracking-[0.3em] text-emerald-600 font-semibold mb-1">Private Note</p>
+              <p id="detail-private" class="text-sm font-semibold text-slate-900 min-h-[1.5rem]">—</p>
             </div>
           </div>
 
@@ -317,15 +320,18 @@
 
     <div id="manual-complete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 px-4">
       <div class="max-w-lg w-full rounded-2xl bg-white p-6 shadow-2xl space-y-4">
-        <div>
-          <p class="text-xs uppercase tracking-[0.3em] text-amber-500 font-semibold">Xác nhận thủ công</p>
-          <h3 class="text-xl font-semibold text-slate-900 mt-1">Đơn vẫn còn thiếu, bạn vẫn muốn đánh dấu hoàn tất?</h3>
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-xs uppercase tracking-[0.3em] text-amber-500 font-semibold">Xác nhận thủ công</p>
+            <h3 class="text-2xl font-semibold text-slate-900 mt-1">Hoàn tất đơn đang kiểm?</h3>
+          </div>
+          <span id="manual-complete-order" class="pill">Đơn hiện tại</span>
         </div>
-        <p id="manual-complete-message" class="text-sm text-slate-600"></p>
-        <ul id="manual-complete-list" class="max-h-48 overflow-y-auto pr-2 text-sm text-slate-700 list-disc pl-5 space-y-1"></ul>
+        <p id="manual-complete-message" class="text-sm text-slate-700"></p>
+        <ul id="manual-complete-list" class="max-h-48 overflow-y-auto pr-2 text-sm text-slate-800 space-y-1"></ul>
         <div class="flex justify-end gap-3 pt-2">
-          <button id="manual-complete-cancel" class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Không, quay lại</button>
-          <button id="manual-complete-confirm" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">Vẫn xác nhận đủ</button>
+          <button id="manual-complete-cancel" class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Không, quay lại</button>
+          <button id="manual-complete-confirm" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">Hoàn tất</button>
         </div>
       </div>
     </div>
@@ -398,6 +404,7 @@
       const COMPLETE_DAY_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/bom-hoanthanh'; // Webhook cập nhật trạng thái hoàn tất ngày
       const UPLOAD_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/upload_file';
       const RESET_PROGRESS_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/reset_masanpham_daquet';
+      const MANUAL_COMPLETE_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/duhang_bom';
       const FLEXIBLE_SUFFIXES = ['DH', '1P1'];
       const REQ_TIMEOUT_MS = 12000;
 
@@ -449,6 +456,7 @@
       const manualCompleteModal = $('manual-complete-modal');
       const manualCompleteMessage = $('manual-complete-message');
       const manualCompleteList = $('manual-complete-list');
+      const manualCompleteOrder = $('manual-complete-order');
       const manualCompleteConfirm = $('manual-complete-confirm');
       const manualCompleteCancel = $('manual-complete-cancel');
       const completeStatusModal = $('complete-status-modal');
@@ -494,6 +502,7 @@
         uploadMessageType: 'info',
         uploadSuccess: false,
         clearingOrder: false,
+        manualCompleteSending: false,
         showDetailPanel: false,
         completeStatusVisible: false,
         completeStatusMessage: '',
@@ -775,6 +784,38 @@
           if (retries > 0) {
             await new Promise((resolve) => setTimeout(resolve, 350));
             return postJSON(url, body, retries - 1);
+          }
+          throw err;
+        }
+      };
+
+      const sendManualCompleteWebhook = async (order) => {
+        const orderCode = (order?.orderCode || state.selectedOrderCode || '').trim();
+        if (!orderCode || !MANUAL_COMPLETE_WEBHOOK_URL) throw new Error('Không có mã vận đơn để gửi webhook.');
+        const payload = {
+          order_code: orderCode,
+          date: state.currentDate,
+          total_qty: order.totalQty,
+          scanned_qty: order.scannedQty,
+          lines: (order.lines || []).map((line) => ({
+            sku: line.sku,
+            size: line.size,
+            product_code: line.productCode,
+            qty: line.qty,
+            scanned_qty: line.scanned,
+          })),
+        };
+        try {
+          return await postJSON(MANUAL_COMPLETE_WEBHOOK_URL, payload);
+        } catch (err) {
+          // Fallback gửi nhanh nếu fetch bị chặn (ví dụ CORS hoặc tắt tab)
+          try {
+            const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+            const ok = navigator.sendBeacon
+              && navigator.sendBeacon(MANUAL_COMPLETE_WEBHOOK_URL, blob);
+            if (ok) return { message: 'Đã gửi xác nhận bằng chế độ dự phòng (beacon).' };
+          } catch (beaconErr) {
+            console.error('Beacon manual complete failed', beaconErr);
           }
           throw err;
         }
@@ -1079,7 +1120,7 @@
           : 'Chưa chọn ngày nào. Vui lòng chọn ngày và bấm “Tải danh sách”.';
 
         loadDayButton.disabled = state.loadingDay;
-        clearDayButton.disabled = state.loadingDay;
+        if (clearDayButton) clearDayButton.disabled = true; // luôn tắt nút làm mới
         orderScanInput.disabled = state.shippingLoading;
         const productDisabled = state.productLoading || state.viewMode !== 'detail';
         productScanInput.disabled = productDisabled;
@@ -1114,20 +1155,28 @@
           if (show) {
             const totalMissing = state.manualCompleteTargets.reduce((sum, item) => sum + (Number(item.remaining) || 0), 0);
             const hasTargets = state.manualCompleteTargets.length > 0;
+            if (manualCompleteOrder) manualCompleteOrder.textContent = state.selectedOrderCode || 'Đơn hiện tại';
             manualCompleteMessage.textContent = hasTargets
-              ? (totalMissing
-                ? `Đơn còn thiếu ${totalMissing} sản phẩm. Bạn chắc chắn muốn đánh dấu hoàn tất?`
-                : 'Đơn còn sản phẩm chưa xác nhận. Vẫn tiếp tục đánh dấu hoàn tất?')
-              : 'Đơn này không có danh sách sản phẩm. Bạn chắc chắn muốn đánh dấu hoàn tất?';
+              ? `Thiếu ${totalMissing} sản phẩm. Hoàn tất nếu bạn đã kiểm đủ.`
+              : 'Không có danh sách chi tiết. Hoàn tất ngay?';
             manualCompleteList.innerHTML = '';
             if (hasTargets) {
               state.manualCompleteTargets.forEach((item) => {
                 const li = document.createElement('li');
-                li.textContent = `${item.sku || 'SKU ?'} ${item.size ? `(${item.size})` : ''} - thiếu ${item.remaining || 0}`;
+                li.className = 'list-none px-3 py-2 rounded-xl bg-slate-50 border border-slate-100 flex justify-between items-center';
+                const label = `${item.sku || 'SKU ?'}${item.size ? ` (${item.size})` : ''}`;
+                li.innerHTML = `<span class="font-semibold text-slate-800">${label}</span><span class="text-slate-500 text-sm">Thiếu ${item.remaining || 0}</span>`;
                 manualCompleteList.appendChild(li);
               });
             } else {
-              manualCompleteList.innerHTML = '<li class="list-none text-slate-500">Không có danh sách cụ thể.</li>';
+              const li = document.createElement('li');
+              li.className = 'list-none px-3 py-2 rounded-xl bg-slate-50 border border-slate-100 text-slate-500';
+              li.textContent = 'Không có mục sản phẩm.';
+              manualCompleteList.appendChild(li);
+            }
+            if (manualCompleteConfirm) {
+              manualCompleteConfirm.disabled = state.manualCompleteSending;
+              manualCompleteConfirm.textContent = state.manualCompleteSending ? 'Đang gửi...' : 'Hoàn tất';
             }
           }
         }
@@ -1286,17 +1335,19 @@
       };
 
       const closeManualCompleteModal = () => {
-        setState({ manualCompleteVisible: false, manualCompleteTargets: [] });
+        setState({ manualCompleteVisible: false, manualCompleteTargets: [], manualCompleteSending: false });
         focusProductInput();
       };
 
-      const confirmManualComplete = () => {
+      const confirmManualComplete = async () => {
         const order = findOrder(state.selectedOrderCode);
-        if (!order) {
+        if (!order || !order.orderCode) {
           closeManualCompleteModal();
+          setState({ scanMessage: 'Không có mã vận đơn đang kiểm để gửi webhook.', scanMessageType: 'error' });
           return;
         }
-        order.lines = order.lines.map((line) => ({
+        const lines = Array.isArray(order.lines) ? order.lines : [];
+        order.lines = lines.map((line) => ({
           ...line,
           scanned: line.qty,
           remaining: 0,
@@ -1305,10 +1356,33 @@
         recomputeOrderFromLines(order);
         order.status = 'done';
         upsertOrder(order);
+        let webhookMessage = '';
+        let webhookError = '';
+        setState({ scanMessage: 'Đang gửi xác nhận hoàn tất...', scanMessageType: 'info', manualCompleteSending: true });
+        if (MANUAL_COMPLETE_WEBHOOK_URL) {
+          try {
+            const response = await sendManualCompleteWebhook(order);
+            const payload = unwrapWebhookPayload(response);
+            webhookMessage = payload?.message || '';
+          } catch (err) {
+            webhookError = err.message || 'Không thể gửi webhook hoàn tất.';
+          }
+          if (webhookError) {
+            setState({
+              manualCompleteVisible: true,
+              manualCompleteSending: false,
+              scanMessage: `Lỗi gửi webhook: ${webhookError}. Thử lại.`,
+              scanMessageType: 'error',
+            });
+            return;
+          }
+        }
+        const finalMessage = webhookMessage || `Đã xác nhận thủ công đơn ${order.orderCode}.`;
         setState({
           manualCompleteVisible: false,
           manualCompleteTargets: [],
-          scanMessage: `Đã xác nhận thủ công đơn ${order.orderCode}.`,
+          manualCompleteSending: false,
+          scanMessage: finalMessage,
           scanMessageType: 'success',
         });
         setTimeout(() => exitDetailMode(), 400);
@@ -1684,7 +1758,11 @@
         }
         loadOrdersForDate(value);
       });
-      clearDayButton.addEventListener('click', clearDayData);
+      if (clearDayButton) {
+        clearDayButton.addEventListener('click', (event) => {
+          event.preventDefault();
+        });
+      }
 
       orderScanForm.addEventListener('submit', (event) => {
         event.preventDefault();
@@ -1730,9 +1808,9 @@
         event.preventDefault();
         closeManualCompleteModal();
       });
-      if (manualCompleteConfirm) manualCompleteConfirm.addEventListener('click', (event) => {
+      if (manualCompleteConfirm) manualCompleteConfirm.addEventListener('click', async (event) => {
         event.preventDefault();
-        confirmManualComplete();
+        await confirmManualComplete();
       });
       if (completeStatusClose) completeStatusClose.addEventListener('click', (event) => {
         event.preventDefault();
