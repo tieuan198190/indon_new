@@ -632,7 +632,18 @@
       let locationSaving = false;
       let statusHideTimer = null;
 
+      const focusSkuInput = () =>
+        requestAnimationFrame(() => {
+          if (!input.disabled) input.focus({ preventScroll: true });
+        });
+
       yearLabel.textContent = new Date().getFullYear();
+
+      ["touchstart", "pointerdown", "click"].forEach((evt) => {
+        window.addEventListener(evt, () => focusSkuInput(), { passive: true, once: true });
+      });
+      window.addEventListener("focus", () => focusSkuInput());
+      input.addEventListener("blur", () => setTimeout(() => focusSkuInput(), 20));
 
       form.addEventListener("submit", (event) => {
         event.preventDefault();
@@ -967,9 +978,11 @@
         button.disabled = isLoading;
         input.disabled = isLoading;
         if (!isLoading) {
-          input.focus();
+          focusSkuInput();
         }
       }
+
+      focusSkuInput();
     </script>
   </body>
 </html>

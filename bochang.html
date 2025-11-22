@@ -598,6 +598,7 @@
       });
 
       window.addEventListener('focus', focusInput);
+      window.addEventListener('touchstart', () => focusInput(), { passive: true });
       scanInput.addEventListener('blur', () => setTimeout(focusInput, 20));
 
       // Nếu máy quét gửi rất nhanh có thể có ký tự xuống dòng

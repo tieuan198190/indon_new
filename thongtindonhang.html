@@ -381,9 +381,21 @@
         "private-description-text"
       );
 
+      const focusOrderInput = () =>
+        requestAnimationFrame(() => {
+          if (!orderInput.disabled) orderInput.focus({ preventScroll: true });
+        });
+
+      ["touchstart", "pointerdown", "click"].forEach((evt) => {
+        window.addEventListener(evt, () => focusOrderInput(), { passive: true, once: true });
+      });
+      window.addEventListener("focus", () => focusOrderInput());
+      orderInput.addEventListener("blur", () => setTimeout(() => focusOrderInput(), 20));
+
       form.addEventListener("submit", handleLookup);
       let hasLookup = false;
       hideNotes();
+      focusOrderInput();
 
       /**
        * Gửi request lên webhook và hiển thị kết quả.
@@ -394,12 +406,12 @@
 
         if (!orderCode) {
           updateStatus("Vui lòng nhập mã đơn hợp lệ.", "empty");
-          orderInput.focus();
+          focusOrderInput();
           return;
         }
 
         orderInput.value = "";
-        orderInput.focus();
+        focusOrderInput();
 
         hasLookup = true;
         hideNotes();

@@ -533,6 +533,7 @@
       const FLEXIBLE_SUFFIXES = ['DH', '1P1'];
       const REQ_TIMEOUT_MS = 12000;
       const isTouchDevice = 'ontouchstart' in window || (navigator?.maxTouchPoints || 0) > 0;
+      let allowAutoFocus = !isTouchDevice;
       if (isTouchDevice) {
         document.documentElement.classList.add('touch-device');
       }
@@ -1333,21 +1334,21 @@
       };
 
       const focusProductInput = () => {
-        if (isTouchDevice) return; // tránh bật bàn phím ảo trên tablet khi không cần
+        if (!allowAutoFocus) return;
         requestAnimationFrame(() => {
-          productScanInput?.focus();
+          productScanInput?.focus({ preventScroll: true });
         });
       };
       const focusOrderInput = () => {
-        if (isTouchDevice) return;
+        if (!allowAutoFocus) return;
         requestAnimationFrame(() => {
-          orderScanInput?.focus();
+          orderScanInput?.focus({ preventScroll: true });
         });
       };
       const focusDayInput = () => {
-        if (isTouchDevice) return;
+        if (!allowAutoFocus) return;
         requestAnimationFrame(() => {
-          dayInput?.focus();
+          dayInput?.focus({ preventScroll: true });
         });
       };
       const focusDefaultInput = () => {
@@ -1360,6 +1361,13 @@
           return;
         }
         focusOrderInput();
+      };
+
+      const enableAutoFocus = () => {
+        if (!allowAutoFocus) {
+          allowAutoFocus = true;
+        }
+        focusDefaultInput();
       };
 
       const clearDayData = () => {
@@ -1925,6 +1933,13 @@
       if (uploadOpenButton) uploadOpenButton.addEventListener('click', () => openUploadModal());
       if (uploadBackButton) uploadBackButton.addEventListener('click', () => closeUploadModal());
       if (uploadCloseButton) uploadCloseButton.addEventListener('click', () => closeUploadModal());
+
+      ['touchstart', 'pointerdown', 'click'].forEach((evt) => {
+        window.addEventListener(evt, enableAutoFocus, { passive: true, once: true });
+      });
+      window.addEventListener('focus', () => {
+        if (allowAutoFocus) focusDefaultInput();
+      });
 
       render();
       focusDefaultInput();
