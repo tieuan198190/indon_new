@@ -639,8 +639,8 @@
 
       yearLabel.textContent = new Date().getFullYear();
 
-      ["touchstart", "pointerdown", "click"].forEach((evt) => {
-        window.addEventListener(evt, () => focusSkuInput(), { passive: true, once: true });
+      ["pointerdown", "touchstart", "touchend", "click"].forEach((evt) => {
+        window.addEventListener(evt, () => focusSkuInput(), { passive: true });
       });
       window.addEventListener("focus", () => focusSkuInput());
       input.addEventListener("blur", () => setTimeout(() => focusSkuInput(), 20));

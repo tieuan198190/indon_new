@@ -386,8 +386,8 @@
           if (!orderInput.disabled) orderInput.focus({ preventScroll: true });
         });
 
-      ["touchstart", "pointerdown", "click"].forEach((evt) => {
-        window.addEventListener(evt, () => focusOrderInput(), { passive: true, once: true });
+      ["pointerdown", "touchstart", "touchend", "click"].forEach((evt) => {
+        window.addEventListener(evt, () => focusOrderInput(), { passive: true });
       });
       window.addEventListener("focus", () => focusOrderInput());
       orderInput.addEventListener("blur", () => setTimeout(() => focusOrderInput(), 20));

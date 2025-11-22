@@ -1934,8 +1934,8 @@
       if (uploadBackButton) uploadBackButton.addEventListener('click', () => closeUploadModal());
       if (uploadCloseButton) uploadCloseButton.addEventListener('click', () => closeUploadModal());
 
-      ['touchstart', 'pointerdown', 'click'].forEach((evt) => {
-        window.addEventListener(evt, enableAutoFocus, { passive: true, once: true });
+      ['pointerdown', 'touchstart', 'touchend', 'click'].forEach((evt) => {
+        window.addEventListener(evt, enableAutoFocus, { passive: true });
       });
       window.addEventListener('focus', () => {
         if (allowAutoFocus) focusDefaultInput();
