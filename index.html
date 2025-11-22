@@ -35,7 +35,7 @@
       margin: 0;
       min-height: 100vh;
       font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 50%, #fff 100%);
+      background: #f8fafc;
       color: #1e293b;
       display: flex;
       justify-content: center;
@@ -44,33 +44,6 @@
       overflow-x: hidden;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
-    }
-
-    /* Hiệu ứng nền trang trí */
-    body::before {
-      content: '';
-      position: fixed;
-      top: -10%;
-      left: -10%;
-      width: 50vw;
-      height: 50vw;
-      background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
-      border-radius: 50%;
-      z-index: -1;
-      animation: floatingBlob 18s ease-in-out infinite;
-    }
-
-    body::after {
-      content: '';
-      position: fixed;
-      bottom: -10%;
-      right: -10%;
-      width: 40vw;
-      height: 40vw;
-      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
-      border-radius: 50%;
-      z-index: -1;
-      animation: floatingBlobReverse 18s ease-in-out infinite;
     }
 
     main {
@@ -89,7 +62,6 @@
       align-items: center;
       gap: 1rem;
       padding: 2rem 1rem 1rem;
-      animation: fadeInDown 0.8s ease-out;
     }
 
     .logo-wrapper {
@@ -97,7 +69,6 @@
       width: 140px;
       height: 140px;
       margin-bottom: 0.5rem;
-      animation: floatPulse 4s ease-in-out infinite;
     }
 
     .logo-mark {
@@ -136,7 +107,6 @@
       margin-top: -20px; /* Chồng lên logo một chút hoặc nằm ngay dưới */
       z-index: 2;
       position: relative;
-      animation: badgeGlow 3.5s ease-in-out infinite;
     }
 
     /* --- GRID SECTION --- */
@@ -145,7 +115,6 @@
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 1.5rem;
       padding-bottom: 2rem;
-      animation: fadeInUp 0.8s ease-out 0.2s backwards;
     }
 
     /* --- CARD DESIGN --- */
@@ -162,53 +131,9 @@
       align-items: center;
       gap: 1.5rem;
       box-shadow: var(--shadow-md);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       overflow: hidden;
       min-height: 110px;
       transform-style: preserve-3d;
-    }
-
-    /* Hiệu ứng hover xịn hơn */
-    .tool-card:hover,
-    .tool-card:focus-visible {
-      transform: translateY(-5px) scale(1.01);
-      box-shadow: var(--shadow-hover);
-      border-color: rgba(255, 255, 255, 0.9);
-      background: rgba(255, 255, 255, 0.95);
-    }
-
-    /* Gradient border ẩn khi hover */
-    .tool-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: var(--radius-lg);
-      padding: 2px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.5), rgba(255,255,255,0));
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-
-    .tool-card:focus-visible::before {
-      opacity: 1;
-    }
-
-    .tool-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at top, rgba(15,106,181,0.12), transparent 65%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      pointer-events: none;
-    }
-
-    .tool-card:hover::after,
-    .tool-card:focus-visible::after {
-      opacity: 1;
     }
 
     .icon-circle {
@@ -220,7 +145,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.3s ease;
       overflow: hidden;
       border: 1px solid rgba(255,255,255,0.5);
     }
@@ -229,11 +153,6 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-    }
-
-    .tool-card:hover .icon-circle,
-    .tool-card:focus-visible .icon-circle {
-      transform: scale(1.1);
     }
 
     .content {
@@ -245,12 +164,6 @@
       font-size: 1.25rem;
       font-weight: 700;
       color: #334155;
-      transition: color 0.2s;
-    }
-
-    .tool-card:hover h2,
-    .tool-card:focus-visible h2 {
-      color: var(--primary-color);
     }
 
     .desc {
@@ -264,21 +177,6 @@
       width: 24px;
       height: 24px;
       color: #cbd5e1;
-      transition: transform 0.3s ease, color 0.3s ease;
-    }
-
-    .tool-card:hover .arrow-icon,
-    .tool-card:focus-visible .arrow-icon {
-      color: var(--primary-color);
-      transform: translateX(4px);
-    }
-
-    .tool-card:active {
-      transform: translateY(-2px) scale(0.99);
-    }
-
-    .tool-card:active::after {
-      opacity: 1;
     }
 
     /* Màu sắc riêng cho từng theme (tùy chọn nếu muốn giữ style cũ) */
@@ -286,35 +184,6 @@
     .theme-location .icon-circle { background: #eff6ff; }
     .theme-hangbom .icon-circle { background: #fff7ed; }
     .theme-order .icon-circle { background: #f0fdf4; }
-
-    /* --- ANIMATIONS --- */
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes floatingBlob {
-      0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(30px, -20px) scale(1.08); }
-      100% { transform: translate(-10px, 10px) scale(1); }
-    }
-    @keyframes floatingBlobReverse {
-      0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(-25px, 25px) scale(1.05); }
-      100% { transform: translate(20px, -15px) scale(1); }
-    }
-    @keyframes floatPulse {
-      0% { transform: translateY(0); }
-      50% { transform: translateY(-6px); }
-      100% { transform: translateY(0); }
-    }
-    @keyframes badgeGlow {
-      0%, 100% { box-shadow: 0 4px 12px rgba(15, 106, 181, 0.1); }
-      50% { box-shadow: 0 8px 24px rgba(15, 106, 181, 0.25); }
-    }
 
     /* --- RESPONSIVE --- */
     @media (max-width: 640px) {
@@ -341,6 +210,36 @@
 
       .tool-card h2 {
         font-size: 1.1rem;
+      }
+    }
+
+    @media (max-width: 1024px) and (min-width: 641px) {
+      body {
+        padding: 1.25rem;
+        align-items: flex-start;
+      }
+
+      main {
+        gap: 1.75rem;
+      }
+
+      .grid {
+        gap: 1.25rem;
+      }
+
+      .tool-card {
+        padding: 1.5rem;
+        border-radius: 20px;
+        min-height: 120px;
+      }
+
+      .tool-card h2 {
+        font-size: 1.2rem;
+      }
+
+      .icon-circle {
+        width: 78px;
+        height: 78px;
       }
     }
 

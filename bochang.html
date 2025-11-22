@@ -6,10 +6,6 @@
   <title>Trình Bóc Hàng</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    @keyframes fadeIn { from { opacity:0; transform: translateY(-8px);} to { opacity:1; transform: translateY(0);} }
-    .animate-fade-in { animation: fadeIn .35s ease-out forwards; }
-    @keyframes pulse-scale { 0%,100% { transform: scale(1);} 50% { transform: scale(1.05);} }
-    .animate-pulse-scale { animation: pulse-scale .8s ease-in-out infinite; }
     .visually-hidden { position:absolute !important; height:1px; width:1px; overflow:hidden; clip:rect(1px,1px,1px,1px); white-space:nowrap; }
     .back-home-link {
       position: fixed;
@@ -90,7 +86,7 @@
           </div>
 
           <!-- Order -->
-          <div id="order-view" class="w-full hidden animate-fade-in">
+          <div id="order-view" class="w-full hidden">
             <div class="w-full bg-white rounded-lg border border-gray-200 shadow-sm">
               <div class="p-4 sm:p-6 border-b border-gray-200 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
@@ -121,7 +117,7 @@
           </div>
 
           <!-- Complete -->
-          <div id="complete-view" class="hidden text-center text-green-600 animate-fade-in p-8">
+          <div id="complete-view" class="hidden text-center text-green-600 p-8">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
             <h2 class="text-3xl font-bold">Đã bóc đủ đơn</h2>
             <p id="complete-order-code" class="text-2xl font-mono mt-2"></p>
@@ -234,7 +230,7 @@
       };
 
       const statusClass = (status) => {
-        if (status === 'processing') return 'bg-yellow-100 ring-2 ring-yellow-400 animate-pulse-scale';
+        if (status === 'processing') return 'bg-yellow-100 ring-2 ring-yellow-400';
         if (status === 'success') return 'bg-green-100';
         if (status === 'error') return 'bg-red-100 ring-2 ring-red-400';
         if (status === 'complete') return 'bg-green-100';
@@ -304,7 +300,7 @@
         const dom = lineDomMap.get(line.line_id);
         if (!dom) return;
         // class
-        dom.rootEl.className = dom.rootEl.className.replace(/bg-\w+-\d+\s?(ring-2\sring-\w+-\d+)?(\sanimate-pulse-scale)?/g, '').trim();
+        dom.rootEl.className = dom.rootEl.className.replace(/bg-\w+-\d+\s?(ring-2\sring-\w+-\d+)?/g, '').trim();
         dom.rootEl.classList.add(...statusClass(line.status).split(' '));
         // qty text & color
         dom.qtyEl.textContent = line.picked_qty;
