@@ -201,6 +201,10 @@
       };
 
       // ---------- HELPERS ----------
+      const focusInput = () => requestAnimationFrame(() => {
+        if (!scanInput.disabled) scanInput.focus({ preventScroll: true });
+      });
+
       const renderError = (message, container) => {
         container.innerHTML = `
           <div class="w-full bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg" role="alert">
@@ -341,7 +345,7 @@
           completeOrderCode.textContent = order?.order_code || '';
         }
         // keep focus for scanner
-        requestAnimationFrame(() => scanInput.focus());
+        focusInput();
       };
 
       const resetState = () => {
@@ -590,8 +594,11 @@
       // ---------- EVENTS ----------
       // Giữ focus cho input đối với máy quét barcode (thường gửi Enter)
       window.addEventListener('visibilitychange', () => {
-        if (!document.hidden) requestAnimationFrame(() => scanInput.focus());
+        if (!document.hidden) focusInput();
       });
+
+      window.addEventListener('focus', focusInput);
+      scanInput.addEventListener('blur', () => setTimeout(focusInput, 20));
 
       // Nếu máy quét gửi rất nhanh có thể có ký tự xuống dòng
       const cleanScanValue = (v) => v.replace(/\r?\n/g, '').trim();
@@ -608,7 +615,7 @@
         }
         // Reset input để sẵn sàng cho lần quét tiếp theo
         scanInput.value = '';
-        requestAnimationFrame(() => scanInput.focus());
+        focusInput();
       });
 
       resetButtons.forEach(btn => btn.addEventListener('click', handleResetAndReport));
@@ -619,6 +626,7 @@
         // Tránh submit đúp khi scanner gửi Enter nhiều lần
         if (ev.key === 'Enter' && submitButton.disabled) ev.preventDefault();
       });
+      focusInput();
     });
   </script>
 </body>
