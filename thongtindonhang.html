@@ -75,6 +75,13 @@
         align-items: flex-end;
       }
 
+      .form-actions {
+        display: flex;
+        gap: 0.75rem;
+        flex: 1 1 240px;
+        align-items: stretch;
+      }
+
       label {
         display: block;
         font-size: 0.9rem;
@@ -123,6 +130,18 @@
       button:not(:disabled):hover {
         transform: translateY(-1px);
         box-shadow: 0 12px 20px rgba(17, 24, 39, 0.2);
+      }
+
+      .ghost-button {
+        background: #f8fafc;
+        color: #0f172a;
+        border: 1.5px dashed #cbd5e1;
+      }
+
+      .ghost-button:not(:disabled):hover {
+        box-shadow: 0 12px 20px rgba(15, 23, 42, 0.12);
+        border-color: #6366f1;
+        color: #111827;
       }
 
       .summary-grid {
@@ -301,6 +320,57 @@
         outline: 3px solid rgba(79, 70, 229, 0.45);
         outline-offset: 3px;
       }
+
+      .camera-panel {
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 1rem;
+        background: #f8fafc;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        margin-bottom: 1.5rem;
+      }
+
+      .camera-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .camera-video {
+        width: 100%;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        background: #0f172a;
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+      }
+
+      .camera-status {
+        margin-top: 0.65rem;
+        font-size: 0.95rem;
+        color: #475569;
+      }
+
+      .camera-status[data-tone="success"] {
+        color: #0f766e;
+      }
+
+      .camera-status[data-tone="error"] {
+        color: #b91c1c;
+      }
+
+      .close-camera {
+        width: auto;
+        padding: 0.6rem 0.9rem;
+        border-radius: 12px;
+        background: #111827;
+        color: #fff;
+      }
+      .close-camera:not(:disabled):hover {
+        box-shadow: 0 8px 12px rgba(17, 24, 39, 0.15);
+      }
     </style>
   </head>
   <body>
@@ -325,10 +395,33 @@
           />
         </label>
 
-        <button id="submit-btn" type="submit">
-          <span aria-hidden="true">🔍</span> Tra cứu đơn
-        </button>
+        <div class="form-actions">
+          <button id="submit-btn" type="submit">
+            <span aria-hidden="true">🔍</span> Tra cứu đơn
+          </button>
+          <button id="open-camera-btn" type="button" class="ghost-button">
+            <span aria-hidden="true">📷</span> Quét bằng camera
+          </button>
+        </div>
       </form>
+
+      <section id="camera-panel" class="camera-panel" hidden>
+        <div class="camera-header">
+          <div>
+            <strong>Quét mã bằng camera</strong>
+            <div class="note" id="camera-hint">
+              Đưa mã QR hoặc barcode vào trong khung hình.
+            </div>
+          </div>
+          <button id="close-camera-btn" type="button" class="close-camera">
+            Đóng
+          </button>
+        </div>
+        <video id="camera-video" class="camera-video" autoplay playsinline muted></video>
+        <div id="camera-status" class="camera-status" aria-live="polite">
+          Đang khởi động camera...
+        </div>
+      </section>
 
       <section id="order-notes" class="order-notes" hidden>
         <article class="note-card">
@@ -371,6 +464,11 @@
       const orderInput = document.getElementById("order-code");
       const submitBtn = document.getElementById("submit-btn");
       const submitBtnDefault = submitBtn.innerHTML;
+      const openCameraBtn = document.getElementById("open-camera-btn");
+      const closeCameraBtn = document.getElementById("close-camera-btn");
+      const cameraPanel = document.getElementById("camera-panel");
+      const cameraVideo = document.getElementById("camera-video");
+      const cameraStatus = document.getElementById("camera-status");
 
       const statusBar = document.getElementById("status-bar");
       const resultBody = document.getElementById("result-body");
@@ -383,6 +481,7 @@
 
       const focusOrderInput = () =>
         requestAnimationFrame(() => {
+          if (cameraPanel && cameraPanel.hidden === false) return;
           if (!orderInput.disabled) orderInput.focus({ preventScroll: true });
         });
 
@@ -396,6 +495,158 @@
       let hasLookup = false;
       hideNotes();
       focusOrderInput();
+
+      const cameraSupported =
+        Boolean(navigator.mediaDevices?.getUserMedia) &&
+        (typeof BarcodeDetector !== "undefined");
+      let cameraStream = null;
+      let cameraDetector = null;
+      let cameraLoopId = null;
+      let cameraStarting = false;
+
+      if (!cameraSupported && openCameraBtn) {
+        openCameraBtn.disabled = true;
+        openCameraBtn.title =
+          "Trình duyệt hiện không hỗ trợ quét mã bằng camera.";
+      } else if (openCameraBtn) {
+        openCameraBtn.addEventListener("click", () => startCameraScan());
+      }
+
+      if (closeCameraBtn) {
+        closeCameraBtn.addEventListener("click", () => stopCameraScan());
+      }
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) stopCameraScan(true);
+      });
+
+      // Tự động bật camera sau khi trang sẵn sàng
+      if (cameraSupported) {
+        window.addEventListener("load", () => startCameraScan());
+      }
+
+      /**
+       * Bật camera và quét mã barcode/QR, tự động điền vào input.
+       */
+      async function startCameraScan() {
+        if (cameraStarting || cameraStream) return;
+        if (!cameraPanel || !cameraVideo || !cameraStatus || !cameraSupported) {
+          alert(
+            "Trình duyệt này không hỗ trợ mở camera. Vui lòng nhập mã thủ công."
+          );
+          return;
+        }
+
+        cameraStarting = true;
+        cameraPanel.hidden = false;
+        updateCameraStatus("Đang khởi động camera...", "info");
+        if (openCameraBtn) openCameraBtn.disabled = true;
+
+        try {
+          cameraDetector = await initBarcodeDetector();
+        } catch (err) {
+          updateCameraStatus(
+            err?.message || "Thiết bị không hỗ trợ Barcode Detector.",
+            "error"
+          );
+          if (openCameraBtn) openCameraBtn.disabled = false;
+          cameraStarting = false;
+          return;
+        }
+
+        try {
+          cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: "environment" } },
+          });
+          cameraVideo.srcObject = cameraStream;
+          await cameraVideo.play();
+          updateCameraStatus("Đang tìm mã... hãy giữ mã trong khung hình.", "info");
+          cameraLoopId = requestAnimationFrame(scanFrame);
+        } catch (err) {
+          console.error("Camera error", err);
+          updateCameraStatus(
+            "Không mở được camera. Kiểm tra quyền truy cập hoặc thử trình duyệt khác.",
+            "error"
+          );
+          stopCameraScan(true);
+          if (openCameraBtn) openCameraBtn.disabled = false;
+        } finally {
+          cameraStarting = false;
+        }
+      }
+
+      async function initBarcodeDetector() {
+        if (typeof BarcodeDetector === "undefined") {
+          throw new Error("Thiết bị không hỗ trợ Barcode Detector.");
+        }
+        const preferred = [
+          "qr_code",
+          "code_128",
+          "code_39",
+          "code_93",
+          "ean_13",
+          "ean_8",
+          "itf",
+          "data_matrix",
+        ];
+
+        if (typeof BarcodeDetector.getSupportedFormats === "function") {
+          const supported = await BarcodeDetector.getSupportedFormats();
+          const usable = preferred.filter((fmt) => supported.includes(fmt));
+          return new BarcodeDetector({ formats: usable.length ? usable : supported });
+        }
+
+        return new BarcodeDetector({ formats: preferred });
+      }
+
+      async function scanFrame() {
+        if (!cameraDetector || !cameraVideo || cameraPanel.hidden) return;
+        try {
+          const barcodes = await cameraDetector.detect(cameraVideo);
+          if (barcodes?.length) {
+            const value = (barcodes[0].rawValue || "").trim();
+            if (value) {
+              updateCameraStatus(`Đã quét: ${value}`, "success");
+              orderInput.value = value;
+              stopCameraScan();
+              form.requestSubmit();
+              return;
+            }
+          }
+        } catch (err) {
+          console.error("Barcode detect error", err);
+          updateCameraStatus(
+            "Không đọc được mã. Thử giữ camera ổn định và đủ sáng.",
+            "error"
+          );
+        }
+        cameraLoopId = requestAnimationFrame(scanFrame);
+      }
+
+      function stopCameraScan(keepPanelOpen = false) {
+        if (cameraLoopId) {
+          cancelAnimationFrame(cameraLoopId);
+          cameraLoopId = null;
+        }
+        if (cameraStream) {
+          cameraStream.getTracks().forEach((t) => t.stop());
+          cameraStream = null;
+        }
+        if (cameraVideo) {
+          cameraVideo.srcObject = null;
+        }
+        if (!keepPanelOpen && cameraPanel) {
+          cameraPanel.hidden = true;
+        }
+        if (openCameraBtn) openCameraBtn.disabled = false;
+        if (!keepPanelOpen) focusOrderInput();
+      }
+
+      function updateCameraStatus(message, tone = "info") {
+        if (!cameraStatus) return;
+        cameraStatus.textContent = message;
+        cameraStatus.dataset.tone = tone;
+      }
 
       /**
        * Gửi request lên webhook và hiển thị kết quả.
