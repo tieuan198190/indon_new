@@ -1351,7 +1351,10 @@
           dayInput?.focus({ preventScroll: true });
         });
       };
+      const isModalOpen = () => state.uploadVisible || state.manualCompleteVisible || state.completeStatusVisible;
+
       const focusDefaultInput = () => {
+        if (isModalOpen()) return;
         if (state.viewMode === 'detail') {
           focusProductInput();
           return;
@@ -1363,10 +1366,17 @@
         focusOrderInput();
       };
 
-      const enableAutoFocus = () => {
+      const shouldKeepCurrentFocus = (target) => {
+        if (!target) return false;
+        return target.closest('input, textarea, select, button, [contenteditable]');
+      };
+
+      const enableAutoFocus = (event) => {
         if (!allowAutoFocus) {
           allowAutoFocus = true;
         }
+        if (shouldKeepCurrentFocus(event?.target)) return;
+        if (isModalOpen()) return;
         focusDefaultInput();
       };
 
