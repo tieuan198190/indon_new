@@ -30,6 +30,7 @@
         radial-gradient(circle at 80% 0%, rgba(14, 165, 233, 0.07), transparent 20%),
         linear-gradient(180deg, var(--bg), var(--bg-2));
       color: var(--text);
+      min-height: 100vh;
     }
 
     .status-badge {
@@ -132,11 +133,18 @@
     #app-shell {
       position: relative;
       z-index: 1;
+      padding-top: 2rem;
+      padding-bottom: 3rem;
     }
     .bg-white.rounded-3xl,
     .bg-white.rounded-2xl {
       background: var(--panel);
       border: 1px solid var(--border);
+      transition: all 0.2s ease;
+    }
+    .bg-white.rounded-3xl:hover,
+    .bg-white.rounded-2xl:hover {
+      border-color: rgba(99, 102, 241, 0.2);
     }
     input, textarea, select {
       background: #f8fafc;
@@ -238,117 +246,202 @@
       }
     }
 
+    /* Modern card styles */
+    .modern-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 1.75rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .modern-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      border-radius: 20px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    /* Improved header */
+    header {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(226, 232, 240, 0.6);
+      border-radius: 24px;
+      padding: 2rem 2.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Better form layout */
+    .form-section {
+      display: grid;
+      gap: 1.5rem;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    /* Improved button groups */
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    /* Better grid layouts */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+
     @media (max-width: 1024px) {
       #app-shell {
-        padding-top: 1rem;
+        padding-top: 1.5rem;
+        padding-bottom: 2rem;
       }
       #detail-section {
-        gap: 1.25rem;
+        gap: 1.5rem;
+      }
+      header {
+        padding: 1.5rem;
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
   <a class="back-home-link" href="index.html" aria-label="Quay lại trang chính Cô Mập Fashion">← Trang chính</a>
-  <div id="app-shell" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-    <header class="space-y-2">
-      <p class="text-sm font-semibold text-indigo-600 uppercase tracking-[0.3em]">Cô Mập Fashion</p>
-      <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <h1 class="text-3xl sm:text-4xl font-bold text-slate-900">Trang Kiểm Hàng</h1>
+  <div id="app-shell" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+    <header class="space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="h-1 w-12 bg-gradient-to-r from-indigo-600 to-emerald-600 rounded-full"></div>
+        <p class="text-sm font-semibold text-indigo-600 uppercase tracking-[0.3em]">Cô Mập Fashion</p>
+      </div>
+      <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <div class="space-y-2">
+          <h1 class="text-4xl sm:text-5xl font-bold text-slate-900 tracking-tight">Trang Kiểm Hàng</h1>
+          <p class="text-sm text-slate-500">Quản lý và theo dõi đơn hàng theo ngày</p>
         </div>
-        <div class="flex flex-wrap gap-3">
-          <div class="bg-white shadow-sm rounded-2xl px-4 py-3 text-right">
-            <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Ngày làm việc</p>
-            <p id="header-day-label" class="text-xl font-semibold text-slate-900">—</p>
+        <div class="flex flex-wrap gap-4">
+          <div class="stat-card text-right min-w-[160px]">
+            <p class="text-xs uppercase tracking-[0.25em] text-slate-400 mb-2">Ngày làm việc</p>
+            <p id="header-day-label" class="text-2xl font-bold text-slate-900">—</p>
           </div>
-          <div class="bg-white shadow-sm rounded-2xl px-4 py-3 text-right">
-            <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Đơn đã quét</p>
-            <p id="header-done-label" class="text-xl font-semibold text-emerald-600">0</p>
+          <div class="stat-card text-right min-w-[160px]">
+            <p class="text-xs uppercase tracking-[0.25em] text-slate-400 mb-2">Đơn đã quét</p>
+            <p id="header-done-label" class="text-2xl font-bold text-emerald-600">0</p>
           </div>
         </div>
       </div>
     </header>
 
-    <section class="bg-white rounded-3xl shadow-sm p-5 sm:p-6 space-y-4">
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-4">
-        <label class="flex flex-col gap-1 text-sm font-medium text-slate-600 flex-1 min-w-[220px]">
-          <span>Chọn ngày cần kiểm</span>
-          <input id="day-input" type="date" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50" />
-        </label>
-        <div class="flex items-end gap-3 flex-wrap sm:flex-nowrap">
-          <button id="load-day-button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold shadow-sm disabled:opacity-60 disabled:cursor-not-allowed">
-            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.477 14.89A6.5 6.5 0 1 1 17.5 10h-2a4.5 4.5 0 1 0-1.615 3.427l-.908-.908H18v4.243l-1.607-1.606a8.5 8.5 0 1 1 2.024-5.614h-2a6.5 6.5 0 0 0-2.94 5.348Z"/></svg>
-            Tải danh sách
-          </button>
-          <button id="clear-day-button" class="hidden inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-300 font-semibold text-slate-600 hover:bg-slate-100" aria-hidden="true" tabindex="-1" disabled>
-            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
-            Làm mới
-          </button>
-          <button id="upload-open-button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 text-white font-semibold shadow-sm">
-            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5"/><path stroke-linecap="round" stroke-linejoin="round" d="M4 7V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2"/></svg>
-            Upload danh sách
-          </button>
+    <section class="modern-card space-y-6">
+      <div class="form-section">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-6">
+          <div class="form-group flex-1 min-w-[240px]">
+            <label class="text-sm font-semibold text-slate-700 mb-1">Chọn ngày cần kiểm</label>
+            <input id="day-input" type="date" class="w-full rounded-xl border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50 transition-all" />
+          </div>
+          <div class="button-group">
+            <button id="load-day-button" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-indigo-600 text-white font-semibold shadow-sm hover:bg-indigo-700 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.477 14.89A6.5 6.5 0 1 1 17.5 10h-2a4.5 4.5 0 1 0-1.615 3.427l-.908-.908H18v4.243l-1.607-1.606a8.5 8.5 0 1 1 2.024-5.614h-2a6.5 6.5 0 0 0-2.94 5.348Z"/></svg>
+              Tải danh sách
+            </button>
+            <button id="clear-day-button" class="hidden inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-slate-300 font-semibold text-slate-600 hover:bg-slate-100 transition-all" aria-hidden="true" tabindex="-1" disabled>
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+              Làm mới
+            </button>
+            <button id="upload-open-button" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 text-white font-semibold shadow-sm hover:bg-emerald-700 transition-all">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5"/><path stroke-linecap="round" stroke-linejoin="round" d="M4 7V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2"/></svg>
+              Upload danh sách
+            </button>
+          </div>
         </div>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-right">
-          <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Tổng đơn</p>
-          <p id="stat-total" class="text-xl sm:text-2xl font-bold text-slate-900 mt-1">0</p>
+      
+      <div class="stats-grid">
+        <div class="stat-card text-right">
+          <p class="text-xs uppercase tracking-[0.25em] text-slate-400 mb-2">Tổng đơn</p>
+          <p id="stat-total" class="text-3xl font-bold text-slate-900">0</p>
         </div>
-        <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-right">
-          <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Đã xong</p>
-          <p id="stat-done" class="text-xl sm:text-2xl font-bold text-emerald-600 mt-1">0</p>
+        <div class="stat-card text-right">
+          <p class="text-xs uppercase tracking-[0.25em] text-slate-400 mb-2">Đã xong</p>
+          <p id="stat-done" class="text-3xl font-bold text-emerald-600">0</p>
         </div>
-        <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-right">
-          <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Còn lại</p>
-          <p id="stat-pending" class="text-xl sm:text-2xl font-bold text-amber-600 mt-1">0</p>
+        <div class="stat-card text-right">
+          <p class="text-xs uppercase tracking-[0.25em] text-slate-400 mb-2">Còn lại</p>
+          <p id="stat-pending" class="text-3xl font-bold text-amber-600">0</p>
         </div>
       </div>
+      
       <div id="day-banner" class="hidden rounded-2xl border px-4 py-3 text-sm font-medium"></div>
     </section>
 
-    <section class="space-y-5">
-      <div class="bg-white rounded-3xl shadow-sm p-5 space-y-4">
-        <form id="order-scan-form" autocomplete="off" class="space-y-2">
-          <label class="text-xs font-semibold text-slate-500 uppercase tracking-[0.25em]">Quét mã vận đơn</label>
-          <div class="relative">
-            <input id="order-scan-input" type="text" inputmode="text" placeholder="Quét mã vận đơn (ví dụ NVS637614631)" class="w-full rounded-2xl border border-slate-200 px-4 py-3 pl-12 font-mono text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-            <svg class="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M5 7h2M17 7h2M5 17h2M17 17h2M7 5v2m10-2v2M7 17v2m10-2v2M9 9h6v6H9z"/></svg>
-          </div>
-        </form>
+    <section class="space-y-6">
+      <div class="modern-card space-y-5">
+        <div class="form-group">
+          <form id="order-scan-form" autocomplete="off" class="space-y-3">
+            <label class="text-xs font-semibold text-slate-500 uppercase tracking-[0.25em] block">Quét mã vận đơn</label>
+            <div class="relative">
+              <input id="order-scan-input" type="text" inputmode="text" placeholder="Quét mã vận đơn (ví dụ NVS637614631)" class="w-full rounded-2xl border border-slate-200 px-4 py-3.5 pl-12 font-mono text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50 transition-all" />
+              <svg class="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M5 7h2M17 7h2M5 17h2M17 17h2M7 5v2m10-2v2M7 17v2m10-2v2M9 9h6v6H9z"/></svg>
+            </div>
+          </form>
+        </div>
 
-        <div class="flex flex-wrap items-center gap-3 pt-2">
-          <button id="complete-day-button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-emerald-600 text-white font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+        <div class="flex flex-wrap items-center gap-3 pt-3 border-t border-slate-100">
+          <button id="complete-day-button" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-emerald-600 text-white font-semibold shadow-sm hover:bg-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4.5 4.5L19 7"/></svg>
             Hoàn thành ngày
           </button>
-          <button id="reset-order-button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-slate-300 font-semibold text-slate-700">
+          <button id="reset-order-button" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl border border-slate-300 font-semibold text-slate-700 hover:bg-slate-50 transition-all">
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M5 19A9 9 0 0 0 19 5"/></svg>
             Reset đơn hiện tại
           </button>
-          <button id="toggle-detail-panel" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-100">
+          <button id="toggle-detail-panel" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all">
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
-            Ẩn danh sách/chi tiết
+            Ẩn/Hiện danh sách
           </button>
-          <span id="order-mode-hint" class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">Chưa có đơn nào</span>
+          <span id="order-mode-hint" class="ml-auto text-xs font-semibold uppercase tracking-[0.25em] text-slate-400 px-3 py-2 bg-slate-50 rounded-xl">Chưa có đơn nào</span>
         </div>
       </div>
     </section>
 
-    <section id="detail-section" class="grid gap-5 lg:grid-cols-5">
-      <div id="order-list-pane" class="bg-white rounded-3xl shadow-sm p-5 space-y-4 lg:col-span-2">
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 class="text-lg font-semibold text-slate-900">Danh sách cần kiểm</h2>
-            <p class="text-sm text-slate-500">Tự động hiển thị khi chọn ngày.</p>
+    <section id="detail-section" class="grid gap-6 lg:grid-cols-5">
+      <div id="order-list-pane" class="modern-card space-y-5 lg:col-span-2">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div class="space-y-1">
+            <h2 class="text-xl font-bold text-slate-900">Danh sách cần kiểm</h2>
+            <p class="text-sm text-slate-500">Tự động hiển thị khi chọn ngày</p>
           </div>
-          <div class="flex flex-col gap-2 sm:items-end">
-            <div class="relative w-full sm:w-56">
-              <input id="order-search-input" type="text" placeholder="Tìm mã đơn..." class="w-full rounded-2xl border border-slate-200 px-4 py-2.5 pl-11 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" />
+          <div class="flex flex-col gap-3 sm:items-end">
+            <div class="relative w-full sm:w-64">
+              <input id="order-search-input" type="text" placeholder="Tìm mã đơn..." class="w-full rounded-xl border border-slate-200 px-4 py-2.5 pl-11 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-slate-50 transition-all" />
               <svg class="h-4 w-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/></svg>
             </div>
-            <button id="open-detail-button" class="inline-flex items-center gap-2 rounded-2xl border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed">
+            <button id="open-detail-button" class="inline-flex items-center gap-2 rounded-xl border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
               <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5h11m0 0v11m0-11-5.5 5.5M7 9v10m0 0H5m2 0 4.5-4.5"/></svg>
               Mở chế độ chi tiết
             </button>
@@ -357,23 +450,26 @@
         <div id="order-list" class="space-y-3 max-h-[520px] overflow-y-auto pr-2 scroll-shadow"></div>
       </div>
 
-      <div id="order-detail-pane" class="bg-white rounded-3xl shadow-sm p-5 space-y-4 lg:col-span-3">
-        <div id="detail-close-bar" class="hidden items-center justify-between border-b border-slate-100 pb-3">
-          <div>
+      <div id="order-detail-pane" class="modern-card space-y-5 lg:col-span-3">
+        <div id="detail-close-bar" class="hidden items-center justify-between border-b border-slate-100 pb-4 mb-4">
+          <div class="space-y-1">
             <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Chế độ toàn màn hình</p>
-            <p class="text-base font-semibold text-slate-900" id="detail-view-title">Đơn đang kiểm</p>
+            <p class="text-lg font-bold text-slate-900" id="detail-view-title">Đơn đang kiểm</p>
           </div>
-          <button id="detail-close-button" class="inline-flex items-center gap-2 rounded-2xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <button id="detail-close-button" class="inline-flex items-center gap-2 rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all">
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m6 18 12-12M6 6l12 12"/></svg>
-            Quay lại trang chính
+            Quay lại
           </button>
         </div>
-        <h2 class="text-lg font-semibold text-slate-900">Chi tiết đơn đang kiểm</h2>
+        <div class="space-y-1 mb-4">
+          <h2 class="text-xl font-bold text-slate-900">Chi tiết đơn đang kiểm</h2>
+          <p class="text-sm text-slate-500">Quét mã sản phẩm để cập nhật tiến độ</p>
+        </div>
 
-        <form id="product-scan-form" autocomplete="off" class="space-y-2">
-          <label class="text-xs font-semibold text-slate-500 uppercase tracking-[0.25em]">Quét mã sản phẩm</label>
+        <form id="product-scan-form" autocomplete="off" class="form-group">
+          <label class="text-xs font-semibold text-slate-500 uppercase tracking-[0.25em] mb-2 block">Quét mã sản phẩm</label>
           <div class="relative">
-            <input id="product-scan-input" type="text" inputmode="text" placeholder="Quét mã sản phẩm (ví dụ A414-XL)" class="w-full rounded-2xl border border-slate-200 px-4 py-3 pl-12 font-mono text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+            <input id="product-scan-input" type="text" inputmode="text" placeholder="Quét mã sản phẩm (ví dụ A414-XL)" class="w-full rounded-2xl border border-slate-200 px-4 py-3.5 pl-12 font-mono text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50 transition-all" />
             <svg class="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7V5a2 2 0 0 1 2-2h2m8 0h2a2 2 0 0 1 2 2v2m0 8v2a2 2 0 0 1-2 2h-2m-8 0H6a2 2 0 0 1-2-2v-2M8 12h8"/></svg>
           </div>
         </form>
@@ -383,12 +479,12 @@
         <div id="order-placeholder" class="rounded-2xl border border-dashed border-slate-300 p-6 text-center text-slate-500">
           Chưa chọn hoặc quét mã vận đơn nào.
         </div>
-        <div id="order-panel" class="hidden space-y-4">
-          <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-            <div>
+        <div id="order-panel" class="hidden space-y-6">
+          <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between p-4 bg-gradient-to-br from-slate-50 to-indigo-50/30 rounded-2xl border border-slate-200">
+            <div class="space-y-1">
               <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Mã đơn</p>
-              <p id="detail-order-code" class="text-2xl font-semibold text-slate-900">—</p>
-              <p id="detail-order-note" class="text-sm text-slate-500"></p>
+              <p id="detail-order-code" class="text-3xl font-bold text-slate-900">—</p>
+              <p id="detail-order-note" class="text-sm text-slate-500 mt-1"></p>
             </div>
             <div class="flex flex-wrap gap-3 items-center">
               <span id="detail-status-badge" class="status-badge px-3 py-1 rounded-full bg-slate-100 text-slate-600">—</span>
@@ -405,6 +501,13 @@
                 </svg>
                 Xóa thông tin đã quét
               </button>
+              <button id="order-wrong-button" type="button" class="hidden inline-flex items-center gap-2 rounded-2xl border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-3.75a3.375 3.375 0 1 1 6.75 0m-6.75 0a3.375 3.375 0 1 0-6.75 0m9 9v.75M9 21.75h6M9 18v.75m6-.75v.75m-3-3.75h.008v.008H12v-.008Z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8.25v.75"/>
+                </svg>
+                Đơn Đi Sai
+              </button>
             </div>
           </div>
 
@@ -413,31 +516,39 @@
           </div>
 
           <div class="grid gap-4 md:grid-cols-2">
-            <div class="rounded-2xl border-2 border-indigo-100 bg-indigo-50/80 p-4 shadow-sm">
-              <p class="text-xs uppercase tracking-[0.3em] text-indigo-600 font-semibold mb-1">Description</p>
+            <div class="rounded-2xl border-2 border-indigo-100 bg-gradient-to-br from-indigo-50 to-indigo-50/50 p-5 shadow-sm transition-all hover:border-indigo-200">
+              <p class="text-xs uppercase tracking-[0.3em] text-indigo-600 font-semibold mb-2">Description</p>
               <p id="detail-desc" class="text-sm font-semibold text-slate-900 min-h-[1.5rem]">—</p>
             </div>
-            <div class="rounded-2xl border-2 border-emerald-100 bg-emerald-50/80 p-4 shadow-sm">
-              <p class="text-xs uppercase tracking-[0.3em] text-emerald-600 font-semibold mb-1">Private Note</p>
+            <div class="rounded-2xl border-2 border-emerald-100 bg-gradient-to-br from-emerald-50 to-emerald-50/50 p-5 shadow-sm transition-all hover:border-emerald-200">
+              <p class="text-xs uppercase tracking-[0.3em] text-emerald-600 font-semibold mb-2">Private Note</p>
               <p id="detail-private" class="text-sm font-semibold text-slate-900 min-h-[1.5rem]">—</p>
             </div>
           </div>
 
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <p class="text-base font-semibold text-slate-900">Sản phẩm cần kiểm</p>
-              <span id="detail-lines-count" class="text-sm text-slate-500">0 dòng</span>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+              <p class="text-base font-bold text-slate-900">Sản phẩm cần kiểm</p>
+              <span id="detail-lines-count" class="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full">0 dòng</span>
             </div>
             <ul id="line-list" class="space-y-3 max-h-[320px] overflow-y-auto pr-2 scroll-shadow"></ul>
           </div>
 
-          <div>
-            <p class="text-base font-semibold text-slate-900 mb-2">Sản phẩm còn thiếu</p>
-            <ul id="missing-list" class="text-sm text-slate-600 list-disc pl-5 space-y-1"></ul>
-          </div>
-          <div>
-            <p class="text-base font-semibold text-slate-900 mb-2">Sản phẩm đã kiểm</p>
-            <ul id="scanned-list" class="text-sm text-slate-600 list-disc pl-5 space-y-1"></ul>
+          <div class="grid gap-4 md:grid-cols-2">
+            <div class="p-4 bg-amber-50/50 rounded-xl border border-amber-100">
+              <p class="text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
+                <span class="w-2 h-2 bg-amber-500 rounded-full"></span>
+                Sản phẩm còn thiếu
+              </p>
+              <ul id="missing-list" class="text-sm text-slate-600 list-disc pl-5 space-y-1.5"></ul>
+            </div>
+            <div class="p-4 bg-emerald-50/50 rounded-xl border border-emerald-100">
+              <p class="text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
+                <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                Sản phẩm đã kiểm
+              </p>
+              <ul id="scanned-list" class="text-sm text-slate-600 list-disc pl-5 space-y-1.5"></ul>
+            </div>
           </div>
         </div>
       </div>
@@ -530,6 +641,7 @@
       const UPLOAD_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/upload_file';
       const RESET_PROGRESS_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/reset_masanpham_daquet';
       const MANUAL_COMPLETE_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/duhang_bom';
+      const ORDER_WRONG_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/hang_bocsai';
       const FLEXIBLE_SUFFIXES = ['DH', '1P1'];
       const REQ_TIMEOUT_MS = 12000;
       const isTouchDevice = 'ontouchstart' in window || (navigator?.maxTouchPoints || 0) > 0;
@@ -579,6 +691,7 @@
       const openDetailButton = $('open-detail-button');
       const manualCompleteButton = $('force-complete-button');
       const clearProgressButton = $('clear-progress-button');
+      const orderWrongButton = $('order-wrong-button');
       const manualCompleteModal = $('manual-complete-modal');
       const manualCompleteMessage = $('manual-complete-message');
       const manualCompleteList = $('manual-complete-list');
@@ -1085,6 +1198,9 @@
           orderPanel.classList.add('hidden');
           orderPlaceholder.classList.remove('hidden');
           orderModeHint.textContent = 'Chưa có đơn nào';
+          if (orderWrongButton) {
+            orderWrongButton.classList.add('hidden');
+          }
           return;
         }
 
@@ -1182,6 +1298,18 @@
         if (clearProgressButton) {
           clearProgressButton.disabled = state.clearingOrder;
           clearProgressButton.title = 'Xóa toàn bộ dữ liệu quét của đơn này.';
+        }
+        
+        // Hiển thị nút "Đơn Đi Sai" chỉ khi enforcement là 'strict'
+        if (orderWrongButton) {
+          const isStrict = order.enforcement === 'strict';
+          if (isStrict) {
+            orderWrongButton.classList.remove('hidden');
+            orderWrongButton.disabled = false;
+            orderWrongButton.title = 'Báo cáo đơn này đi sai';
+          } else {
+            orderWrongButton.classList.add('hidden');
+          }
         }
       };
 
@@ -1567,6 +1695,52 @@
         });
       };
 
+      const reportOrderWrong = async () => {
+        const targetCode = (state.selectedOrderCode || '').trim();
+        if (!targetCode) {
+          setState({ scanMessage: 'Hãy chọn một đơn trước khi báo cáo.', scanMessageType: 'error' });
+          return;
+        }
+        const order = findOrder(targetCode);
+        if (!order) {
+          setState({ scanMessage: `Không tìm thấy đơn ${targetCode}.`, scanMessageType: 'error' });
+          return;
+        }
+        const confirmReport = window.confirm(`Xác nhận báo cáo đơn ${order.orderCode} đi sai?`);
+        if (!confirmReport) return;
+        
+        setState({ scanMessage: 'Đang gửi báo cáo...', scanMessageType: 'info' });
+        let webhookMessage = '';
+        if (ORDER_WRONG_WEBHOOK_URL) {
+          try {
+            const response = await postJSON(ORDER_WRONG_WEBHOOK_URL, {
+              order_code: order.orderCode,
+              date: state.currentDate,
+              total_qty: order.totalQty,
+              scanned_qty: order.scannedQty,
+              status: order.status,
+              enforcement: order.enforcement,
+            });
+            const payload = unwrapWebhookPayload(response);
+            webhookMessage = payload?.message || payload?.answer || 'Đã gửi báo cáo đơn đi sai.';
+            setState({
+              scanMessage: webhookMessage,
+              scanMessageType: 'success',
+            });
+          } catch (err) {
+            setState({
+              scanMessage: err.message || 'Không thể gửi báo cáo đơn đi sai.',
+              scanMessageType: 'error',
+            });
+          }
+        } else {
+          setState({
+            scanMessage: 'Chưa cấu hình webhook báo cáo đơn đi sai.',
+            scanMessageType: 'error',
+          });
+        }
+      };
+
       const openUploadModal = () => {
         if (!uploadModal) return;
         uploadDayInput.value = state.currentDate || '';
@@ -1917,6 +2091,7 @@
       });
       if (manualCompleteButton) manualCompleteButton.addEventListener('click', openManualCompleteModal);
       if (clearProgressButton) clearProgressButton.addEventListener('click', () => clearOrderProgress());
+      if (orderWrongButton) orderWrongButton.addEventListener('click', () => reportOrderWrong());
       if (toggleDetailPanelButton) {
         toggleDetailPanelButton.addEventListener('click', () => {
           setState({ showDetailPanel: !state.showDetailPanel });
