@@ -157,10 +157,65 @@
       padding: clamp(1.5rem, 3vw, 2rem);
       box-shadow: 0 30px 60px rgba(6, 11, 33, 0.17);
       transition: transform 0.35s ease, box-shadow 0.35s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .modern-card::before {
+      content: '';
+      position: absolute;
+      inset: -40% auto auto -30%;
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, rgba(107, 91, 255, 0.22), transparent 65%);
+      filter: blur(0);
+      animation: cubertoGlow 14s ease-in-out infinite;
+      pointer-events: none;
+      z-index: -1;
     }
     .modern-card:hover {
       transform: translateY(-6px);
       box-shadow: 0 40px 80px rgba(6, 11, 33, 0.22);
+    }
+    @keyframes cubertoGlow {
+      0% { transform: translate(0, 0) scale(1); opacity: 0.65; }
+      40% { transform: translate(40px, 20px) scale(1.1); opacity: 0.45; }
+      70% { transform: translate(-10px, 35px) scale(0.9); opacity: 0.6; }
+      100% { transform: translate(0, 0) scale(1); opacity: 0.65; }
+    }
+    @keyframes cubertoPulse {
+      0%, 100% { box-shadow: 0 15px 30px rgba(99, 102, 241, 0.15); }
+      50% { box-shadow: 0 25px 45px rgba(99, 102, 241, 0.35); }
+    }
+    button.bg-indigo-600,
+    button.bg-emerald-600 {
+      animation: cubertoPulse 6s ease-in-out infinite;
+    }
+    [data-animate] {
+      opacity: 0;
+      transform: translateY(24px) scale(0.98);
+      transition: opacity 0.8s cubic-bezier(0.17, 0.67, 0.47, 1), transform 0.8s cubic-bezier(0.17, 0.67, 0.47, 1);
+    }
+    [data-animate].is-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .floating-input-capsule {
+      position: relative;
+      isolation: isolate;
+    }
+    .floating-input-capsule::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      border: 1px solid transparent;
+      background: linear-gradient(120deg, rgba(107, 91, 255, 0.35), rgba(45, 212, 191, 0.35));
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      z-index: -1;
+    }
+    .floating-input-capsule:focus-within::after {
+      opacity: 1;
     }
     .main-date-card {
       max-width: 640px;
@@ -343,7 +398,7 @@
         Chọn ngày khác
       </button>
     </div>
-    <section id="main-date-card" class="modern-card main-date-card space-y-6">
+    <section id="main-date-card" class="modern-card main-date-card space-y-6" data-animate>
       <div class="space-y-3">
         <h1 class="main-title">Chọn ngày cần kiểm</h1>
         <p class="main-subtitle">Chỉ hiển thị các công cụ kiểm sau khi bạn chọn đúng ngày cần xử lý.</p>
@@ -365,7 +420,7 @@
       </div>
     </section>
     <section id="detail-section" class="grid gap-6 lg:grid-cols-5 hidden">
-      <div id="order-list-pane" class="modern-card space-y-5 lg:col-span-2">
+      <div id="order-list-pane" class="modern-card space-y-5 lg:col-span-2" data-animate>
         <div class="space-y-5">
           <div class="text-center space-y-1">
             <p class="text-xs uppercase tracking-[0.3em] text-slate-400 font-semibold">Ngày đang xử lý</p>
@@ -392,16 +447,16 @@
             </button>
           </div>
           <div class="flex flex-col gap-3 sm:items-start sm:flex-row sm:gap-4 sm:justify-between">
-            <div class="relative w-full sm:w-64">
+            <div class="relative w-full sm:w-64 floating-input-capsule">
               <input id="order-search-input" type="text" placeholder="Tìm mã đơn..." class="w-full rounded-xl border border-slate-200 px-4 py-2.5 pl-11 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-slate-50 transition-all" />
               <svg class="h-4 w-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/></svg>
             </div>
           </div>
         </div>
-        <div id="order-list" class="space-y-3 max-h-[520px] overflow-y-auto pr-2 scroll-shadow"></div>
+        <div id="order-list" class="space-y-3 max-h-[520px] overflow-y-auto pr-2 scroll-shadow" data-animate></div>
       </div>
 
-      <div id="order-detail-pane" class="modern-card space-y-5 lg:col-span-3">
+      <div id="order-detail-pane" class="modern-card space-y-5 lg:col-span-3" data-animate>
         <div id="detail-close-bar" class="hidden items-center justify-between border-b border-slate-100 pb-4 mb-4">
           <div class="space-y-1">
             <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Chế độ toàn màn hình</p>
@@ -420,19 +475,19 @@
           </button>
         </div>
 
-        <div id="order-scan-block" class="space-y-3">
+        <div id="order-scan-block" class="space-y-3" data-animate>
           <form id="order-scan-form" autocomplete="off" class="form-group">
-            <div class="relative">
+            <div class="relative floating-input-capsule">
               <input id="order-scan-input" type="text" inputmode="text" placeholder="Quét mã vận đơn (ví dụ NVS637614631)" class="w-full rounded-2xl border border-slate-200 px-4 py-3.5 pl-12 font-mono text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50 transition-all" />
               <svg class="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M5 7h2M17 7h2M5 17h2M17 17h2M7 5v2m10-2v2M7 17v2m10-2v2M9 9h6v6H9z"/></svg>
             </div>
           </form>
         </div>
 
-        <div id="scan-feedback" class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 hidden"></div>
+        <div id="scan-feedback" class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 hidden" data-animate></div>
 
-        <div id="order-detail-content" class="space-y-5 hidden">
-          <div id="order-panel" class="hidden space-y-5">
+        <div id="order-detail-content" class="space-y-5 hidden" data-animate>
+          <div id="order-panel" class="hidden space-y-5" data-animate>
             <div class="rounded-3xl border border-slate-200 bg-white/90 p-5 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div class="space-y-1">
                 <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Mã đơn</p>
@@ -508,18 +563,18 @@
               </div>
             </div>
           </div>
-          <div id="order-placeholder" class="rounded-3xl border border-dashed border-slate-300 bg-white/80 p-6 text-center text-slate-500">
+          <div id="order-placeholder" class="rounded-3xl border border-dashed border-slate-300 bg-white/80 p-6 text-center text-slate-500" data-animate>
             Chưa chọn hoặc quét mã vận đơn nào.
           </div>
 
-          <form id="product-scan-form" autocomplete="off" class="form-group rounded-3xl border border-slate-200 bg-white/90 p-5">
-            <div class="relative">
+          <form id="product-scan-form" autocomplete="off" class="form-group rounded-3xl border border-slate-200 bg-white/90 p-5" data-animate>
+            <div class="relative floating-input-capsule">
               <input id="product-scan-input" type="text" inputmode="text" aria-label="Quét mã sản phẩm" placeholder="Quét mã sản phẩm (ví dụ A414-XL)" class="w-full rounded-2xl border border-slate-200 px-4 py-3.5 pl-12 font-mono text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50 transition-all" />
               <svg class="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7V5a2 2 0 0 1 2-2h2m8 0h2a2 2 0 0 1 2 2v2m0 8v2a2 2 0 0 1-2 2h-2m-8 0H6a2 2 0 0 1-2-2v-2M8 12h8"/></svg>
             </div>
           </form>
 
-          <div class="rounded-3xl border border-slate-200 bg-white/90 p-4 flex flex-wrap items-center gap-3 justify-between">
+          <div class="rounded-3xl border border-slate-200 bg-white/90 p-4 flex flex-wrap items-center gap-3 justify-between" data-animate>
             <button id="reset-order-button" class="inline-flex items-center gap-2 px-4 py-2 text-sm rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50 transition-all">
               <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M5 19A9 9 0 0 0 19 5"/></svg>
               Reset đơn hiện tại
@@ -812,6 +867,17 @@
         monthSelect.addEventListener('change', handleYearMonthChange);
       };
       initializeDateSelectors();
+      const animatedElements = document.querySelectorAll('[data-animate]');
+      const animateObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+          } else {
+            entry.target.classList.remove('is-visible');
+          }
+        });
+      }, { threshold: 0.2, rootMargin: '0px 0px -10% 0px' });
+      animatedElements.forEach((element) => animateObserver.observe(element));
 
       const coalesce = (...values) => {
         for (const value of values) {
