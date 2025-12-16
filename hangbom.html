@@ -18,6 +18,9 @@
       --primary: #6b5bff;
       --accent: #2dd4bf;
       --radius-lg: 28px;
+      --container: 1180px;
+      --nav-h: 78px;
+      --hairline: rgba(15, 23, 42, 0.12);
     }
 
     .scroll-shadow {
@@ -32,6 +35,74 @@
       min-height: 100vh;
       position: relative;
       overflow-x: hidden;
+    }
+
+    /* ---- Cuberto-like shell ---- */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--nav-h);
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+      z-index: 60;
+    }
+    .topbar-inner {
+      height: 100%;
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.25rem;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+    }
+    .brand-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      background: #0f172a;
+      display: inline-block;
+    }
+    .topnav {
+      display: flex;
+      align-items: center;
+      gap: clamp(0.65rem, 2vw, 1.75rem);
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .topnav a {
+      text-decoration: none;
+      color: rgba(15, 23, 42, 0.72);
+      font-weight: 500;
+      font-size: 0.98rem;
+      padding: 0.45rem 0.15rem;
+      border-bottom: 2px solid transparent;
+      transition: color 0.18s ease, border-color 0.18s ease;
+    }
+    .topnav a:hover {
+      color: rgba(15, 23, 42, 0.92);
+    }
+    .topnav a[aria-current="page"] {
+      color: rgba(15, 23, 42, 0.92);
+      border-color: rgba(15, 23, 42, 0.9);
+    }
+
+    body.detail-mode .topbar {
+      display: none;
     }
 
     .status-badge {
@@ -76,19 +147,7 @@
     }
 
     .back-home-link {
-      position: fixed;
-      top: 16px;
-      left: 16px;
-      z-index: 1000;
-      padding: 0.45rem 0.95rem;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 999px;
-      font-weight: 600;
-      color: var(--primary);
-      text-decoration: none;
-      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
-      border: 1px solid rgba(15, 23, 42, 0.08);
-      letter-spacing: 0.05em;
+      display: none;
     }
 
     .back-home-link:focus-visible {
@@ -121,7 +180,6 @@
     }
 
     button {
-      border-radius: 999px !important;
       font-weight: 600;
       letter-spacing: 0.02em;
     }
@@ -129,8 +187,9 @@
     #app-shell {
       position: relative;
       z-index: 1;
-      padding-top: clamp(3rem, 6vw, 5rem);
+      padding-top: calc(var(--nav-h) + 1.5rem);
       padding-bottom: clamp(2.5rem, 5vw, 4rem);
+      max-width: var(--container);
     }
     input, textarea, select {
       background: rgba(246, 248, 255, 0.9);
@@ -140,8 +199,8 @@
     }
     input:focus, textarea:focus, select:focus {
       outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(123, 92, 252, 0.2);
+      border-color: rgba(15, 23, 42, 0.55);
+      box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
     }
 
     button.bg-indigo-600,
@@ -151,30 +210,21 @@
     }
 
     .modern-card {
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(245, 248, 255, 0.92));
-      border: 1px solid rgba(226, 232, 240, 0.65);
-      border-radius: 32px;
+      background: #ffffff;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 28px;
       padding: clamp(1.5rem, 3vw, 2rem);
-      box-shadow: 0 30px 60px rgba(6, 11, 33, 0.17);
+      box-shadow: none;
       transition: transform 0.35s ease, box-shadow 0.35s ease;
       position: relative;
       overflow: hidden;
     }
     .modern-card::before {
-      content: '';
-      position: absolute;
-      inset: -40% auto auto -30%;
-      width: 260px;
-      height: 260px;
-      background: radial-gradient(circle, rgba(107, 91, 255, 0.22), transparent 65%);
-      filter: blur(0);
-      animation: cubertoGlow 14s ease-in-out infinite;
-      pointer-events: none;
-      z-index: -1;
+      display: none;
     }
     .modern-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 40px 80px rgba(6, 11, 33, 0.22);
+      transform: translateY(-4px);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
     }
     @keyframes cubertoGlow {
       0% { transform: translate(0, 0) scale(1); opacity: 0.65; }
@@ -387,10 +437,117 @@
         grid-template-columns: 1fr;
       }
     }
+
+    .status-tabs {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.75rem;
+      flex-wrap: wrap;
+      padding-top: 0.25rem;
+    }
+    .status-tab {
+      background: transparent;
+      border: none;
+      padding: 0.2rem 0;
+      border-bottom: 2px solid transparent;
+      font-weight: 500;
+      font-size: 0.98rem;
+      color: rgba(15, 23, 42, 0.72);
+      cursor: pointer;
+      transition: color 0.18s ease, border-color 0.18s ease;
+    }
+    .status-tab:hover {
+      color: rgba(15, 23, 42, 0.92);
+    }
+    .status-tab.is-active {
+      color: rgba(15, 23, 42, 0.92);
+      border-color: rgba(15, 23, 42, 0.92);
+    }
+
+    .detail-block {
+      padding-top: 1.25rem;
+      margin-top: 1.25rem;
+      border-top: none;
+    }
+    .detail-block:first-child {
+      padding-top: 0;
+      margin-top: 0;
+      border-top: 0;
+    }
+
+    .note-card {
+      background: rgba(248, 250, 252, 0.92);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 20px;
+      padding: 1rem 1.25rem;
+    }
+    .note-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(15, 23, 42, 0.55);
+      margin-bottom: 0.5rem;
+    }
+    .note-label.note-desc {
+      color: rgba(79, 70, 229, 0.9);
+    }
+    .note-label.note-private {
+      color: rgba(16, 185, 129, 0.9);
+    }
+    .note-value {
+      font-size: 1.05rem;
+      line-height: 1.55;
+      font-weight: 600;
+      color: rgba(15, 23, 42, 0.92);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .cuberto-input {
+      background: #ffffff !important;
+      border: 1px solid rgba(15, 23, 42, 0.12) !important;
+      box-shadow: none !important;
+    }
+    .cuberto-input::placeholder {
+      color: rgba(100, 116, 139, 0.85);
+    }
+
+    /* Cuberto-like smooth scroll container */
+    .cuberto-scroll {
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .cuberto-scroll::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cuberto-scroll {
+        scroll-behavior: auto;
+      }
+    }
+
   </style>
 </head>
 <body class="min-h-screen">
-  <a class="back-home-link" href="index.html" aria-label="Quay lại trang chính Cô Mập Fashion">← Trang chính</a>
+  <header class="topbar" role="banner">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html" aria-label="Về trang chính">
+        <span class="brand-dot" aria-hidden="true"></span>
+        <span>Cô Mập</span>
+      </a>
+      <nav class="topnav" aria-label="Điều hướng">
+        <a href="index.html">Home</a>
+        <a href="location.html">Location</a>
+        <a href="bochang.html">Bóc chang</a>
+        <a href="thongtindonhang.html">Đơn hàng</a>
+        <a href="hangbom.html" aria-current="page">Kiểm hàng</a>
+      </nav>
+    </div>
+  </header>
   <div id="app-shell" class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
     <div class="flex justify-end">
       <button id="change-day-button" type="button" class="hidden inline-flex items-center gap-2 rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-white transition-all">
@@ -452,8 +609,14 @@
               <svg class="h-4 w-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/></svg>
             </div>
           </div>
+          <div class="status-tabs" role="tablist" aria-label="Lọc theo trạng thái">
+            <button type="button" class="status-tab is-active" data-order-status-filter="all">Tất cả</button>
+            <button type="button" class="status-tab" data-order-status-filter="pending">Chưa quét</button>
+            <button type="button" class="status-tab" data-order-status-filter="progress">Đang quét</button>
+            <button type="button" class="status-tab" data-order-status-filter="done">Đã xong</button>
+          </div>
         </div>
-        <div id="order-list" class="space-y-3 max-h-[520px] overflow-y-auto pr-2 scroll-shadow" data-animate></div>
+        <div id="order-list" class="cuberto-scroll max-h-[520px] overflow-y-auto overflow-x-visible scroll-shadow rounded-3xl border border-slate-200 bg-white" data-animate></div>
       </div>
 
       <div id="order-detail-pane" class="modern-card space-y-5 lg:col-span-3" data-animate>
@@ -468,7 +631,7 @@
           </button>
         </div>
         <div class="flex items-center justify-between gap-3 mb-4">
-          <h2 class="text-xl font-bold text-slate-900">Quét mã vận đơn</h2>
+          <h2 id="detail-panel-title" class="text-xl font-bold text-slate-900">Quét mã vận đơn</h2>
           <button id="back-to-scan-button" type="button" class="hidden inline-flex items-center gap-2 rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-white transition-all">
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m15 18-6-6 6-6"/></svg>
             Quét mã khác
@@ -478,7 +641,7 @@
         <div id="order-scan-block" class="space-y-3" data-animate>
           <form id="order-scan-form" autocomplete="off" class="form-group">
             <div class="relative floating-input-capsule">
-              <input id="order-scan-input" type="text" inputmode="text" placeholder="Quét mã vận đơn (ví dụ NVS637614631)" class="w-full rounded-2xl border border-slate-200 px-4 py-3.5 pl-12 font-mono text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50 transition-all" />
+              <input id="order-scan-input" type="text" inputmode="text" placeholder="Nhập mã đơn để xem chi tiết (ví dụ NVS637614631)" class="cuberto-input w-full px-4 py-4 pl-12 font-mono text-base transition-all" />
               <svg class="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M5 7h2M17 7h2M5 17h2M17 17h2M7 5v2m10-2v2M7 17v2m10-2v2M9 9h6v6H9z"/></svg>
             </div>
           </form>
@@ -487,74 +650,76 @@
         <div id="scan-feedback" class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 hidden" data-animate></div>
 
         <div id="order-detail-content" class="space-y-5 hidden" data-animate>
-          <div id="order-panel" class="hidden space-y-5" data-animate>
-            <div class="rounded-3xl border border-slate-200 bg-white/90 p-5 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-              <div class="space-y-1">
-                <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Mã đơn</p>
-                <p id="detail-order-code" class="text-3xl font-bold text-slate-900">—</p>
-                <p id="detail-order-note" class="text-sm text-slate-500 mt-1"></p>
+          <form id="product-scan-form" autocomplete="off" class="form-group" data-animate>
+            <div class="relative floating-input-capsule">
+              <input id="product-scan-input" type="text" inputmode="text" aria-label="Quét mã sản phẩm" placeholder="Quét mã sản phẩm (ví dụ A414-XL)" class="cuberto-input w-full px-4 py-4 pl-12 font-mono text-base transition-all" />
+              <svg class="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7V5a2 2 0 0 1 2-2h2m8 0h2a2 2 0 0 1 2 2v2m0 8v2a2 2 0 0 1-2 2h-2m-8 0H6a2 2 0 0 1-2-2v-2M8 12h8"/></svg>
+            </div>
+          </form>
+
+          <div id="order-panel" class="hidden space-y-0" data-animate>
+            <div class="detail-block flex flex-col gap-3 items-end">
+              <div class="hidden" aria-hidden="true">
+                <p id="detail-order-code">—</p>
+                <p id="detail-order-note"></p>
               </div>
-              <div class="flex flex-col gap-2 w-full md:w-auto md:items-end md:text-right">
-                <div class="flex flex-wrap justify-end gap-2">
-                  <span id="detail-status-badge" class="status-badge px-3 py-1 rounded-full bg-slate-100 text-slate-600">—</span>
-                  <span id="detail-qty-badge" class="status-badge px-3 py-1 rounded-full bg-slate-100 text-slate-600">0 / 0 SP</span>
-                </div>
-                <div class="flex flex-wrap justify-end gap-2">
-                  <button id="force-complete-button" type="button" class="inline-flex items-center gap-2 rounded-2xl border border-amber-300 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-50 disabled:opacity-40 disabled:cursor-not-allowed">
-                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"/>
-                    </svg>
-                    Đã quét xong (thủ công)
-                  </button>
-                  <button id="clear-progress-button" type="button" class="inline-flex items-center gap-2 rounded-2xl border border-rose-300 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 disabled:opacity-40 disabled:cursor-not-allowed">
-                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="m6 18 12-12M6 6l12 12"/>
-                    </svg>
-                    Xóa thông tin đã quét
-                  </button>
-                  <button id="order-wrong-button" type="button" class="hidden inline-flex items-center gap-2 rounded-2xl border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
-                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-3.75a3.375 3.375 0 1 1 6.75 0m-6.75 0a3.375 3.375 0 1 0-6.75 0m9 9v.75M9 21.75h6M9 18v.75m6-.75v.75m-3-3.75h.008v.008H12v-.008Z"/>
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 8.25v.75"/>
-                    </svg>
-                    Đơn Đi Sai
-                  </button>
-                </div>
+              <div class="flex flex-wrap items-center justify-end gap-2 w-full md:w-auto md:text-right">
+                <span id="detail-status-badge" class="status-badge px-3 py-1 rounded-full bg-slate-100 text-slate-600">—</span>
+                <span id="detail-qty-badge" class="status-badge px-3 py-1 rounded-full bg-slate-100 text-slate-600">0 / 0 SP</span>
+                <button id="force-complete-button" type="button" class="inline-flex items-center gap-2 rounded-2xl border border-amber-300 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-50 disabled:opacity-40 disabled:cursor-not-allowed">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"/>
+                  </svg>
+                  Đã quét xong (thủ công)
+                </button>
+                <button id="clear-progress-button" type="button" class="inline-flex items-center gap-2 rounded-2xl border border-rose-300 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 disabled:opacity-40 disabled:cursor-not-allowed">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m6 18 12-12M6 6l12 12"/>
+                  </svg>
+                  Xóa thông tin đã quét
+                </button>
+                <button id="order-wrong-button" type="button" class="hidden inline-flex items-center gap-2 rounded-2xl border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-3.75a3.375 3.375 0 1 1 6.75 0m-6.75 0a3.375 3.375 0 1 0-6.75 0m9 9v.75M9 21.75h6M9 18v.75m6-.75v.75m-3-3.75h.008v.008H12v-.008Z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8.25v.75"/>
+                  </svg>
+                  Đơn Đi Sai
+                </button>
               </div>
             </div>
 
-            <div id="flexible-banner" class="hidden rounded-3xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            <div id="flexible-banner" class="detail-block hidden rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
               Đơn có hậu tố linh hoạt. Chỉ cần xác nhận thông tin, không bắt buộc quét từng mã sản phẩm.
             </div>
 
-            <div class="grid gap-4 md:grid-cols-2">
-              <div class="rounded-3xl border border-slate-200 bg-white/90 p-5 space-y-2">
-                <p class="text-xs uppercase tracking-[0.3em] text-indigo-600 font-semibold mb-2">Description</p>
-                <p id="detail-desc" class="text-sm font-semibold text-slate-900 min-h-[1.5rem]">—</p>
+            <div class="detail-block grid gap-6 md:grid-cols-2">
+              <div class="note-card">
+                <p class="note-label note-desc">Mô tả</p>
+                <p id="detail-desc" class="note-value">—</p>
               </div>
-              <div class="rounded-3xl border border-slate-200 bg-white/90 p-5 space-y-2">
-                <p class="text-xs uppercase tracking-[0.3em] text-emerald-600 font-semibold mb-2">Private Note</p>
-                <p id="detail-private" class="text-sm font-semibold text-slate-900 min-h-[1.5rem]">—</p>
+              <div class="note-card">
+                <p class="note-label note-private">Ghi chú nội bộ</p>
+                <p id="detail-private" class="note-value">—</p>
               </div>
             </div>
 
-            <div class="rounded-3xl border border-slate-200 bg-white/90 p-5 space-y-4">
-              <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+            <div class="detail-block space-y-4">
+              <div class="flex items-center justify-between pb-2">
                 <p class="text-base font-bold text-slate-900">Sản phẩm cần kiểm</p>
                 <span id="detail-lines-count" class="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full">0 dòng</span>
               </div>
               <ul id="line-list" class="space-y-3 max-h-[320px] overflow-y-auto pr-2 scroll-shadow"></ul>
             </div>
 
-            <div class="grid gap-4 md:grid-cols-2">
-              <div class="rounded-3xl border border-slate-200 bg-white/90 p-5">
+            <div class="detail-block grid gap-8 md:grid-cols-2">
+              <div>
                 <p class="text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
                   <span class="w-2 h-2 bg-amber-500 rounded-full"></span>
                   Sản phẩm còn thiếu
                 </p>
                 <ul id="missing-list" class="text-sm text-slate-600 list-disc pl-5 space-y-1.5"></ul>
               </div>
-              <div class="rounded-3xl border border-slate-200 bg-white/90 p-5">
+              <div>
                 <p class="text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
                   <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
                   Sản phẩm đã kiểm
@@ -567,14 +732,7 @@
             Chưa chọn hoặc quét mã vận đơn nào.
           </div>
 
-          <form id="product-scan-form" autocomplete="off" class="form-group rounded-3xl border border-slate-200 bg-white/90 p-5" data-animate>
-            <div class="relative floating-input-capsule">
-              <input id="product-scan-input" type="text" inputmode="text" aria-label="Quét mã sản phẩm" placeholder="Quét mã sản phẩm (ví dụ A414-XL)" class="w-full rounded-2xl border border-slate-200 px-4 py-3.5 pl-12 font-mono text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50 transition-all" />
-              <svg class="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7V5a2 2 0 0 1 2-2h2m8 0h2a2 2 0 0 1 2 2v2m0 8v2a2 2 0 0 1-2 2h-2m-8 0H6a2 2 0 0 1-2-2v-2M8 12h8"/></svg>
-            </div>
-          </form>
-
-          <div class="rounded-3xl border border-slate-200 bg-white/90 p-4 flex flex-wrap items-center gap-3 justify-between" data-animate>
+          <div class="flex flex-wrap items-center gap-3 justify-between" data-animate>
             <button id="reset-order-button" class="inline-flex items-center gap-2 px-4 py-2 text-sm rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50 transition-all">
               <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M5 19A9 9 0 0 0 19 5"/></svg>
               Reset đơn hiện tại
@@ -756,6 +914,7 @@
         currentDate: '',
         orders: [],
         filter: '',
+        statusFilterMode: 'all',
         selectedOrderCode: null,
         loadingDay: false,
         shippingLoading: false,
@@ -785,6 +944,56 @@
 
       const state = { ...initialState };
       let loadRequestHandle = 0;
+
+      const statusFilterButtons = Array.from(document.querySelectorAll('[data-order-status-filter]'));
+
+      const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+      const enableCubertoSmoothScroll = (element) => {
+        if (!element) return;
+        if (window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) return;
+        const isFinePointer = window.matchMedia?.('(pointer: fine)')?.matches;
+        if (!isFinePointer) return;
+
+        let current = element.scrollTop;
+        let target = element.scrollTop;
+        let raf = null;
+
+        const tick = () => {
+          current += (target - current) * 0.14;
+          if (Math.abs(target - current) < 0.5) {
+            current = target;
+            element.scrollTop = current;
+            raf = null;
+            return;
+          }
+          element.scrollTop = current;
+          raf = requestAnimationFrame(tick);
+        };
+
+        element.addEventListener('wheel', (event) => {
+          if (event.ctrlKey) return;
+          event.preventDefault();
+          const maxScroll = Math.max(0, element.scrollHeight - element.clientHeight);
+          target = clamp(target + event.deltaY, 0, maxScroll);
+          if (!raf) raf = requestAnimationFrame(tick);
+        }, { passive: false });
+
+        element.addEventListener('scroll', () => {
+          if (raf) return;
+          current = element.scrollTop;
+          target = element.scrollTop;
+        }, { passive: true });
+      };
+
+      statusFilterButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const mode = btn.getAttribute('data-order-status-filter') || 'all';
+          setState({ statusFilterMode: mode });
+        });
+      });
+
+      enableCubertoSmoothScroll(orderList);
 
       const padNumber = (value) => String(value).padStart(2, '0');
       const getVietnamTodayParts = () => {
@@ -1221,19 +1430,21 @@
 
       const renderOrdersList = () => {
         orderList.innerHTML = '';
+        orderList.classList.remove('divide-y', 'divide-slate-200/80');
         const filtered = state.orders.filter((order) => {
-          if (!state.filter) return true;
-          return order.orderCode?.toLowerCase().includes(state.filter.toLowerCase());
+          const matchesText = !state.filter || order.orderCode?.toLowerCase().includes(state.filter.toLowerCase());
+          const matchesStatus = state.statusFilterMode === 'all' || order.status === state.statusFilterMode;
+          return matchesText && matchesStatus;
         });
 
         if (!state.currentDate) {
-          orderList.innerHTML = '<p class="text-sm text-slate-500">Chọn ngày để xem danh sách.</p>';
+          orderList.innerHTML = '<p class="p-4 text-sm text-slate-500">Chọn ngày để xem danh sách.</p>';
           return;
         }
 
         if (state.loadingDay) {
           orderList.innerHTML = `
-            <div class="flex items-center gap-3 text-slate-500 text-sm">
+            <div class="p-4 flex items-center gap-3 text-slate-500 text-sm">
               <div class="h-4 w-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
               Đang tải dữ liệu...
             </div>`;
@@ -1241,35 +1452,37 @@
         }
 
         if (!filtered.length) {
-          orderList.innerHTML = '<p class="text-sm text-slate-500">Không tìm thấy mã đơn nào cho ngày này.</p>';
+          orderList.innerHTML = '<p class="p-4 text-sm text-slate-500">Không tìm thấy mã đơn nào cho ngày này.</p>';
           return;
         }
 
+        orderList.classList.add('divide-y', 'divide-slate-200/80');
         filtered.forEach((order) => {
           const li = document.createElement('button');
           li.type = 'button';
           const isActive = state.selectedOrderCode === order.orderCode;
           li.className = [
-            'w-full text-left rounded-2xl border p-4 transition focus:outline-none focus:ring-2 focus:ring-indigo-500',
-            isActive ? 'border-indigo-300 bg-indigo-50 shadow-sm' : 'border-slate-200 bg-white hover:border-indigo-200'
+            'w-full text-left px-5 py-4 bg-white transform-gpu transition-all duration-150 ease-out',
+            'hover:-translate-y-0.5 hover:shadow-md hover:relative hover:z-10',
+            'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-white',
+            isActive ? 'scale-[1.02] shadow-lg relative z-20' : ''
           ].join(' ');
 
           const statusColor = order.status === 'done'
-            ? 'bg-emerald-100 text-emerald-700'
+            ? 'bg-emerald-100 text-emerald-800'
             : order.status === 'progress'
-              ? 'bg-amber-100 text-amber-700'
-              : 'bg-slate-100 text-slate-600';
+              ? 'bg-amber-100 text-amber-800'
+              : 'bg-slate-100 text-slate-700';
 
           li.innerHTML = `
-            <div class="flex items-center justify-between mb-2">
-              <span class="font-semibold text-slate-900">${order.orderCode}</span>
-              <span class="status-badge px-3 py-1 rounded-full ${statusColor}">
+            <div class="flex items-start justify-between gap-4">
+              <div class="min-w-0">
+                <div class="text-xl font-semibold text-slate-900 tracking-tight">${order.orderCode}</div>
+                <div class="mt-1 text-sm text-slate-500">${order.scannedQty} / ${order.totalQty || '—'} sản phẩm${order.flexible ? ' • Linh hoạt' : ''}</div>
+              </div>
+              <span class="status-badge px-4 py-2 rounded-full ${statusColor} whitespace-nowrap">
                 ${order.status === 'done' ? 'Đã xong' : order.status === 'progress' ? 'Đang quét' : 'Chưa quét'}
               </span>
-            </div>
-            <div class="flex items-center justify-between text-xs text-slate-500">
-              <span>${order.scannedQty} / ${order.totalQty || '—'} sản phẩm</span>
-              ${order.flexible ? '<span class="font-semibold text-indigo-500">Linh hoạt</span>' : ''}
             </div>
           `;
 
@@ -1325,10 +1538,12 @@
 
       const renderOrderDetail = () => {
         const order = findOrder(state.selectedOrderCode);
+        const detailPanelTitle = $('detail-panel-title');
         if (!order) {
           orderPanel.classList.add('hidden');
           orderPlaceholder.classList.remove('hidden');
           if (orderModeHint) orderModeHint.textContent = 'Chưa có đơn nào';
+          if (detailPanelTitle) detailPanelTitle.textContent = 'Quét mã vận đơn';
           if (orderWrongButton) {
             orderWrongButton.classList.add('hidden');
           }
@@ -1340,6 +1555,7 @@
         if (orderModeHint) orderModeHint.textContent = `Đang kiểm: ${order.orderCode}`;
 
         detailOrderCode.textContent = order.orderCode;
+        if (detailPanelTitle) detailPanelTitle.textContent = `Chi tiết đơn: ${order.orderCode}`;
         detailOrderNote.textContent = state.detailLoading
           ? 'Đang tải mô tả & ghi chú...'
           : order.lastUpdated
@@ -1491,6 +1707,12 @@
       };
 
       const render = () => {
+        if (statusFilterButtons.length) {
+          statusFilterButtons.forEach((btn) => {
+            const mode = btn.getAttribute('data-order-status-filter') || 'all';
+            btn.classList.toggle('is-active', mode === state.statusFilterMode);
+          });
+        }
         renderStats();
         renderOrdersList();
         renderOrderDetail();
