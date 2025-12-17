@@ -530,9 +530,620 @@
       }
     }
 
+    /* ---- Score-style UI (monochrome / Swiss grid) ---- */
+    .score-ui {
+      --score-bg: #f5f5f4;
+      --score-panel: #ffffff;
+      --score-text: #111827;
+      --score-muted: rgba(17, 24, 39, 0.6);
+      --score-line: rgba(17, 24, 39, 0.14);
+      --score-line-strong: rgba(17, 24, 39, 0.22);
+      --score-bar: rgba(17, 24, 39, 0.08);
+      --score-bar-fill: rgba(17, 24, 39, 0.22);
+    }
+
+    .score-ui body,
+    body.score-ui {
+      background: var(--score-bg);
+      color: var(--score-text);
+    }
+
+    body.score-ui .topbar {
+      background: rgba(245, 245, 244, 0.86);
+      border-bottom: 1px solid var(--score-line);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    body.score-ui .brand-dot {
+      border-radius: 0;
+      width: 12px;
+      height: 12px;
+      background: var(--score-text);
+    }
+
+    body.score-ui #app-shell {
+      max-width: 1200px;
+      padding-top: calc(var(--nav-h) + 2rem);
+    }
+
+    body.score-ui .modern-card {
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+      box-shadow: none;
+      transform: none !important;
+    }
+
+    body.score-ui .main-date-card {
+      max-width: 920px;
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    body.score-ui .main-title {
+      font-size: clamp(2.5rem, 6vw, 4.25rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+    }
+
+    body.score-ui .main-subtitle {
+      color: var(--score-muted);
+      font-size: 1.05rem;
+      max-width: 60ch;
+    }
+
+    body.score-ui .date-select-grid select,
+    body.score-ui input,
+    body.score-ui textarea,
+    body.score-ui select {
+      background: var(--score-panel);
+      border: 1px solid var(--score-line);
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    body.score-ui button {
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      animation: none !important;
+    }
+
+    body.score-ui button.bg-indigo-600,
+    body.score-ui button.bg-emerald-600 {
+      background: var(--score-text) !important;
+    }
+
+    body.score-ui button.bg-indigo-600:hover,
+    body.score-ui button.bg-emerald-600:hover {
+      background: rgba(17, 24, 39, 0.92) !important;
+    }
+
+    body.score-ui #day-banner {
+      max-width: 1200px;
+      margin: 0 auto;
+      border-radius: 0;
+    }
+
+    body.score-ui .score-hero {
+      background: var(--score-panel);
+      border: 1px solid var(--score-line);
+      padding: clamp(1.5rem, 3vw, 2.25rem);
+    }
+
+    body.score-ui .score-hero-top {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1.25rem;
+      align-items: end;
+      border-bottom: 1px solid var(--score-line);
+      padding-bottom: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    body.score-ui .score-hero-title {
+      font-size: clamp(2.6rem, 6.2vw, 4.8rem);
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+    }
+
+    body.score-ui .score-hero-date {
+      margin-top: 0.6rem;
+      color: var(--score-muted);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    body.score-ui .score-hero-score {
+      display: grid;
+      grid-template-columns: auto auto auto;
+      align-items: baseline;
+      justify-items: end;
+      gap: 0.55rem;
+      text-align: right;
+    }
+
+    body.score-ui .score-hero-arrow {
+      font-size: clamp(1.8rem, 3.6vw, 3.2rem);
+      font-weight: 700;
+      opacity: 0.9;
+    }
+
+    body.score-ui .score-hero-number {
+      font-size: clamp(3.2rem, 7vw, 6.2rem);
+      line-height: 0.95;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    body.score-ui .score-hero-unit {
+      font-size: 1.1rem;
+      color: var(--score-muted);
+      font-weight: 700;
+      padding-bottom: 0.35rem;
+    }
+
+    body.score-ui .score-hero-system {
+      grid-column: 1 / -1;
+      color: var(--score-muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--score-line);
+      justify-self: end;
+      padding-bottom: 0.15rem;
+      margin-top: 0.25rem;
+    }
+
+    body.score-ui .score-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0;
+      border-left: 1px dashed var(--score-line);
+      border-right: 1px dashed var(--score-line);
+    }
+
+    body.score-ui .score-metric {
+      padding: 1.1rem 1.1rem 0.95rem;
+      border-right: 1px dashed var(--score-line);
+      min-height: 140px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 0.75rem;
+    }
+
+    body.score-ui .score-metric:last-child {
+      border-right: none;
+    }
+
+    body.score-ui .score-metric-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    body.score-ui .score-metric-name {
+      font-weight: 700;
+      color: rgba(17, 24, 39, 0.72);
+      text-transform: none;
+    }
+
+    body.score-ui .score-metric-weight {
+      font-weight: 800;
+      color: rgba(17, 24, 39, 0.92);
+    }
+
+    body.score-ui .score-bar {
+      height: 56px;
+      background: var(--score-bar);
+      border: 1px solid var(--score-line);
+      position: relative;
+      overflow: hidden;
+    }
+
+    body.score-ui .score-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--score-bar-fill), rgba(17, 24, 39, 0.08));
+      transition: width 0.45s ease;
+    }
+
+    body.score-ui .score-metric-foot {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.75rem;
+      color: rgba(17, 24, 39, 0.78);
+      font-weight: 700;
+    }
+
+    body.score-ui .score-metric-score {
+      font-variant-numeric: tabular-nums;
+    }
+
+    body.score-ui .score-metric-count {
+      color: var(--score-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    @media (max-width: 900px) {
+      body.score-ui .score-hero-top {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+      body.score-ui .score-hero-score {
+        justify-items: start;
+        text-align: left;
+      }
+      body.score-ui .score-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      body.score-ui .score-metric:nth-child(2n) {
+        border-right: none;
+      }
+    }
+
+    @media (max-width: 520px) {
+      body.score-ui .score-metrics {
+        grid-template-columns: 1fr;
+        border-left: none;
+        border-right: none;
+      }
+      body.score-ui .score-metric {
+        border-right: none;
+        border-bottom: 1px dashed var(--score-line);
+      }
+      body.score-ui .score-metric:last-child {
+        border-bottom: none;
+      }
+    }
+
+    /* Make lists look like a score table */
+    body.score-ui #order-list {
+      border-radius: 0 !important;
+      border: 1px solid var(--score-line) !important;
+      background: var(--score-panel) !important;
+    }
+
+    body.score-ui #order-list button {
+      border-bottom: 1px dashed var(--score-line);
+      box-shadow: none !important;
+    }
+
+    body.score-ui #order-list button:last-child {
+      border-bottom: none;
+    }
+
+    body.score-ui .status-tab {
+      border-radius: 0;
+    }
+
+    /* ---- Detail pane: Rejouice-like calm layout ---- */
+    body.score-ui #order-list-pane,
+    body.score-ui #order-detail-pane {
+      background: var(--score-panel);
+      border: 1px solid var(--score-line);
+      padding: clamp(1.25rem, 2.4vw, 1.75rem);
+    }
+
+    body.score-ui #detail-close-bar {
+      border-bottom: 1px solid var(--score-line) !important;
+    }
+
+    body.score-ui #detail-panel-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(17, 24, 39, 0.68);
+    }
+
+    body.score-ui #scan-feedback {
+      border-radius: 0 !important;
+      border: 1px solid var(--score-line) !important;
+      background: rgba(17, 24, 39, 0.03) !important;
+    }
+
+    body.score-ui .detail-shell {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    body.score-ui .detail-actions-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: flex-end;
+      padding-bottom: 0.25rem;
+    }
+
+    body.score-ui .detail-hero {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1.75rem;
+      padding-bottom: 1.15rem;
+      border-bottom: 1px solid var(--score-line);
+      align-items: end;
+    }
+
+    body.score-ui .detail-hero-kicker {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(17, 24, 39, 0.55);
+      margin-bottom: 0.45rem;
+    }
+
+    body.score-ui .detail-hero-inline {
+      margin: 0;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    body.score-ui .detail-hero-inline-label {
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(17, 24, 39, 0.55);
+    }
+
+    body.score-ui .detail-hero-inline-code {
+      font-size: clamp(1.4rem, 2.8vw, 2.2rem);
+      line-height: 1.05;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: rgba(17, 24, 39, 0.92);
+      font-variant-numeric: tabular-nums;
+      word-break: break-word;
+    }
+
+    body.score-ui .detail-hero-note {
+      margin-top: 0.65rem;
+      color: rgba(17, 24, 39, 0.62);
+      font-weight: 650;
+      letter-spacing: 0.02em;
+    }
+
+    body.score-ui .detail-hero-actions {
+      display: grid;
+      gap: 0.75rem;
+      justify-items: end;
+    }
+
+    body.score-ui .detail-meta {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 1.35rem;
+      justify-content: flex-end;
+      align-items: baseline;
+    }
+
+    body.score-ui .detail-meta-item {
+      position: relative;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.35rem;
+      font-size: 0.88rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(17, 24, 39, 0.72);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    body.score-ui .detail-meta-item::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -0.18rem;
+      height: 1px;
+      background: rgba(17, 24, 39, 0.22);
+      transform: scaleX(0.86);
+      transform-origin: left;
+      opacity: 0.85;
+    }
+
+    body.score-ui .detail-meta-item--done {
+      color: rgba(17, 24, 39, 0.92);
+    }
+    body.score-ui .detail-meta-item--progress {
+      color: rgba(17, 24, 39, 0.86);
+    }
+    body.score-ui .detail-meta-item--pending {
+      opacity: 0.75;
+    }
+
+    body.score-ui .detail-meta-item--link::after {
+      background: rgba(17, 24, 39, 0.35);
+      transform: scaleX(1);
+    }
+
+    body.score-ui .detail-hero-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: flex-end;
+    }
+
+    body.score-ui .detail-action-btn {
+      appearance: none;
+      border: none;
+      background: transparent;
+      padding: 0;
+      font-size: 0.92rem;
+      font-weight: 750;
+      color: rgba(17, 24, 39, 0.82);
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      transition: color 0.15s ease, opacity 0.15s ease;
+    }
+
+    body.score-ui .detail-action-btn:hover {
+      color: rgba(17, 24, 39, 0.95);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.22em;
+    }
+
+    body.score-ui .detail-action-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    body.score-ui #flexible-banner {
+      border-radius: 0 !important;
+      border: 1px dashed var(--score-line) !important;
+      background: transparent !important;
+      color: rgba(17, 24, 39, 0.72) !important;
+    }
+
+    body.score-ui .note-card {
+      background: transparent !important;
+      border: 1px solid var(--score-line) !important;
+      border-radius: 0 !important;
+      padding: 1rem 1.1rem !important;
+    }
+
+    body.score-ui .note-label {
+      color: rgba(17, 24, 39, 0.55) !important;
+    }
+
+    body.score-ui .note-label.note-desc,
+    body.score-ui .note-label.note-private {
+      color: rgba(17, 24, 39, 0.55) !important;
+    }
+
+    body.score-ui .note-value {
+      color: rgba(17, 24, 39, 0.9) !important;
+      font-weight: 650;
+    }
+
+    body.score-ui #detail-lines-count {
+      background: transparent !important;
+      border: 1px solid var(--score-line) !important;
+      border-radius: 0 !important;
+    }
+
+    body.score-ui #line-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      border-top: 1px solid var(--score-line);
+      border-bottom: 1px solid var(--score-line);
+      border-radius: 0;
+    }
+
+    body.score-ui #line-list .line-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1.25rem;
+      padding: 0.95rem 0.2rem;
+      border-bottom: 1px dashed var(--score-line);
+      align-items: center;
+    }
+
+    body.score-ui #line-list .line-row:last-child {
+      border-bottom: none;
+    }
+
+    body.score-ui #line-list .line-row.is-done {
+      opacity: 0.78;
+    }
+
+    body.score-ui .line-sku {
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: rgba(17, 24, 39, 0.92);
+    }
+
+    body.score-ui .line-sub {
+      margin-top: 0.25rem;
+      font-size: 0.85rem;
+      color: rgba(17, 24, 39, 0.58);
+      font-weight: 650;
+      word-break: break-word;
+    }
+
+    body.score-ui .line-right {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    body.score-ui .line-qty {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+      font-weight: 800;
+      color: rgba(17, 24, 39, 0.92);
+      letter-spacing: -0.02em;
+    }
+
+    body.score-ui .line-remaining {
+      margin-top: 0.25rem;
+      font-size: 0.85rem;
+      color: rgba(17, 24, 39, 0.55);
+      font-weight: 650;
+    }
+
+    body.score-ui .detail-subhead {
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(17, 24, 39, 0.62);
+      margin-bottom: 0.75rem;
+    }
+
+    body.score-ui .detail-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      border: 1px solid var(--score-line);
+    }
+
+    body.score-ui .detail-item,
+    body.score-ui .detail-empty {
+      padding: 0.75rem 0.9rem;
+      border-bottom: 1px dashed var(--score-line);
+      color: rgba(17, 24, 39, 0.78);
+      font-weight: 650;
+      font-size: 0.92rem;
+    }
+
+    body.score-ui .detail-empty {
+      color: rgba(17, 24, 39, 0.5);
+      font-weight: 650;
+    }
+
+    body.score-ui .detail-list li:last-child {
+      border-bottom: none;
+    }
+
+	    @media (max-width: 900px) {
+	      body.score-ui .detail-hero {
+	        grid-template-columns: 1fr;
+	        align-items: start;
+	      }
+	      body.score-ui .detail-hero-actions {
+	        justify-items: start;
+	      }
+	      body.score-ui .detail-meta,
+	      body.score-ui .detail-hero-buttons {
+	        justify-content: flex-start;
+	      }
+	    }
+
   </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen score-ui">
   <header class="topbar" role="banner">
     <div class="topbar-inner">
       <a class="brand" href="index.html" aria-label="Về trang chính">
@@ -555,6 +1166,8 @@
         Chọn ngày khác
       </button>
     </div>
+    <div id="day-banner" class="hidden"></div>
+
     <section id="main-date-card" class="modern-card main-date-card space-y-6" data-animate>
       <div class="space-y-3">
         <h1 class="main-title">Chọn ngày cần kiểm</h1>
@@ -602,21 +1215,26 @@
               <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4.5 4.5L19 7"/></svg>
               Hoàn thành ngày
             </button>
+            <button id="toggle-order-controls" type="button" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl border border-slate-200 bg-white text-slate-700 font-semibold hover:bg-slate-50 transition-all">
+              Hiện
+            </button>
           </div>
-          <div class="flex flex-col gap-3 sm:items-start sm:flex-row sm:gap-4 sm:justify-between">
-            <div class="relative w-full sm:w-64 floating-input-capsule">
-              <input id="order-search-input" type="text" placeholder="Tìm mã đơn..." class="w-full rounded-xl border border-slate-200 px-4 py-2.5 pl-11 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-slate-50 transition-all" />
-              <svg class="h-4 w-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/></svg>
+          <div id="order-controls" class="hidden space-y-5">
+            <div class="flex flex-col gap-3 sm:items-start sm:flex-row sm:gap-4 sm:justify-between">
+              <div class="relative w-full sm:w-64 floating-input-capsule">
+                <input id="order-search-input" type="text" placeholder="Tìm mã đơn..." class="w-full rounded-xl border border-slate-200 px-4 py-2.5 pl-11 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-slate-50 transition-all" />
+                <svg class="h-4 w-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/></svg>
+              </div>
             </div>
-          </div>
-          <div class="status-tabs" role="tablist" aria-label="Lọc theo trạng thái">
-            <button type="button" class="status-tab is-active" data-order-status-filter="all">Tất cả</button>
-            <button type="button" class="status-tab" data-order-status-filter="pending">Chưa quét</button>
-            <button type="button" class="status-tab" data-order-status-filter="progress">Đang quét</button>
-            <button type="button" class="status-tab" data-order-status-filter="done">Đã xong</button>
+            <div class="status-tabs" role="tablist" aria-label="Lọc theo trạng thái">
+              <button type="button" class="status-tab is-active" data-order-status-filter="all">Tất cả</button>
+              <button type="button" class="status-tab" data-order-status-filter="pending">Chưa quét</button>
+              <button type="button" class="status-tab" data-order-status-filter="progress">Đang quét</button>
+              <button type="button" class="status-tab" data-order-status-filter="done">Đã xong</button>
+            </div>
+            <div id="order-list" class="cuberto-scroll max-h-[520px] overflow-y-auto overflow-x-visible scroll-shadow rounded-3xl border border-slate-200 bg-white" data-animate></div>
           </div>
         </div>
-        <div id="order-list" class="cuberto-scroll max-h-[520px] overflow-y-auto overflow-x-visible scroll-shadow rounded-3xl border border-slate-200 bg-white" data-animate></div>
       </div>
 
       <div id="order-detail-pane" class="modern-card space-y-5 lg:col-span-3" data-animate>
@@ -657,40 +1275,30 @@
             </div>
           </form>
 
-          <div id="order-panel" class="hidden space-y-0" data-animate>
-            <div class="detail-block flex flex-col gap-3 items-end">
-              <div class="hidden" aria-hidden="true">
-                <p id="detail-order-code">—</p>
-                <p id="detail-order-note"></p>
-              </div>
-              <div class="flex flex-wrap items-center justify-end gap-2 w-full md:w-auto md:text-right">
-                <span id="detail-status-badge" class="status-badge px-3 py-1 rounded-full bg-slate-100 text-slate-600">—</span>
-                <span id="detail-qty-badge" class="status-badge px-3 py-1 rounded-full bg-slate-100 text-slate-600">0 / 0 SP</span>
-                <button id="force-complete-button" type="button" class="inline-flex items-center gap-2 rounded-2xl border border-amber-300 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-50 disabled:opacity-40 disabled:cursor-not-allowed">
-                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"/>
-                  </svg>
-                  Đã quét xong (thủ công)
-                </button>
-                <button id="clear-progress-button" type="button" class="inline-flex items-center gap-2 rounded-2xl border border-rose-300 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 disabled:opacity-40 disabled:cursor-not-allowed">
-                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m6 18 12-12M6 6l12 12"/>
-                  </svg>
-                  Xóa thông tin đã quét
-                </button>
-                <button id="order-wrong-button" type="button" class="hidden inline-flex items-center gap-2 rounded-2xl border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
-                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-3.75a3.375 3.375 0 1 1 6.75 0m-6.75 0a3.375 3.375 0 1 0-6.75 0m9 9v.75M9 21.75h6M9 18v.75m6-.75v.75m-3-3.75h.008v.008H12v-.008Z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8.25v.75"/>
-                  </svg>
-                  Đơn Đi Sai
-                </button>
-              </div>
-            </div>
+	          <div id="order-panel" class="hidden detail-shell" data-animate>
+	            <div class="hidden" aria-hidden="true">
+	              <span id="detail-order-code">—</span>
+	              <span id="detail-status-badge">—</span>
+	              <span id="detail-qty-badge">0 / 0 SP</span>
+	              <span id="detail-enforcement">—</span>
+	              <span id="detail-order-note"></span>
+	            </div>
 
-            <div id="flexible-banner" class="detail-block hidden rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-              Đơn có hậu tố linh hoạt. Chỉ cần xác nhận thông tin, không bắt buộc quét từng mã sản phẩm.
-            </div>
+	            <div class="detail-actions-row">
+	              <button id="force-complete-button" type="button" class="detail-action-btn">
+	                Đã quét xong (thủ công)
+	              </button>
+	              <button id="clear-progress-button" type="button" class="detail-action-btn">
+	                Xóa thông tin đã quét
+	              </button>
+	              <button id="order-wrong-button" type="button" class="hidden detail-action-btn">
+	                Đơn đi sai
+	              </button>
+	            </div>
+
+	            <div id="flexible-banner" class="detail-block hidden rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+	              Đơn có hậu tố linh hoạt. Chỉ cần xác nhận thông tin, không bắt buộc quét từng mã sản phẩm.
+	            </div>
 
             <div class="detail-block grid gap-6 md:grid-cols-2">
               <div class="note-card">
@@ -703,36 +1311,30 @@
               </div>
             </div>
 
-            <div class="detail-block space-y-4">
-              <div class="flex items-center justify-between pb-2">
-                <p class="text-base font-bold text-slate-900">Sản phẩm cần kiểm</p>
-                <span id="detail-lines-count" class="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full">0 dòng</span>
-              </div>
-              <ul id="line-list" class="space-y-3 max-h-[320px] overflow-y-auto pr-2 scroll-shadow"></ul>
-            </div>
+	            <div class="detail-block space-y-4 hidden" aria-hidden="true">
+	              <div class="flex items-center justify-between pb-2">
+	                <p class="text-base font-bold text-slate-900">Sản phẩm cần kiểm</p>
+	                <span id="detail-lines-count" class="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full">0 dòng</span>
+	              </div>
+	              <ul id="line-list" class="max-h-[360px] overflow-y-auto scroll-shadow"></ul>
+	            </div>
 
-            <div class="detail-block grid gap-8 md:grid-cols-2">
-              <div>
-                <p class="text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
-                  <span class="w-2 h-2 bg-amber-500 rounded-full"></span>
-                  Sản phẩm còn thiếu
-                </p>
-                <ul id="missing-list" class="text-sm text-slate-600 list-disc pl-5 space-y-1.5"></ul>
-              </div>
-              <div>
-                <p class="text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
-                  <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
-                  Sản phẩm đã kiểm
-                </p>
-                <ul id="scanned-list" class="text-sm text-slate-600 list-disc pl-5 space-y-1.5"></ul>
-              </div>
-            </div>
+	            <div class="detail-block grid gap-8 md:grid-cols-2">
+	              <div>
+	                <p class="detail-subhead">Sản phẩm còn thiếu</p>
+	                <ul id="missing-list" class="detail-list"></ul>
+	              </div>
+	              <div>
+	                <p class="detail-subhead">Sản phẩm đã kiểm</p>
+	                <ul id="scanned-list" class="detail-list"></ul>
+	              </div>
+	            </div>
           </div>
           <div id="order-placeholder" class="rounded-3xl border border-dashed border-slate-300 bg-white/80 p-6 text-center text-slate-500" data-animate>
             Chưa chọn hoặc quét mã vận đơn nào.
           </div>
 
-          <div class="flex flex-wrap items-center gap-3 justify-between" data-animate>
+          <div class="hidden flex flex-wrap items-center gap-3 justify-between" data-animate>
             <button id="reset-order-button" class="inline-flex items-center gap-2 px-4 py-2 text-sm rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50 transition-all">
               <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M5 19A9 9 0 0 0 19 5"/></svg>
               Reset đơn hiện tại
@@ -860,6 +1462,8 @@
       const orderScanBlock = $('order-scan-block');
       const orderDetailContent = $('order-detail-content');
       const completeDayButton = $('complete-day-button');
+      const toggleOrderControlsButton = $('toggle-order-controls');
+      const orderControls = $('order-controls');
       const resetOrderButton = $('reset-order-button');
       const backToScanButton = $('back-to-scan-button');
       const toggleDetailPanelButton = $('toggle-detail-panel');
@@ -872,6 +1476,7 @@
       const detailOrderNote = $('detail-order-note');
       const detailStatusBadge = $('detail-status-badge');
       const detailQtyBadge = $('detail-qty-badge');
+      const detailEnforcement = $('detail-enforcement');
       const detailDesc = $('detail-desc');
       const detailPrivate = $('detail-private');
       const detailLinesCount = $('detail-lines-count');
@@ -940,6 +1545,7 @@
         completeStatusMessage: '',
         completeStatusType: 'info',
         dateLocked: false,
+        orderControlsVisible: false,
       };
 
       const state = { ...initialState };
@@ -1568,12 +2174,15 @@
 
         const statusLabel = order.status === 'done' ? 'ĐÃ ĐỦ' : order.status === 'progress' ? 'ĐANG QUÉT' : 'CHƯA QUÉT';
         const statusClass = order.status === 'done'
-          ? 'bg-emerald-100 text-emerald-700'
+          ? 'detail-meta-item--done'
           : order.status === 'progress'
-            ? 'bg-amber-100 text-amber-700'
-            : 'bg-slate-100 text-slate-600';
-        detailStatusBadge.className = `status-badge px-3 py-1 rounded-full ${statusClass}`;
+            ? 'detail-meta-item--progress'
+            : 'detail-meta-item--pending';
+        detailStatusBadge.className = `detail-meta-item ${statusClass}`;
         detailStatusBadge.textContent = statusLabel;
+        if (detailEnforcement) {
+          detailEnforcement.textContent = order.flexible ? 'LINH HOẠT' : (order.enforcement || 'STRICT').toString().toUpperCase();
+        }
 
         flexibleBanner.classList.toggle('hidden', !order.flexible);
 
@@ -1581,22 +2190,16 @@
         order.lines.forEach((line) => {
           const li = document.createElement('li');
           const done = line.remaining === 0;
-          li.className = [
-            'p-4 rounded-2xl border transition',
-            done ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200 bg-white'
-          ].join(' ');
+          li.className = ['line-row', done ? 'is-done' : ''].join(' ');
           li.innerHTML = `
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="font-semibold text-slate-900">${line.sku || line.productCode}</p>
-                <p class="text-xs text-slate-500">${line.size || ''}</p>
-              </div>
-              <div class="text-right">
-                <p class="font-mono text-lg text-slate-900">${line.scanned} / ${line.qty}</p>
-                <p class="text-xs text-slate-500">${line.remaining === 0 ? 'Đủ' : `${line.remaining} thiếu`}</p>
-              </div>
+            <div class="line-left">
+              <div class="line-sku">${line.sku || line.productCode}</div>
+              <div class="line-sub">${[line.size, line.description].filter(Boolean).join(' • ')}</div>
             </div>
-            ${line.description ? `<p class="text-xs text-slate-500 mt-2">${line.description}</p>` : ''}
+            <div class="line-right">
+              <div class="line-qty">${line.scanned} / ${line.qty}</div>
+              <div class="line-remaining">${line.remaining === 0 ? 'Đủ' : `${line.remaining} thiếu`}</div>
+            </div>
           `;
           lineList.appendChild(li);
         });
@@ -1604,10 +2207,11 @@
         missingList.innerHTML = '';
         const missing = order.lines.filter((line) => line.remaining > 0);
         if (!missing.length) {
-          missingList.innerHTML = '<li class="text-emerald-600 list-none">Tất cả sản phẩm đã đủ.</li>';
+          missingList.innerHTML = '<li class="detail-empty">Tất cả sản phẩm đã đủ.</li>';
         } else {
           missing.forEach((line) => {
             const li = document.createElement('li');
+            li.className = 'detail-item';
             li.textContent = `${line.sku || line.productCode} (${line.size || 'Size ?'}) - còn thiếu ${line.remaining}`;
             missingList.appendChild(li);
           });
@@ -1615,10 +2219,11 @@
         scannedList.innerHTML = '';
         const scannedSummary = summarizeScannedProducts(order.scannedProducts);
         if (!scannedSummary.length) {
-          scannedList.innerHTML = '<li class="text-slate-400 list-none">Chưa có sản phẩm nào được quét.</li>';
+          scannedList.innerHTML = '<li class="detail-empty">Chưa có sản phẩm nào được quét.</li>';
         } else {
           scannedSummary.forEach((item) => {
             const li = document.createElement('li');
+            li.className = 'detail-item';
             li.textContent = `${item.label || item.code || '—'} × ${item.count}`;
             scannedList.appendChild(li);
           });
@@ -1668,13 +2273,9 @@
 
       const renderMessages = () => {
         if (dayBanner) {
-          if (state.dayMessage) {
+          if (state.dayMessage && state.dayMessageType === 'error') {
             dayBanner.textContent = state.dayMessage;
-            const styles = state.dayMessageType === 'error'
-              ? 'border-red-200 bg-red-50 text-red-700'
-              : state.dayMessageType === 'success'
-                ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                : 'border-slate-200 bg-slate-50 text-slate-600';
+            const styles = 'border-red-200 bg-red-50 text-red-700';
             dayBanner.className = `rounded-2xl border px-4 py-3 text-sm font-medium ${styles}`;
             dayBanner.classList.remove('hidden');
           } else {
@@ -1721,6 +2322,12 @@
         if (orderScanBlock) orderScanBlock.classList.toggle('hidden', hasOrder);
         if (backToScanButton) backToScanButton.classList.toggle('hidden', !hasOrder);
         renderMessages();
+        if (toggleOrderControlsButton) {
+          toggleOrderControlsButton.textContent = state.orderControlsVisible ? 'Ẩn' : 'Hiện';
+        }
+        if (orderControls) {
+          orderControls.classList.toggle('hidden', !state.orderControlsVisible);
+        }
         if (toggleDetailPanelButton) {
           toggleDetailPanelButton.innerHTML = state.showDetailPanel
             ? '<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg> Ẩn danh sách'
@@ -1881,6 +2488,7 @@
           viewMode: 'main',
           showDetailPanel: false,
           dateLocked: false,
+          orderControlsVisible: false,
           loadingDay: false,
         });
         const today = getVietnamTodayParts();
@@ -2188,8 +2796,8 @@
           setState({
             orders,
             selectedOrderCode: null,
-            dayMessage: infoMessage || `Đã tải ${orders.length} đơn cho ngày ${formatDateLabel(dateStr)}.`,
-            dayMessageType: 'success',
+            dayMessage: '',
+            dayMessageType: 'info',
             showDetailPanel: true,
             dateLocked: true,
           });
@@ -2445,9 +3053,11 @@
         attemptCompleteDay();
       });
 
-      resetOrderButton.addEventListener('click', () => {
-        returnToScanMode({ scanMessage: 'Đã bỏ chọn đơn hiện tại.', scanMessageType: 'info' });
-      });
+      if (resetOrderButton) {
+        resetOrderButton.addEventListener('click', () => {
+          returnToScanMode({ scanMessage: 'Đã bỏ chọn đơn hiện tại.', scanMessageType: 'info' });
+        });
+      }
       if (backToScanButton) {
         backToScanButton.addEventListener('click', () => {
           returnToScanMode();
@@ -2488,6 +3098,11 @@
       if (uploadOpenButton) uploadOpenButton.addEventListener('click', () => openUploadModal());
       if (uploadBackButton) uploadBackButton.addEventListener('click', () => closeUploadModal());
       if (uploadCloseButton) uploadCloseButton.addEventListener('click', () => closeUploadModal());
+      if (toggleOrderControlsButton) {
+        toggleOrderControlsButton.addEventListener('click', () => {
+          setState({ orderControlsVisible: !state.orderControlsVisible });
+        });
+      }
 
       ['pointerdown', 'touchstart', 'touchend', 'click'].forEach((evt) => {
         window.addEventListener(evt, enableAutoFocus, { passive: true });
