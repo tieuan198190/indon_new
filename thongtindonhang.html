@@ -1,1008 +1,323 @@
-
 <!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tra Cứu Thông Tin Đơn</title>
-    <style>
-      :root {
-        font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto,
-          sans-serif;
-        color: #0f172a;
-        background-color: #f4f6fb;
-        line-height: 1.4;
-      }
 
-      * {
-        box-sizing: border-box;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đơn Hàng - Cô Mập Fashion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    /* Table Minimalist overrides */
+    .clean-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
 
-      body {
-        margin: 0;
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        padding: clamp(1rem, 2vw, 2rem);
-        background: radial-gradient(
-            circle at top,
-            rgba(99, 102, 241, 0.08),
-            transparent 45%
-          ),
-          #f4f6fb;
-      }
+    .clean-table th {
+      text-align: left;
+      font-weight: 500;
+      color: #888;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #eee;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
 
-      main {
-        width: min(1100px, 100%);
-        background: #fff;
-        border-radius: 28px;
-        padding: clamp(1.5rem, 4vw, 3rem);
-        box-shadow: 0 30px 60px rgba(15, 23, 42, 0.12);
-      }
+    .clean-table td {
+      padding: 1rem 0;
+      border-bottom: 1px solid #f9f9f9;
+    }
 
-      header {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        justify-content: space-between;
-        align-items: flex-end;
-        margin-bottom: 2rem;
-      }
+    .clean-table tr:last-child td {
+      border-bottom: none;
+    }
 
-      header h1 {
-        margin: 0;
-        font-size: clamp(1.8rem, 3vw, 2.4rem);
-      }
+    /* Camera container integration */
+    #camera-container {
+      position: relative;
+      background: #000;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      min-height: 300px;
+    }
 
-      header p {
-        margin: 0.4rem 0 0;
-        color: #475569;
-      }
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-      .tagline {
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.4em;
-        color: #4f46e5;
-        font-weight: 600;
-      }
+    .camera-overlay {
+      position: absolute;
+      inset: 0;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      margin: 2rem;
+      border-radius: 12px;
+      pointer-events: none;
+    }
 
-      form {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-        align-items: flex-end;
-      }
+    .note-box {
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      color: #92400e;
+      padding: 1rem;
+      border-radius: var(--radius-sm);
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
 
-      .form-actions {
-        display: flex;
-        gap: 0.75rem;
-        flex: 1 1 240px;
-        align-items: stretch;
-      }
+<body>
+  <main>
+    <div class="topbar">
+      <nav class="header-nav">
+        <a href="index.html" class="header-link">Home</a>
+        <a href="location.html" class="header-link">Vị trí</a>
+        <a href="thongtindonhang.html" class="header-link active">Đơn hàng</a>
+        <a href="bochang.html" class="header-link">Đóng hàng</a>
+        <a href="hangbom.html" class="header-link">Hàng hoàn</a>
+      </nav>
+    </div>
 
-      label {
-        display: block;
-        font-size: 0.9rem;
-        font-weight: 600;
-        margin-bottom: 0.35rem;
-        color: #475569;
-      }
-
-      input,
-      select,
-      button {
-        width: 100%;
-        border-radius: 16px;
-        border: 1.5px solid #e2e8f0;
-        padding: 0.85rem 1.1rem;
-        font-size: 1rem;
-        font-family: inherit;
-        transition: border-color 0.2s, box-shadow 0.2s;
-      }
-
-      input:focus,
-      select:focus {
-        border-color: #6366f1;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
-        outline: none;
-      }
-
-      button {
-        border: none;
-        background: #111827;
-        color: white;
-        font-weight: 600;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.4rem;
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-      }
-
-      button:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-      }
-
-      button:not(:disabled):hover {
-        transform: translateY(-1px);
-        box-shadow: 0 12px 20px rgba(17, 24, 39, 0.2);
-      }
-
-      .ghost-button {
-        background: #f8fafc;
-        color: #0f172a;
-        border: 1.5px dashed #cbd5e1;
-      }
-
-      .ghost-button:not(:disabled):hover {
-        box-shadow: 0 12px 20px rgba(15, 23, 42, 0.12);
-        border-color: #6366f1;
-        color: #111827;
-      }
-
-      .summary-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-      }
-
-      .summary-card {
-        border-radius: 20px;
-        padding: 1.25rem;
-        background: #0f172a;
-        color: white;
-      }
-
-      .summary-card small {
-        opacity: 0.7;
-        text-transform: uppercase;
-        letter-spacing: 0.26em;
-        font-weight: 600;
-      }
-
-      .summary-card strong {
-        display: block;
-        font-size: 1.9rem;
-        margin-top: 0.5rem;
-      }
-
-      .summary-card span {
-        display: block;
-        font-size: 0.95rem;
-        margin-top: 0.25rem;
-        color: rgba(255, 255, 255, 0.85);
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        background: white;
-        border-radius: 24px;
-        overflow: hidden;
-      }
-
-      thead {
-        background: #111827;
-        color: white;
-      }
-
-      th,
-      td {
-        padding: 1rem;
-        text-align: left;
-      }
-
-      th {
-        font-size: 0.85rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        border-bottom: none;
-      }
-
-      tbody tr {
-        border-bottom: 1px solid #e2e8f0;
-        transition: background 0.15s ease;
-      }
-
-      tbody tr:last-child {
-        border-bottom: none;
-      }
-
-      tbody tr:hover {
-        background: #f8fafc;
-      }
-
-      .location-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
-        padding: 0.4rem 1rem;
-        border-radius: 999px;
-        font-size: 0.9rem;
-        background: #ecfdf5;
-        color: #047857;
-        font-weight: 600;
-      }
-
-      .note {
-        font-size: 0.88rem;
-        color: #475569;
-      }
-
-      .order-notes {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-      }
-      .order-notes[hidden] {
-        display: none !important;
-      }
-
-      .note-card {
-        border-radius: 20px;
-        border: 1px solid #e2e8f0;
-        padding: 1.25rem;
-        background: #f8fafc;
-      }
-
-      .note-card strong {
-        display: block;
-        font-size: 0.85rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: #475569;
-        margin-bottom: 0.5rem;
-      }
-
-      .note-card p {
-        margin: 0;
-        font-size: 0.95rem;
-        color: #0f172a;
-      }
-
-      .empty-state {
-        text-align: center;
-        padding: 3rem 1rem;
-        color: #94a3b8;
-      }
-
-      .empty-state strong {
-        display: block;
-        color: #475569;
-        font-size: 1.1rem;
-        margin-bottom: 0.35rem;
-      }
-
-      .product-info {
-        display: flex;
-        align-items: center;
-        gap: 0.9rem;
-      }
-
-      .product-thumb {
-        width: 300px;
-        height: 400px;
-        object-fit: cover;
-        border-radius: 16px;
-        border: 1px solid rgba(15, 23, 42, 0.1);
-        box-shadow: 0 6px 15px rgba(15, 23, 42, 0.08);
-      }
-
-      .back-home-link {
-        position: fixed;
-        top: 16px;
-        left: 16px;
-        z-index: 1000;
-        padding: 0.45rem 1rem;
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 999px;
-        font-weight: 600;
-        color: #4338ca;
-        text-decoration: none;
-        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
-        border: 1px solid rgba(99, 102, 241, 0.25);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-      }
-
-      .back-home-link:hover,
-      .back-home-link:focus-visible {
-        transform: translateY(-1px);
-        box-shadow: 0 18px 40px rgba(79, 70, 229, 0.25);
-      }
-
-      .back-home-link:focus-visible {
-        outline: 3px solid rgba(79, 70, 229, 0.45);
-        outline-offset: 3px;
-      }
-
-      .camera-panel {
-        border: 1px solid #e2e8f0;
-        border-radius: 20px;
-        padding: 1rem;
-        background: #f8fafc;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
-        margin-bottom: 1.5rem;
-      }
-
-      .camera-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.75rem;
-        margin-bottom: 0.75rem;
-      }
-
-      .camera-video {
-        width: 100%;
-        border-radius: 16px;
-        border: 1px solid #e2e8f0;
-        background: #0f172a;
-        aspect-ratio: 3 / 4;
-        object-fit: cover;
-      }
-
-      .camera-status {
-        margin-top: 0.65rem;
-        font-size: 0.95rem;
-        color: #475569;
-      }
-
-      .camera-status[data-tone="success"] {
-        color: #0f766e;
-      }
-
-      .camera-status[data-tone="error"] {
-        color: #b91c1c;
-      }
-
-      .close-camera {
-        width: auto;
-        padding: 0.6rem 0.9rem;
-        border-radius: 12px;
-        background: #111827;
-        color: #fff;
-      }
-      .close-camera:not(:disabled):hover {
-        box-shadow: 0 8px 12px rgba(17, 24, 39, 0.15);
-      }
-    </style>
-  </head>
-  <body>
-    <a class="back-home-link" href="index.html" aria-label="Quay lại trang chính Cô Mập Fashion">← Trang chính</a>
-    <main>
-      <header>
-        <div>
-          <div class="tagline">Cô Mập Fashion</div>
-          <h1>Tra cứu thông tin đơn</h1>
-        </div>
-      </header>
-
-      <form id="lookup-form">
-        <label style="flex: 1 1 260px">
-          <span>Mã đơn</span>
-          <input
-            id="order-code"
-            type="text"
-            placeholder="Ví dụ: DH123456"
-            autocomplete="off"
-            required
-          />
-        </label>
-
-        <div class="form-actions">
-          <button id="submit-btn" type="submit">
-            <span aria-hidden="true">🔍</span> Tra cứu đơn
-          </button>
-          <button id="open-camera-btn" type="button" class="ghost-button">
-            <span aria-hidden="true">📷</span> Quét bằng camera
+    <!-- Search -->
+    <div class="lookup-form">
+      <form id="lookup-form" autocomplete="off">
+        <label class="sr-only" for="order-input">Mã đơn hàng</label>
+        <div class="input-group" style="width: 100%; border:none;">
+          <input id="order-input" type="text" placeholder="Nhập mã đơn hoặc quét..." autocomplete="off" />
+          <!-- Optional Camera Toggle Button -->
+          <button type="button" id="camera-btn" style="width: auto; background: none; color: #000; padding: 0.5rem;">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
           </button>
         </div>
+        <button type="submit" id="lookup-btn">Tra cứu</button>
       </form>
+    </div>
 
-      <section id="camera-panel" class="camera-panel" hidden>
-        <div class="camera-header">
-          <div>
-            <strong>Quét mã bằng camera</strong>
-            <div class="note" id="camera-hint">
-              Đưa mã QR hoặc barcode vào trong khung hình.
+    <div class="status-bar" id="status-bar" hidden></div>
+
+    <section id="result-card" class="result-card" hidden>
+      <!-- Left: Info -->
+      <article class="location-panel">
+        <div class="location-panel-header">
+          <p class="location-label">Thông tin đơn hàng</p>
+          <div id="order-info-content">
+            <p class="location-text" id="display-order-code">---</p>
+            <p style="margin-top: 0.5rem; font-size: 1.1rem;" id="display-customer">---</p>
+
+            <div id="note-container" class="note-box" hidden>
+              <strong>Ghi chú:</strong> <span id="display-note"></span>
+            </div>
+
+            <div style="margin-top: 2rem;">
+              <p class="location-label">Trạng thái</p>
+              <div id="display-status" style="font-size: 1.2rem; font-weight: 500;">---</div>
             </div>
           </div>
-          <button id="close-camera-btn" type="button" class="close-camera">
-            Đóng
-          </button>
         </div>
-        <video id="camera-video" class="camera-video" autoplay playsinline muted></video>
-        <div id="camera-status" class="camera-status" aria-live="polite">
-          Đang khởi động camera...
+      </article>
+
+      <!-- Right: Items or Camera -->
+      <article style="width: 100%; position: relative;">
+        <!-- Camera View (Toggled) -->
+        <div id="camera-panel" hidden
+          style="background: black; border-radius: 8px; overflow: hidden; height: 400px; position:relative;">
+          <video id="video-preview" muted playsinline></video>
+          <div class="camera-overlay"></div>
+          <button type="button" id="close-camera" class="ghost-btn"
+            style="position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%); background: white; color: black; border: none; margin: 0;">Đóng
+            Camera</button>
         </div>
-      </section>
 
-      <section id="order-notes" class="order-notes" hidden>
-        <article class="note-card">
-          <strong>Mô tả</strong>
-          <p id="description-text"></p>
-        </article>
-        <article class="note-card">
-          <strong>Ghi chú nội bộ</strong>
-          <p id="private-description-text"></p>
-        </article>
-      </section>
+        <!-- Items List -->
+        <div id="items-panel">
+          <div class="location-label">Chi tiết sản phẩm</div>
+          <div class="product-visual"
+            style="height: auto; min-height: 200px; background: white; border: 1px solid #f2f2f2; border-radius: 8px; padding: 1rem; aspect-ratio: auto;">
+            <table class="clean-table">
+              <thead>
+                <tr>
+                  <th>Sản phẩm</th>
+                  <th style="text-align: right;">SL</th>
+                </tr>
+              </thead>
+              <tbody id="items-table-body">
+                <!-- Rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </article>
+    </section>
 
-      <div class="table-wrapper" id="table-wrapper" hidden>
-        <table>
-          <thead>
-            <tr>
-              <th>Sản phẩm</th>
-              <th>Vị trí</th>
-            </tr>
-          </thead>
-          <tbody id="result-body">
-            <tr>
-              <td colspan="2">
-                <div class="empty-state">
-                  <strong>Chưa có dữ liệu</strong>
-                  Kết quả sẽ hiển thị tại đây sau khi tra cứu thành công.
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </main>
+    <footer>&copy; <span id="year"></span> Kho vận hành.</footer>
+  </main>
 
-    <script>
-      const WEBHOOK_URL =
-        "https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/thongtin_don";
+  <script>
+    const API_URL = "https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/thongtindonhang";
 
-      const form = document.getElementById("lookup-form");
-      const orderInput = document.getElementById("order-code");
-      const submitBtn = document.getElementById("submit-btn");
-      const submitBtnDefault = submitBtn.innerHTML;
-      const openCameraBtn = document.getElementById("open-camera-btn");
-      const closeCameraBtn = document.getElementById("close-camera-btn");
-      const cameraPanel = document.getElementById("camera-panel");
-      const cameraVideo = document.getElementById("camera-video");
-      const cameraStatus = document.getElementById("camera-status");
+    const lookupForm = document.getElementById('lookup-form');
+    const orderInput = document.getElementById('order-input');
+    const statusBar = document.getElementById('status-bar');
+    const resultCard = document.getElementById('result-card');
 
-      const statusBar = document.getElementById("status-bar");
-      const resultBody = document.getElementById("result-body");
-      const tableWrapper = document.getElementById("table-wrapper");
-      const notesSection = document.getElementById("order-notes");
-      const descriptionText = document.getElementById("description-text");
-      const privateDescriptionText = document.getElementById(
-        "private-description-text"
-      );
+    const displayCode = document.getElementById('display-order-code');
+    const displayCustomer = document.getElementById('display-customer');
+    const displayNote = document.getElementById('display-note');
+    const noteContainer = document.getElementById('note-container');
+    const displayStatus = document.getElementById('display-status');
+    const itemsTableBody = document.getElementById('items-table-body');
 
-      const focusOrderInput = () =>
-        requestAnimationFrame(() => {
-          if (cameraPanel && cameraPanel.hidden === false) return;
-          if (!orderInput.disabled) orderInput.focus({ preventScroll: true });
+    const cameraBtn = document.getElementById('camera-btn');
+    const cameraPanel = document.getElementById('camera-panel');
+    const itemsPanel = document.getElementById('items-panel');
+    const videoPreview = document.getElementById('video-preview');
+    const closeCameraBtn = document.getElementById('close-camera');
+
+    let stream = null;
+    let barcodeDetector = null;
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    function updateStatus(msg, type = 'idle') {
+      if (!msg) { statusBar.hidden = true; return; }
+      statusBar.textContent = msg;
+      statusBar.dataset.variant = type;
+      statusBar.hidden = false;
+      if (type !== 'loading') setTimeout(() => statusBar.hidden = true, 3000);
+    }
+
+    async function fetchOrder(code) {
+      updateStatus('Đang tra cứu...', 'loading');
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({ message: code, text: code }), // Supporting legacy payloads
+          headers: { 'Content-Type': 'application/json' }
         });
+        const data = await res.json();
+        const order = Array.isArray(data) ? data[0] : data;
 
-      ["pointerdown", "touchstart", "touchend", "click"].forEach((evt) => {
-        window.addEventListener(evt, () => focusOrderInput(), { passive: true });
+        if (!order || (!order.order_code && !order.ma_don_hang)) throw new Error('Không tìm thấy đơn hàng');
+
+        renderOrder(order);
+        updateStatus('', 'idle');
+      } catch (e) {
+        updateStatus(e.message, 'error');
+      }
+    }
+
+    function renderOrder(data) {
+      resultCard.hidden = false;
+      itemsPanel.hidden = false;
+      cameraPanel.hidden = true;
+      stopCamera();
+
+      displayCode.textContent = data.order_code || data.ma_don_hang || '---';
+      displayCustomer.textContent = data.customer_name || data.ten_khach_hang || '';
+
+      const note = data.note || data.ghi_chu;
+      if (note) {
+        displayNote.textContent = note;
+        noteContainer.hidden = false;
+      } else {
+        noteContainer.hidden = true;
+      }
+
+      displayStatus.textContent = data.status || data.trang_thai || 'Đã đồng bộ';
+
+      // Items
+      itemsTableBody.innerHTML = '';
+      const lines = data.line_items || data.san_pham || [];
+      lines.forEach(line => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+                 <td>
+                    <div style="font-weight: 500;">${line.sku || line.ma_san_pham}</div>
+                    <div style="color: #888; font-size: 0.8rem;">${line.name || line.ten_san_pham || ''}</div>
+                 </td>
+                 <td style="text-align: right; font-weight: 600;">${line.quantity || line.so_luong}</td>
+             `;
+        itemsTableBody.appendChild(row);
       });
-      window.addEventListener("focus", () => focusOrderInput());
-      orderInput.addEventListener("blur", () => setTimeout(() => focusOrderInput(), 20));
+    }
 
-      form.addEventListener("submit", handleLookup);
-      let hasLookup = false;
-      hideNotes();
-      focusOrderInput();
-
-      const cameraSupported =
-        Boolean(navigator.mediaDevices?.getUserMedia) &&
-        (typeof BarcodeDetector !== "undefined");
-      let cameraStream = null;
-      let cameraDetector = null;
-      let cameraLoopId = null;
-      let cameraStarting = false;
-
-      if (!cameraSupported && openCameraBtn) {
-        openCameraBtn.disabled = true;
-        openCameraBtn.title =
-          "Trình duyệt hiện không hỗ trợ quét mã bằng camera.";
-      } else if (openCameraBtn) {
-        openCameraBtn.addEventListener("click", () => startCameraScan());
+    // Camera Handling
+    async function startCamera() {
+      if (!('BarcodeDetector' in window)) {
+        alert('Trình duyệt không hỗ trợ quét mã vạch.');
+        return;
       }
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        videoPreview.srcObject = stream;
+        await videoPreview.play();
 
-      if (closeCameraBtn) {
-        closeCameraBtn.addEventListener("click", () => stopCameraScan());
-      }
-
-      document.addEventListener("visibilitychange", () => {
-        if (document.hidden) stopCameraScan(true);
-      });
-
-      // Tự động bật camera sau khi trang sẵn sàng
-      if (cameraSupported) {
-        window.addEventListener("load", () => startCameraScan());
-      }
-
-      /**
-       * Bật camera và quét mã barcode/QR, tự động điền vào input.
-       */
-      async function startCameraScan() {
-        if (cameraStarting || cameraStream) return;
-        if (!cameraPanel || !cameraVideo || !cameraStatus || !cameraSupported) {
-          alert(
-            "Trình duyệt này không hỗ trợ mở camera. Vui lòng nhập mã thủ công."
-          );
-          return;
-        }
-
-        cameraStarting = true;
         cameraPanel.hidden = false;
-        updateCameraStatus("Đang khởi động camera...", "info");
-        if (openCameraBtn) openCameraBtn.disabled = true;
+        itemsPanel.hidden = true;
+        resultCard.hidden = false; // Show result card container to show camera
 
-        try {
-          cameraDetector = await initBarcodeDetector();
-        } catch (err) {
-          updateCameraStatus(
-            err?.message || "Thiết bị không hỗ trợ Barcode Detector.",
-            "error"
-          );
-          if (openCameraBtn) openCameraBtn.disabled = false;
-          cameraStarting = false;
+        barcodeDetector = new BarcodeDetector({ formats: ['qr_code', 'code_128', 'code_39'] });
+        detectLoop();
+      } catch (e) {
+        alert('Không thể mở camera: ' + e.message);
+      }
+    }
+
+    function stopCamera() {
+      if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+      }
+      cameraPanel.hidden = true;
+      itemsPanel.hidden = false;
+    }
+
+    async function detectLoop() {
+      if (!stream) return;
+      try {
+        const barcodes = await barcodeDetector.detect(videoPreview);
+        if (barcodes.length > 0) {
+          const code = barcodes[0].rawValue;
+          playSound();
+          orderInput.value = code;
+          stopCamera();
+          fetchOrder(code);
           return;
         }
+      } catch (e) { }
+      requestAnimationFrame(detectLoop);
+    }
 
-        try {
-          cameraStream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: { ideal: "environment" } },
-          });
-          cameraVideo.srcObject = cameraStream;
-          await cameraVideo.play();
-          updateCameraStatus("Đang tìm mã... hãy giữ mã trong khung hình.", "info");
-          cameraLoopId = requestAnimationFrame(scanFrame);
-        } catch (err) {
-          console.error("Camera error", err);
-          updateCameraStatus(
-            "Không mở được camera. Kiểm tra quyền truy cập hoặc thử trình duyệt khác.",
-            "error"
-          );
-          stopCameraScan(true);
-          if (openCameraBtn) openCameraBtn.disabled = false;
-        } finally {
-          cameraStarting = false;
-        }
-      }
+    function playSound() {
+      // Simple beep could go here
+    }
 
-      async function initBarcodeDetector() {
-        if (typeof BarcodeDetector === "undefined") {
-          throw new Error("Thiết bị không hỗ trợ Barcode Detector.");
-        }
-        const preferred = [
-          "qr_code",
-          "code_128",
-          "code_39",
-          "code_93",
-          "ean_13",
-          "ean_8",
-          "itf",
-          "data_matrix",
-        ];
+    lookupForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const code = orderInput.value.trim();
+      if (code) fetchOrder(code);
+    });
 
-        if (typeof BarcodeDetector.getSupportedFormats === "function") {
-          const supported = await BarcodeDetector.getSupportedFormats();
-          const usable = preferred.filter((fmt) => supported.includes(fmt));
-          return new BarcodeDetector({ formats: usable.length ? usable : supported });
-        }
+    cameraBtn.addEventListener('click', () => {
+      if (stream) stopCamera();
+      else startCamera();
+    });
 
-        return new BarcodeDetector({ formats: preferred });
-      }
+    closeCameraBtn.addEventListener('click', stopCamera);
 
-      async function scanFrame() {
-        if (!cameraDetector || !cameraVideo || cameraPanel.hidden) return;
-        try {
-          const barcodes = await cameraDetector.detect(cameraVideo);
-          if (barcodes?.length) {
-            const value = (barcodes[0].rawValue || "").trim();
-            if (value) {
-              updateCameraStatus(`Đã quét: ${value}`, "success");
-              orderInput.value = value;
-              stopCameraScan();
-              form.requestSubmit();
-              return;
-            }
-          }
-        } catch (err) {
-          console.error("Barcode detect error", err);
-          updateCameraStatus(
-            "Không đọc được mã. Thử giữ camera ổn định và đủ sáng.",
-            "error"
-          );
-        }
-        cameraLoopId = requestAnimationFrame(scanFrame);
-      }
+  </script>
+</body>
 
-      function stopCameraScan(keepPanelOpen = false) {
-        if (cameraLoopId) {
-          cancelAnimationFrame(cameraLoopId);
-          cameraLoopId = null;
-        }
-        if (cameraStream) {
-          cameraStream.getTracks().forEach((t) => t.stop());
-          cameraStream = null;
-        }
-        if (cameraVideo) {
-          cameraVideo.srcObject = null;
-        }
-        if (!keepPanelOpen && cameraPanel) {
-          cameraPanel.hidden = true;
-        }
-        if (openCameraBtn) openCameraBtn.disabled = false;
-        if (!keepPanelOpen) focusOrderInput();
-      }
-
-      function updateCameraStatus(message, tone = "info") {
-        if (!cameraStatus) return;
-        cameraStatus.textContent = message;
-        cameraStatus.dataset.tone = tone;
-      }
-
-      /**
-       * Gửi request lên webhook và hiển thị kết quả.
-       */
-      async function handleLookup(event) {
-        event.preventDefault();
-        const orderCode = orderInput.value.trim();
-
-        if (!orderCode) {
-          updateStatus("Vui lòng nhập mã đơn hợp lệ.", "empty");
-          focusOrderInput();
-          return;
-        }
-
-        orderInput.value = "";
-        focusOrderInput();
-
-        hasLookup = true;
-        hideNotes();
-
-        toggleLoading(true);
-        updateStatus("Đang lấy dữ liệu từ kho...", "loading");
-
-        try {
-          const payload = {
-            order_code: orderCode,
-          };
-
-          const response = await fetch(WEBHOOK_URL, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-          });
-
-          if (!response.ok) {
-            throw new Error(`Webhook trả về lỗi ${response.status}`);
-          }
-
-          const data = await response.json();
-          const normalized = normalizePayload(data, orderCode);
-          renderNotes(normalized);
-
-          if (!normalized.items.length) {
-            renderEmpty();
-            updateStatus(
-              "Không tìm thấy sản phẩm nào trong đơn này.",
-              "empty"
-            );
-            return;
-          }
-
-          renderRows(normalized.items);
-          updateStatus(
-            `Đã tải thông tin đơn ${normalized.orderCode} (${normalized.items.length} sản phẩm).`,
-            "success"
-          );
-        } catch (error) {
-          console.error("Fetch error", error);
-          renderEmpty();
-          hideNotes();
-          updateStatus(
-            "Không thể lấy dữ liệu. Kiểm tra webhook hoặc thử lại sau.",
-            "error"
-          );
-        } finally {
-          toggleLoading(false);
-        }
-      }
-
-      /**
-       * Chuẩn hoá dữ liệu trả về từ Webhook cho UI.
-       */
-      function normalizePayload(payload, fallbackCode) {
-        if (!payload) {
-          return {
-            orderCode: fallbackCode,
-            customer: "",
-            updatedAt: new Date(),
-            items: [],
-            raw: payload,
-          };
-        }
-
-        const rootPayload = Array.isArray(payload)
-          ? payload[0] || {}
-          : payload;
-        const sourceArray = extractItems(payload);
-        const items = sourceArray.map(mapItem);
-
-        return {
-          orderCode:
-            rootPayload.order_code ||
-            rootPayload.orderCode ||
-            rootPayload.ma_don ||
-            rootPayload.code ||
-            items[0]?.orderCode ||
-            fallbackCode,
-          customer:
-            rootPayload.customer_name ||
-            rootPayload.customer ||
-            rootPayload.customerName ||
-            items[0]?.customer ||
-            "",
-          updatedAt: parseDate(
-            rootPayload.updated_at ||
-              rootPayload.updatedAt ||
-              rootPayload.timestamp ||
-              rootPayload.time ||
-              Date.now()
-          ),
-          handler:
-            rootPayload.staff ||
-            rootPayload.process_by ||
-            rootPayload.user ||
-            rootPayload.handledBy ||
-            "—",
-          description:
-            rootPayload.description ||
-            rootPayload.desc ||
-            rootPayload.notes ||
-            rootPayload.note ||
-            "",
-          privateDescription:
-            rootPayload.privateDescription ||
-            rootPayload.private_description ||
-            rootPayload.privateNote ||
-            rootPayload.private_note ||
-            "",
-          items,
-          raw: payload,
-        };
-      }
-
-      /**
-       * Đồng bộ nhiều kiểu field khác nhau về chung một cấu trúc.
-       */
-      function mapItem(item = {}) {
-        const qty =
-          Number(
-            item.quantity ??
-              item.qty ??
-              item.qty_ordered ??
-              item.so_luong ??
-              0
-          ) || 0;
-
-        return {
-          orderCode:
-            item.order_code || item.orderCode || item.ma_don || undefined,
-          customer:
-            item.customer ||
-            item.customer_name ||
-            item.ten_khach ||
-            undefined,
-          sku:
-            item.sku ||
-            item.SKU ||
-            item.product_code ||
-            item.Product_code ||
-            item.productCode ||
-            item.ma_hang ||
-            "—",
-          name:
-            item.product_name ||
-            item.Product_name ||
-            item.name ||
-            item.ten_san_pham ||
-            item.Product_code ||
-            item.productCode ||
-            item.sku ||
-            "Không tên",
-          variant:
-            item.variant ||
-            item.model ||
-            item.size ||
-            item.color ||
-            item.thuoc_tinh ||
-            "—",
-          qty: qty || 1,
-          location:
-            item.location ||
-            item.bin ||
-            item.vi_tri ||
-            item.khu ||
-            "Chưa gán",
-          note: item.note || item.ghi_chu || "",
-          image:
-            item.image ||
-            item.image_url ||
-            item.imageUrl ||
-            item.thumbnail ||
-            item.anh ||
-            item.productImage ||
-            "",
-        };
-      }
-
-      function extractItems(payload) {
-        let candidates = [];
-
-        if (Array.isArray(payload?.items)) {
-          candidates = payload.items;
-        } else if (Array.isArray(payload?.data?.items)) {
-          candidates = payload.data.items;
-        } else if (Array.isArray(payload?.data)) {
-          candidates = payload.data;
-        } else if (Array.isArray(payload?.result)) {
-          candidates = payload.result;
-        } else if (Array.isArray(payload)) {
-          candidates = payload;
-        } else if (payload && typeof payload === "object") {
-          candidates = [payload];
-        }
-
-        return flattenItems(candidates);
-      }
-
-      function flattenItems(list = []) {
-        const result = [];
-
-        list.forEach((entry) => {
-          if (!entry) return;
-          if (entry.json && typeof entry.json === "object") {
-            result.push(...flattenItems([entry.json]));
-            return;
-          }
-          if (Array.isArray(entry)) {
-            result.push(...flattenItems(entry));
-            return;
-          }
-          if (Array.isArray(entry.data)) {
-            result.push(...flattenItems(entry.data));
-            return;
-          }
-          if (Array.isArray(entry.items)) {
-            result.push(...flattenItems(entry.items));
-            return;
-          }
-          if (Array.isArray(entry.products)) {
-            const { products, ...rest } = entry;
-            products.forEach((product) => {
-              if (!product) return;
-              if (Array.isArray(product)) {
-                result.push(...flattenItems(product));
-                return;
-              }
-              result.push({ ...rest, ...product });
-            });
-            return;
-          }
-          result.push(entry);
-        });
-
-        return result;
-      }
-
-      function parseDate(value) {
-        const date = value ? new Date(value) : new Date();
-        if (Number.isNaN(date.getTime())) return new Date();
-        return date;
-      }
-
-      function renderRows(items) {
-        showResults();
-        resultBody.innerHTML = "";
-
-        items.forEach((item) => {
-          const row = document.createElement("tr");
-
-          row.innerHTML = `
-            <td>
-              <div class="product-info">
-                ${
-                  item.image
-                    ? `<img src="${item.image}" alt="${item.sku}" class="product-thumb" loading="lazy" onerror="this.remove()" />`
-                    : ""
-                }
-                <div>
-                  <strong>${item.name}</strong>
-                </div>
-              </div>
-            </td>
-            <td>
-              <span class="location-pill">${item.location}</span>
-            </td>
-          `;
-
-          resultBody.appendChild(row);
-        });
-      }
-
-      function renderEmpty() {
-        showResults();
-        resultBody.innerHTML = `
-          <tr>
-            <td colspan="2">
-              <div class="empty-state">
-                <strong>Không có dữ liệu</strong>
-                Hãy kiểm tra lại mã đơn hoặc thử tra cứu lại.
-              </div>
-            </td>
-          </tr>
-        `;
-      }
-
-      function updateStatus(message, variant = "idle") {
-        if (!statusBar) return;
-        statusBar.textContent = message;
-        statusBar.dataset.variant = variant;
-      }
-
-      function toggleLoading(isLoading) {
-        submitBtn.disabled = isLoading;
-        submitBtn.innerHTML = isLoading
-          ? '<span aria-hidden="true">⏳</span> Đang tra cứu...'
-          : submitBtnDefault;
-      }
-
-      function showResults() {
-        if (tableWrapper) {
-          tableWrapper.hidden = false;
-        }
-      }
-
-      function renderNotes(order = {}) {
-        if (!notesSection || !hasLookup) {
-          hideNotes();
-          return;
-        }
-        const description = String(order?.description ?? "").trim();
-        const privateDescription = String(
-          order?.privateDescription ?? ""
-        ).trim();
-        const hasNotes = Boolean(description.length || privateDescription.length);
-
-        if (!hasNotes) {
-          hideNotes();
-          return;
-        }
-
-        notesSection.hidden = false;
-        descriptionText.textContent =
-          description || "Không có mô tả công khai.";
-        privateDescriptionText.textContent =
-          privateDescription || "Không có ghi chú nội bộ.";
-      }
-
-      function hideNotes() {
-        if (!notesSection) return;
-        notesSection.hidden = true;
-        if (descriptionText) descriptionText.textContent = "";
-        if (privateDescriptionText)
-          privateDescriptionText.textContent = "";
-      }
-    </script>
-  </body>
 </html>

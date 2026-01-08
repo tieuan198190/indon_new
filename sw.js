@@ -33,27 +33,23 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
 
-  if (request.method !== 'GET') {
-    return;
-  }
+  if (request.method !== 'GET') return;
 
+  // Stale-While-Revalidate Strategy
   event.respondWith(
-    fetch(request)
-      .then((response) => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-        return response;
-      })
-      .catch(() =>
-        caches.match(request).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          if (request.mode === 'navigate') {
-            return caches.match('./index.html');
-          }
-          return Response.error();
+    caches.open(CACHE_NAME).then(async (cache) => {
+      const cachedResponse = await cache.match(request);
+
+      // 1. Fetch from network and update cache in background
+      const fetchPromise = fetch(request)
+        .then((networkResponse) => {
+          cache.put(request, networkResponse.clone());
+          return networkResponse;
         })
-      )
+        .catch(() => cachedResponse); // Fallback if offline
+
+      // 2. Return cached response immediately if available, else wait for network
+      return cachedResponse || fetchPromise;
+    })
   );
 });

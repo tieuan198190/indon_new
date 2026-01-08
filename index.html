@@ -1,346 +1,230 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cô Mập Fashion - Trung tâm kho</title>
+  <title>Cô Mập Fashion - Vận Hành</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#0f6ab5">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  
+  <link rel="stylesheet" href="app.css">
+  <script>
+    document.documentElement.classList.add('is-ready');
+  </script>
   <style>
-    :root {
-      --primary-color: #0f6ab5;
-      --primary-dark: #093b6b;
-      --bg-gradient-start: #e0f2fe;
-      --bg-gradient-end: #f0f9ff;
-      --card-bg: rgba(255, 255, 255, 0.85);
-      --glass-border: rgba(255, 255, 255, 0.6);
-      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-      --shadow-md: 0 10px 25px -5px rgba(15, 60, 100, 0.1);
-      --shadow-hover: 0 20px 35px -5px rgba(15, 60, 100, 0.15);
-      --radius-lg: 24px;
-      --radius-xl: 32px;
-    }
+    /* Homepage Specific Styles */
 
-    * {
-      box-sizing: border-box;
-    }
+    /* Mobile: Stacked, Desktop: Split (handled by app.css main grid) */
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #f8fafc;
-      color: #1e293b;
+    .home-hero {
       display: flex;
+      flex-direction: column;
       justify-content: center;
-      align-items: center;
-      padding: 1.5rem;
-      overflow-x: hidden;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-    }
-
-    main {
-      width: 100%;
-      max-width: 1000px;
-      display: flex;
-      flex-direction: column;
-      gap: 2.5rem;
-    }
-
-    /* --- HERO SECTION --- */
-    .hero {
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-      padding: 2rem 1rem 1rem;
-    }
-
-    .logo-wrapper {
-      position: relative;
-      width: 140px;
-      height: 140px;
-      margin-bottom: 0.5rem;
-    }
-
-    .logo-mark {
-      width: 100%;
+      align-items: flex-start;
       height: 100%;
-      object-fit: cover;
-      border-radius: 50%;
-      border: 4px solid #fff;
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease;
     }
 
-    .logo-wrapper:hover .logo-mark,
-    .logo-wrapper:focus-within .logo-mark {
-      transform: scale(1.05) rotate(2deg);
-    }
-
-    .hero h1 {
-      margin: 0;
-      font-size: 1.75rem;
+    .brand-large {
+      font-size: 15vw;
+      /* Massive on mobile */
+      line-height: 0.9;
       font-weight: 800;
-      color: var(--primary-dark);
-      letter-spacing: -0.02em;
+      letter-spacing: -0.04em;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
     }
 
-    .badge {
-      background: #fff;
-      color: var(--primary-color);
-      font-weight: 600;
-      padding: 0.5rem 1.25rem;
-      border-radius: 99px;
-      font-size: 0.9rem;
-      box-shadow: 0 4px 12px rgba(15, 106, 181, 0.1);
-      border: 1px solid #e2e8f0;
-      display: inline-block;
-      margin-top: -20px; /* Chồng lên logo một chút hoặc nằm ngay dưới */
-      z-index: 2;
-      position: relative;
+    .brand-subtitle {
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: #888;
+      margin-bottom: 3rem;
+      letter-spacing: 0.02em;
     }
 
-    /* --- GRID SECTION --- */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 1.5rem;
-      padding-bottom: 2rem;
-    }
-
-    /* --- CARD DESIGN --- */
-    .tool-card {
-      position: relative;
-      text-decoration: none;
-      background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
-      padding: 1.75rem;
+    .home-menu {
       display: flex;
-      align-items: center;
+      flex-direction: column;
       gap: 1.5rem;
-      box-shadow: var(--shadow-md);
-      overflow: hidden;
-      min-height: 110px;
-      transform-style: preserve-3d;
-    }
-
-    .icon-circle {
-      flex-shrink: 0;
-      width: 72px;
-      height: 72px;
-      border-radius: 20px;
-      background: #f1f5f9;
-      display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.5);
+      padding-left: 2rem;
     }
 
-    .icon-circle img {
+    .menu-item {
+      text-decoration: none;
+      color: #000;
+      font-size: 2rem;
+      font-weight: 400;
+      position: relative;
+      transition: opacity 0.3s ease;
+      display: flex;
+      align-items: center;
+    }
+
+    .menu-item::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: #000;
+      border-radius: 50%;
+      position: absolute;
+      left: -20px;
+      opacity: 0;
+      transform: scale(0);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .menu-item:hover {
+      opacity: 0.7;
+    }
+
+    .menu-item:hover::before {
+      opacity: 1;
+      transform: scale(1);
+      left: -15px;
+    }
+
+    /* Desktop Overrides */
+    @media (min-width: 900px) {
+      .brand-large {
+        font-size: 5rem;
+      }
+
+      .home-hero {
+        padding-right: 4rem;
+        /* Line separator between hero and menu */
+        border-right: 1px solid #f0f0f0;
+      }
+
+      .home-menu {
+        padding-left: 4rem;
+        gap: 2rem;
+      }
+
+      .menu-item {
+        font-size: 2.5rem;
+      }
+    }
+
+    /* Animation Optimization: Faster & No Delays */
+    .fade-in-up {
+      opacity: 0;
+      animation: fadeInUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Rapid "Machine Gun" Stagger */
+    .delay-1 {
+      animation-delay: 0.02s;
+    }
+
+    .delay-2 {
+      animation-delay: 0.04s;
+    }
+
+    .delay-3 {
+      animation-delay: 0.06s;
+    }
+
+    .delay-4 {
+      animation-delay: 0.08s;
+    }
+
+    .page-enter {
+      animation-duration: 0.25s;
+    }
+
+    .letter {
+      animation-duration: 0.45s;
+      animation-delay: calc(0.02s * var(--i));
+    }
+
+    .load-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
+      height: 2px;
+      z-index: 999;
+      background: transparent;
+      pointer-events: none;
+    }
+
+    .load-bar span {
+      display: block;
       height: 100%;
-      object-fit: cover;
+      width: 0;
+      background: #000;
+      animation: loadBar 0.45s ease-out forwards;
     }
 
-    .content {
-      flex: 1;
-    }
-
-    .tool-card h2 {
-      margin: 0 0 0.35rem;
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #334155;
-    }
-
-    .desc {
-      margin: 0;
-      font-size: 0.925rem;
-      color: #64748b;
-      line-height: 1.4;
-    }
-
-    .arrow-icon {
-      width: 24px;
-      height: 24px;
-      color: #cbd5e1;
-    }
-
-    /* Màu sắc riêng cho từng theme (tùy chọn nếu muốn giữ style cũ) */
-    .theme-picking .icon-circle { background: #fff1f2; }
-    .theme-location .icon-circle { background: #eff6ff; }
-    .theme-hangbom .icon-circle { background: #fff7ed; }
-    .theme-order .icon-circle { background: #f0fdf4; }
-
-    /* --- RESPONSIVE --- */
-    @media (max-width: 640px) {
-      body {
-        padding: 1rem;
-        display: block; /* Để cuộn tự nhiên trên mobile */
-      }
-      
-      .grid {
-        grid-template-columns: 1fr; /* 1 cột trên mobile */
-        gap: 1rem;
+    @keyframes loadBar {
+      0% {
+        width: 0;
+        opacity: 0.6;
       }
 
-      .tool-card {
-        padding: 1.25rem;
-        border-radius: 20px;
-        min-height: 100px;
+      60% {
+        width: 70%;
+        opacity: 0.8;
       }
 
-      .icon-circle {
-        width: 60px;
-        height: 60px;
-      }
-
-      .tool-card h2 {
-        font-size: 1.1rem;
-      }
-    }
-
-    @media (max-width: 1024px) and (min-width: 641px) {
-      body {
-        padding: 1.25rem;
-        align-items: flex-start;
-      }
-
-      main {
-        gap: 1.75rem;
-      }
-
-      .grid {
-        gap: 1.25rem;
-      }
-
-      .tool-card {
-        padding: 1.5rem;
-        border-radius: 20px;
-        min-height: 120px;
-      }
-
-      .tool-card h2 {
-        font-size: 1.2rem;
-      }
-
-      .icon-circle {
-        width: 78px;
-        height: 78px;
-      }
-    }
-
-    @media (hover: none) {
-      .tool-card {
-        transition-duration: 0.2s;
-      }
-
-      .tool-card:hover,
-      .tool-card:focus-visible {
-        transform: none;
-      }
-
-      .tool-card:active {
-        transform: scale(0.98);
-      }
-
-      .tool-card::after {
-        background: radial-gradient(circle at center, rgba(15,106,181,0.2), transparent 70%);
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
+      100% {
+        width: 100%;
+        opacity: 0;
       }
     }
   </style>
 </head>
+
 <body>
-  <main>
-    <div class="hero">
-      <div class="logo-wrapper">
-        <img src="logo.jpeg" alt="Logo Cô Mập Fashion" class="logo-mark" />
-      </div>
-      <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-        <h1>Cô Mập Fashion</h1>
-      </div>
-    </div>
+  <div class="load-bar" aria-hidden="true"><span></span></div>
+  <main class="page-enter">
+    <!-- Left Column: Brand Hero -->
+    <section class="home-hero fade-in-up">
+      <h1 class="brand-large" style="display: flex; flex-direction: column; width: 100%;">
+        <span>CÔ MẬP</span>
+        <span style="align-self: flex-end;">FASHION</span>
+      </h1>
 
-    <div class="grid" aria-label="Danh sách công cụ kho">
-      <a class="tool-card theme-location" href="location.html">
-        <div class="icon-circle">
-          <img src="location_logo.jpeg" alt="Icon vị trí" />
-        </div>
-        <div class="content">
-          <h2>Vị trí sản phẩm</h2>
-        </div>
-        <svg class="arrow-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-        </svg>
-      </a>
+    </section>
 
-      <a class="tool-card theme-order" href="thongtindonhang.html">
-        <div class="icon-circle">
-          <img src="thongtindonhang_logo.jpeg" alt="Icon đơn hàng" />
-        </div>
-        <div class="content">
-          <h2>Thông Tin Đơn</h2>
-        </div>
-        <svg class="arrow-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-        </svg>
-      </a>     
+    <!-- Right Column: Navigation Grid -->
+    <nav class="home-menu">
+      <a href="location.html" class="menu-item fade-in-up delay-1">Vị trí</a>
+      <a href="thongtindonhang.html" class="menu-item fade-in-up delay-2">Đơn hàng</a>
+      <a href="bochang.html" class="menu-item fade-in-up delay-3">Đóng hàng</a>
+      <a href="hangbom.html" class="menu-item fade-in-up delay-4">Hàng hoàn</a>
+    </nav>
 
-      <a class="tool-card theme-picking" href="bochang.html">
-        <div class="icon-circle">
-          <img src="bochang_logo.jpeg" alt="Icon đóng hàng" />
-        </div>
-        <div class="content">
-          <h2>Đóng hàng</h2>
-        </div>
-        <svg class="arrow-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-        </svg>
-      </a>
-
-      <a class="tool-card theme-hangbom" href="hangbom.html">
-        <div class="icon-circle">
-          <img src="hangbom_logo.jpeg" alt="Icon hàng hoàn" />
-        </div>
-        <div class="content">
-          <h2>Kiểm tra hàng hoàn</h2>
-        </div>
-        <svg class="arrow-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-        </svg>
-      </a>
-    </div>
+    <!-- Footer Hidden on Desktop via CSS -->
+    <footer>&copy; <span id="year"></span> Kho vận hành.</footer>
   </main>
+
   <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Split Brand Text into Letters for Wave Animation
+    const brandSpans = document.querySelectorAll('.brand-large > span');
+    brandSpans.forEach(span => {
+      const text = span.textContent.trim();
+      span.innerHTML = text.split('').map((char, index) =>
+        char === ' ' ? '&nbsp;' : `<span class="letter" style="--i:${index}">${char}</span>`
+      ).join('');
+    });
+
+    const loadBar = document.querySelector('.load-bar');
+    if (loadBar) {
+      setTimeout(() => loadBar.remove(), 650);
+    }
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {
-        navigator.serviceWorker.register('sw.js').catch(function (error) {
-          console.error('Service worker đăng ký thất bại:', error);
-        });
+        navigator.serviceWorker.register('sw.js').catch(console.error);
       });
     }
   </script>
 </body>
+
 </html>
