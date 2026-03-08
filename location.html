@@ -7,51 +7,535 @@
   <title>Cô Mập Fashion</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Manrope:wght@400;500;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="app.css">
   <style>
     /* Specific styles for Location Page to match reference UI */
-    .search-label {
-      font-size: 0.95rem;
-      font-weight: 500;
-      color: #000;
+    body.location-page {
+      --sidebar-width: 14%;
+      --search-form-width: min(100%, 640px);
+      --search-form-offset: 2.4rem;
+      --shell-pad-x: clamp(3rem, 5vw, 4rem);
+      --shell-pad-y: clamp(2.25rem, 3vw, 3rem);
+      background: #F5F5F7;
+      color: #1D1D1F;
+    }
+
+    .location-page main {
+      max-width: 1320px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
       white-space: nowrap;
-      margin-right: 0.5rem;
-      align-self: center;
+      border: 0;
+    }
+
+    .location-page .lookup-form {
+      width: var(--search-form-width);
+      margin-left: 0;
+      margin-right: 0;
+      margin-top: var(--search-form-offset);
+      margin-bottom: 0;
+      justify-self: start;
+      align-self: start;
+    }
+
+    .location-page #lookup-form {
+      width: 100%;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 1rem;
+      padding: 0 0 0.75rem;
+      border-bottom: 1px solid #D2D2D7;
+    }
+
+    .location-page #lookup-form:focus-within {
+      border-bottom-color: #1D1D1F;
+    }
+
+    .location-page .search-label {
+      display: none;
+    }
+
+    .location-page input[type="text"] {
+      border: none;
+      padding: 0;
+      background: transparent;
+      font-family: "Inter", sans-serif;
+      font-size: clamp(1.15rem, 1.8vw, 1.55rem);
+      font-weight: 400;
+      line-height: 1.2;
+      text-align: left;
+      color: #1D1D1F;
+    }
+
+    .location-page input[type="text"]::placeholder {
+      font-family: "Inter", sans-serif;
+      font-size: inherit;
+      line-height: inherit;
+      color: #6E6E73;
+      font-weight: 400;
+    }
+
+    .location-page input[type="text"]:focus {
+      border-bottom: none;
+    }
+
+    .location-page button[type="submit"] {
+      width: 2.25rem;
+      height: 2.25rem;
+      padding: 0;
+      min-width: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: #1D1D1F;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .location-page button[type="submit"]:hover,
+    .location-page button[type="submit"]:active {
+      transform: none;
+      color: #1D1D1F;
+      background: transparent;
+    }
+
+    .location-page button[type="submit"] svg {
+      width: 1.35rem;
+      height: 1.35rem;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .location-page button[type="submit"].loading {
+      opacity: 0.45;
+      cursor: wait;
+    }
+
+    .location-page .mobile-inline-submit {
+      display: none;
+    }
+
+    .location-page .result-card {
+      margin-top: clamp(2.5rem, 8vh, 5rem);
+      align-items: center;
+    }
+
+    .location-page .location-panel {
+      padding: 0;
+      text-align: center;
+    }
+
+    .location-page .location-panel-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0;
+    }
+
+    .location-page .location-skeleton {
+      width: min(360px, 78vw);
+      height: clamp(4rem, 10vw, 6rem);
+      border-radius: 18px;
+      background: linear-gradient(90deg, #D2D2D7 25%, #F5F5F7 50%, #D2D2D7 75%);
+      background-size: 200% 100%;
+      animation: shimmerPulse 1.35s infinite linear;
+    }
+
+    .location-page .location-text {
+      font-family: "Manrope", sans-serif;
+      font-size: clamp(4.25rem, 13vw, 8.5rem);
+      font-weight: 800;
+      letter-spacing: -0.06em;
+      line-height: 0.95;
+      color: #1D1D1F;
+      text-transform: uppercase;
+      margin: 0;
+      max-width: 5.5ch;
+      text-wrap: balance;
+    }
+
+    .location-page .ghost-btn {
+      margin-top: 0.35rem;
+      border: none;
+      padding: 0;
+      background: transparent;
+      color: #6E6E73;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .location-page .ghost-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    .location-page .ghost-btn:hover {
+      border-color: transparent;
+      color: #1D1D1F;
+    }
+
+    .location-page .location-editor {
+      width: min(100%, 460px);
+      margin: 0 auto;
+      gap: 1rem;
+    }
+
+    .location-page .location-editor textarea {
+      min-height: 132px;
+      border: 1px solid #D2D2D7;
+      border-radius: 24px;
+      background: #FFFFFF;
+      padding: 1.15rem 1.25rem;
+      font-size: 1.05rem;
+      box-shadow: none;
+    }
+
+    .location-page .neutral-btn,
+    .location-page .primary-btn {
+      border-radius: 999px;
+      padding: 0.9rem 1.5rem;
+      text-decoration: none;
+    }
+
+    .location-page .neutral-btn {
+      background: #FFFFFF;
+      color: #1D1D1F;
+      border: 1px solid #D2D2D7;
+    }
+
+    .location-page .primary-btn {
+      background: #1D1D1F;
+    }
+
+    .location-page .product-card {
+      width: min(100%, 680px);
+    }
+
+    .location-page .product-visual-shell {
+      position: relative;
+      width: min(100%, clamp(320px, 30vw, 520px));
+      margin: 0 auto;
+    }
+
+    .location-page .product-visual {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      overflow: visible;
+      background: none;
+      border-radius: 0;
+      box-shadow: none;
+      border: none;
+    }
+
+    .location-page .product-visual img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      background: transparent;
+      border-radius: 40px;
+      image-rendering: auto;
+      filter: contrast(1.03) saturate(1.02);
+      transform: translateZ(0);
+    }
+
+    .map-chip {
+      position: absolute;
+      right: -2.8rem;
+      bottom: 3rem;
+      width: 68px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #D2D2D7;
+      border-radius: 16px;
+      background: #FFFFFF;
+      box-shadow: none;
+      color: #1D1D1F;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .map-chip:hover {
+      transform: translateY(-2px);
+    }
+
+    .map-chip svg {
+      width: 26px;
+      height: 26px;
+      fill: currentColor;
+    }
+
+    .location-page footer {
+      display: none;
+    }
+
+    @media (min-width: 900px) {
+      body.location-page {
+        overflow: hidden;
+      }
+
+      .location-page main {
+        width: calc(100% - var(--sidebar-width));
+        max-width: none;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto 1fr auto;
+        column-gap: clamp(3rem, 7vw, 9rem);
+        row-gap: 2rem;
+        padding: var(--shell-pad-y) var(--shell-pad-x) 1rem;
+        max-height: none;
+        align-items: start;
+      }
+
+      .location-page .lookup-form {
+        grid-column: 1 / 2;
+        width: min(100%, 520px);
+        margin: 0;
+      }
+
+      .location-page .result-card {
+        grid-column: 1 / -1;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(3rem, 7vw, 8rem);
+        height: min(68vh, 760px);
+        margin-top: 1rem;
+        align-items: center;
+      }
+
+      .location-page .location-panel {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100%;
+        text-align: center;
+      }
+
+      .location-page .location-panel-header {
+        gap: 1.2rem;
+      }
+
+      .location-page .location-text {
+        font-size: clamp(5.8rem, 9vw, 8.8rem);
+        line-height: 0.88;
+        max-width: 4.8ch;
+      }
+
+      .location-page .ghost-btn {
+        margin-top: 0.4rem;
+      }
+
+      .location-page .product-card {
+        justify-content: flex-end;
+        align-items: center;
+        min-height: 100%;
+        max-height: none;
+      }
+
+      .location-page .product-visual-shell {
+        width: min(100%, clamp(430px, 34vw, 620px));
+        margin-left: auto;
+      }
+
+      .location-page .product-visual img {
+        border-radius: 48px;
+      }
+
+      .map-chip {
+        right: -3.25rem;
+        bottom: 4.5rem;
+        width: 72px;
+        height: 72px;
+      }
+
+      .location-page footer {
+        grid-column: 1 / -1;
+        display: block;
+      }
     }
 
     @media (max-width: 899px) {
-      .search-label {
+      .location-page .topbar {
+        position: static;
+        padding: 0.75rem 1rem;
+        justify-content: flex-start;
+      }
+
+      .location-page .lookup-form {
+        margin-top: 0.8rem;
+      }
+
+      .location-page #lookup-form {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 0.75rem;
+        align-items: end;
+      }
+
+      .location-page #lookup-button {
+        display: none;
+      }
+
+      .location-page .mobile-inline-submit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 72px;
+        height: 42px;
+        padding: 0 1rem;
+        border: none;
+        border-radius: 999px;
+        background: #1D1D1F;
+        color: #FFFFFF;
         font-size: 0.85rem;
-        margin-bottom: -0.5rem;
-        color: #666;
-        align-self: flex-start;
+        font-weight: 600;
+        line-height: 1;
+      }
+
+      .location-page input[type="text"] {
+        min-height: 42px;
+      }
+
+      .location-page .result-card {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      .location-page .location-panel {
+        position: static;
+        width: 100%;
+        background: transparent;
+        box-shadow: none;
+        border: none;
+      }
+
+      .location-page .location-text {
+        font-size: clamp(3.4rem, 19vw, 5.6rem);
+      }
+
+      .location-page .ghost-btn {
+        font-size: 0.95rem;
+      }
+
+      .location-page .location-editor {
+        width: 100%;
+      }
+
+      .location-page .product-card,
+      .location-page .product-visual-shell {
+        width: 100%;
+      }
+
+      .location-page .product-visual {
+        border-radius: 0;
+      }
+
+      .location-page .product-visual img {
+        border-radius: 28px;
+      }
+
+      .map-chip {
+        right: 1rem;
+        bottom: 1rem;
+        width: 56px;
+        height: 56px;
+      }
+
+      .location-page footer {
+        padding-top: 1rem;
+        font-size: 0.72rem;
+        letter-spacing: 0.14em;
       }
     }
   </style>
 </head>
 
-<body>
+<body class="location-page">
   <main>
     <div class="topbar">
+      <div class="sidebar-brand">
+        <span class="sidebar-brand-mark">CM</span>
+        <div class="sidebar-brand-text">
+          <strong>Cô Mập</strong>
+          <span>Fashion</span>
+        </div>
+        <span class="mobile-page-title">Vị trí</span>
+        <button class="mobile-nav-toggle" type="button" aria-label="Mở menu" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
+        </button>
+      </div>
       <nav class="header-nav">
-        <a href="index.html" class="header-link">Home</a>
-        <a href="location.html" class="header-link active">Vị trí</a>
-        <a href="thongtindonhang.html" class="header-link">Đơn hàng</a>
-        <a href="bochang.html" class="header-link">Đóng hàng</a>
-        <a href="hangbom.html" class="header-link">Hàng hoàn</a>
+        <a href="location.html" class="header-link active">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-5.5-4.2-5.5-9.25A5.5 5.5 0 0 1 12 6.25a5.5 5.5 0 0 1 5.5 5.5C17.5 16.8 12 21 12 21Z"></path><circle cx="12" cy="11.75" r="2.25"></circle></svg>
+          <span class="nav-text">Vị trí</span>
+        </a>
+        <a href="thongtindonhang.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"></rect><path d="M8 9h8"></path><path d="M8 13h5"></path></svg>
+          <span class="nav-text">Đơn hàng</span>
+        </a>
+        <a href="bochang.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5h10v10H5z"></path><path d="M15 11h2.5l1.5 2v5H15"></path><circle cx="8.5" cy="18.5" r="1.5"></circle><circle cx="16.5" cy="18.5" r="1.5"></circle></svg>
+          <span class="nav-text">Đóng hàng</span>
+        </a>
+        <a href="hangbom.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h8"></path><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"></path><path d="M6 7h12l-1 12H7L6 7Z"></path></svg>
+          <span class="nav-text">Hàng hoàn</span>
+        </a>
+        <a href="inmaqr.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="6" height="6"></rect><rect x="13" y="5" width="6" height="6"></rect><rect x="5" y="13" width="6" height="6"></rect><path d="M14 14h1"></path><path d="M18 14h1"></path><path d="M14 18h5"></path><path d="M18 15v3"></path></svg>
+          <span class="nav-text">In Mã QR</span>
+        </a>
+        <a href="kiemkho.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"></path><path d="M7 7v10h10V7"></path><path d="M9.5 11.5h5"></path><path d="M9.5 14.5h3"></path></svg>
+          <span class="nav-text">Kiểm Kho</span>
+        </a>
       </nav>
+      <div class="sidebar-meta">Cô Mập Fashion</div>
     </div>
+    <button class="mobile-nav-backdrop" type="button" aria-label="Đóng menu"></button>
 
     <div class="lookup-form">
       <form id="lookup-form" autocomplete="off">
-        <label class="search-label" for="sku-input">Mã sản phẩm</label>
-        <input id="sku-input" type="text" name="sku" placeholder="Nhập mã (VD: A324)" maxlength="20" autocomplete="off"
+        <label class="search-label sr-only" for="sku-input">Mã sản phẩm</label>
+        <button type="submit" id="lookup-button" aria-label="Tra cứu sản phẩm">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M20 20L16.65 16.65"></path>
+          </svg>
+        </button>
+        <input id="sku-input" type="text" name="sku" placeholder="Enter product code (e.g. A412)..." maxlength="20" autocomplete="off"
           required />
-        <button type="submit" id="lookup-button">Tra cứu</button>
+        <button type="submit" class="mobile-inline-submit">Tìm</button>
       </form>
     </div>
-
     <div class="status-bar" id="status-bar" data-variant="idle" hidden></div>
     <div class="top-progress" id="top-progress" hidden aria-hidden="true">
       <span class="bar"></span>
@@ -60,15 +544,17 @@
     <section id="result-section" class="result-card" hidden>
       <article class="location-panel" id="location-panel" hidden>
         <div class="location-panel-header">
-          <div>
-            <p class="location-label">Vị trí sản phẩm</p>
-            <div class="location-skeleton" id="location-skeleton" hidden></div>
-            <p id="product-location" class="location-text">
-              Đang tải...
-            </p>
-          </div>
+          <div class="location-skeleton" id="location-skeleton" hidden></div>
+          <p id="product-location" class="location-text">
+            Đang tải...
+          </p>
           <button type="button" class="ghost-btn" id="edit-location" hidden>
-            Chỉnh sửa vị trí
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 21s-5.5-4.2-5.5-9.25A5.5 5.5 0 0 1 12 6.25a5.5 5.5 0 0 1 5.5 5.5C17.5 16.8 12 21 12 21Zm0-7.75a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z">
+              </path>
+            </svg>
+            Sửa vị trí
           </button>
         </div>
         <div id="location-editor" class="location-editor" hidden>
@@ -85,13 +571,21 @@
       </article>
 
       <article class="product-card">
-        <div class="product-visual" id="product-visual">
-          <div class="placeholder">NO IMAGE</div>
+        <div class="product-visual-shell">
+          <div class="product-visual" id="product-visual">
+            <div class="placeholder">NO IMAGE</div>
+          </div>
+          <button type="button" class="map-chip" id="quick-edit-location" hidden aria-label="Sửa vị trí">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M9 3.5 3.75 5.6A1 1 0 0 0 3 6.53v12.24a1 1 0 0 0 1.37.93L9 17.75l6 2.75 5.25-2.1a1 1 0 0 0 .75-.93V5.23a1 1 0 0 0-1.37-.93L15 6.25 9 3.5Zm0 2.2 5 2.29v9.96l-5-2.29V5.7Zm-4 1.52 3-1.2v9.96l-3 1.2V7.22Zm14 9.56-3 1.2V8.02l3-1.2v9.96Z">
+              </path>
+            </svg>
+          </button>
         </div>
       </article>
     </section>
 
-    <footer>&copy; <span id="year-label"></span> Kho vận hành.</footer>
   </main>
 
   <script>
@@ -101,6 +595,7 @@
       "https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/nhaplai-location";
     const REQUEST_TIMEOUT = 12000;
     const STATUS_AUTO_HIDE = 2600;
+    const LAST_PAGE_KEY = 'cmf:lastPage';
 
     const form = document.getElementById("lookup-form");
     const input = document.getElementById("sku-input");
@@ -114,11 +609,11 @@
     const productVisualEl = document.getElementById("product-visual");
     const productCard = document.querySelector(".product-card");
     const editLocationBtn = document.getElementById("edit-location");
+    const quickEditBtn = document.getElementById("quick-edit-location");
     const locationEditor = document.getElementById("location-editor");
     const locationInput = document.getElementById("location-input");
     const saveLocationBtn = document.getElementById("save-location");
     const cancelLocationBtn = document.getElementById("cancel-location");
-    const yearLabel = document.getElementById("year-label");
     const mainEl = document.querySelector("main");
 
     let currentSku = "";
@@ -128,8 +623,7 @@
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
-
-    yearLabel.textContent = new Date().getFullYear();
+    localStorage.setItem(LAST_PAGE_KEY, 'location.html');
 
     function setWelcomeState(isWelcome) {
       // Optional: adjust layout if needed
@@ -166,6 +660,7 @@
       locationPanel.hidden = false;
       resultSection.hidden = false;
       editLocationBtn.hidden = true;
+      quickEditBtn.hidden = true;
       locationEditor.hidden = true;
 
       if (isSkeleton) {
@@ -187,6 +682,10 @@
     });
 
     editLocationBtn.addEventListener("click", () => {
+      if (!locationSaving) enterLocationEdit();
+    });
+
+    quickEditBtn.addEventListener("click", () => {
       if (!locationSaving) enterLocationEdit();
     });
 
@@ -303,6 +802,7 @@
 
       updateLocationText(currentLocation);
       editLocationBtn.hidden = false;
+      quickEditBtn.hidden = false;
       cancelLocationEdit();
 
       if (product.imageUrl) {
@@ -323,17 +823,18 @@
 
     function updateLocationText(loc) {
       if (!loc) {
-        productLocationEl.textContent = "Chưa có vị trí";
-        productLocationEl.style.color = "#999";
+        productLocationEl.textContent = "UNSET";
+        productLocationEl.style.color = "#6E6E73";
       } else {
         productLocationEl.textContent = loc;
-        productLocationEl.style.color = "#000";
+        productLocationEl.style.color = "#1D1D1F";
       }
     }
 
     function enterLocationEdit() {
       locationPanel.querySelector('.location-panel-header').hidden = true;
       locationEditor.hidden = false;
+      quickEditBtn.hidden = true;
       locationInput.value = currentLocation;
       locationInput.focus();
     }
@@ -341,6 +842,7 @@
     function cancelLocationEdit() {
       locationEditor.hidden = true;
       locationPanel.querySelector('.location-panel-header').hidden = false;
+      quickEditBtn.hidden = !currentSku;
       locationInput.value = "";
     }
 
@@ -405,10 +907,10 @@
     function setLoadingState(isLoading) {
       if (isLoading) {
         button.classList.add("loading");
-        button.textContent = "";
+        button.disabled = true;
       } else {
         button.classList.remove("loading");
-        button.textContent = "Tra cứu";
+        button.disabled = false;
       }
     }
 
@@ -417,7 +919,41 @@
       currentLocation = "";
       productVisualEl.innerHTML = "";
       productLocationEl.textContent = "";
+      quickEditBtn.hidden = true;
     }
+  </script>
+  <script>
+    (() => {
+      const topbar = document.querySelector('.topbar');
+      const toggle = document.querySelector('.mobile-nav-toggle');
+      const nav = document.querySelector('.header-nav');
+      const backdrop = document.querySelector('.mobile-nav-backdrop');
+      if (!topbar || !toggle || !nav || !backdrop) return;
+      const closeMenu = () => {
+        topbar.classList.remove('nav-open');
+        document.body.classList.remove('mobile-nav-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      };
+      const openMenu = () => {
+        topbar.classList.add('nav-open');
+        document.body.classList.add('mobile-nav-open');
+        toggle.setAttribute('aria-expanded', 'true');
+      };
+      toggle.addEventListener('click', () => {
+        if (topbar.classList.contains('nav-open')) closeMenu();
+        else openMenu();
+      });
+      backdrop.addEventListener('click', closeMenu);
+      nav.addEventListener('click', (event) => {
+        if (event.target.closest('a')) closeMenu();
+      });
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 899) closeMenu();
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeMenu();
+      });
+    })();
   </script>
 </body>
 

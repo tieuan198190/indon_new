@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kiểm Kho - Cô Mập Fashion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    body.stock-page {
+      --sidebar-width: 14%;
+      --shell-pad-x: clamp(3rem, 5vw, 4rem);
+      --shell-pad-y: clamp(2.25rem, 3vw, 3rem);
+      background: #F5F5F7;
+      color: #1D1D1F;
+    }
+
+    .stock-page main {
+      display: block;
+      width: calc(100% - var(--sidebar-width));
+      max-width: none;
+      height: auto;
+      max-height: none;
+      padding: var(--shell-pad-y) var(--shell-pad-x);
+    }
+
+    .stock-shell {
+      width: min(100%, 1240px);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .stock-header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      padding-top: 0.1rem;
+    }
+
+    .stock-kicker {
+      margin: 0;
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #6E6E73;
+    }
+
+    .stock-title {
+      margin: 0;
+      font-size: clamp(2.4rem, 4.2vw, 4rem);
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+      font-weight: 700;
+    }
+
+    .stock-grid {
+      display: grid;
+      grid-template-columns: minmax(400px, 1fr) minmax(0, 1fr);
+      gap: 1.25rem;
+      align-items: stretch;
+    }
+
+    .stock-column {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      min-width: 0;
+      height: 100%;
+    }
+
+    .stock-card {
+      display: flex;
+      flex-direction: column;
+      gap: 1.15rem;
+      min-width: 0;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #E5E5EA;
+      border-radius: 28px;
+      padding: 1.5rem;
+      min-height: 22rem;
+      box-shadow: 0 12px 36px rgba(29, 29, 31, 0.04);
+    }
+
+    .stock-card h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .stock-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .manual-card {
+      justify-content: flex-start;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+      min-height: auto;
+      box-shadow: none;
+    }
+
+    .action-btn {
+      min-height: 46px;
+      padding: 0.8rem 1.15rem;
+      border-radius: 999px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .manual-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .manual-field label {
+      margin: 0;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #6E6E73;
+    }
+
+    .manual-line {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      padding: 0 0 1rem;
+      border-bottom: 1px solid #D2D2D7;
+    }
+
+    .manual-line button[type="button"] {
+      width: 2.25rem;
+      height: 2.25rem;
+      min-width: 0;
+      padding: 0;
+      border: none;
+      border-radius: 999px;
+      background: transparent;
+      color: #1D1D1F;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: none;
+    }
+
+    .manual-line button[type="button"] svg {
+      width: 1.35rem;
+      height: 1.35rem;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .stock-page input[type="text"] {
+      width: 100%;
+      border: none;
+      padding: 0;
+      background: transparent;
+      font-family: "Inter", sans-serif;
+      font-size: clamp(1.2rem, 1.7vw, 1.55rem);
+      font-weight: 400;
+      line-height: 1.2;
+      color: #1D1D1F;
+      text-align: left;
+      outline: none;
+    }
+
+    .stock-page input[type="text"]::placeholder {
+      color: #6E6E73;
+    }
+
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: auto;
+    }
+
+    .manual-card .action-row {
+      margin-top: 0.5rem;
+    }
+
+    .camera-toggle-btn {
+      display: none;
+    }
+
+    .action-btn {
+      border: 1px solid #D2D2D7;
+      background: #FFFFFF;
+      color: #1D1D1F;
+    }
+
+    .action-btn.primary {
+      border-color: transparent;
+      background: #1D1D1F;
+      color: #FFFFFF;
+    }
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      color: #6E6E73;
+      font-size: 0.92rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.45rem 0.8rem;
+      border-radius: 999px;
+      background: #F5F5F7;
+      color: #6E6E73;
+      font-weight: 600;
+    }
+
+    .count {
+      font-weight: 700;
+      color: #1D1D1F;
+    }
+
+    .table-wrapper {
+      border: 1px solid #E5E5EA;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #FFFFFF;
+      flex: 1;
+    }
+
+    .stock-page table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.94rem;
+      table-layout: fixed;
+    }
+
+    .stock-page th,
+    .stock-page td {
+      padding: 0.9rem 0.95rem;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid #ECECEF;
+    }
+
+    .stock-page th {
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #6E6E73;
+      background: #FAFAFB;
+    }
+
+    .stock-page tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .table-empty {
+      text-align: center;
+      color: #6E6E73;
+      font-style: italic;
+    }
+
+    .log-note {
+      font-weight: 600;
+    }
+
+    .log-note.pending {
+      color: #6E6E73;
+    }
+
+    .log-note.success {
+      color: #059669;
+    }
+
+    .log-note.error {
+      color: #DC2626;
+    }
+
+    .status-bar {
+      border-radius: 18px;
+      padding: 0.9rem 1rem;
+      background: #FFFFFF;
+      border: 1px solid #E5E5EA;
+      color: #6E6E73;
+      font-weight: 600;
+    }
+
+    .desktop-log-card .status-bar {
+      margin-top: auto;
+    }
+
+    .camera-panel {
+      display: none;
+      margin-top: 0.9rem;
+      padding: 1rem;
+      border: 1px solid #E5E5EA;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 12px 30px rgba(29, 29, 31, 0.05);
+      gap: 0.9rem;
+    }
+
+    .camera-panel.is-open {
+      display: grid;
+    }
+
+    .camera-reader {
+      width: 100%;
+      min-height: 260px;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #FAFAFB;
+      border: 1px dashed rgba(29, 29, 31, 0.14);
+    }
+
+    .camera-hint {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #6E6E73;
+    }
+
+    @media (max-width: 980px) {
+      .stock-page main {
+        width: 100%;
+        padding: 1rem 1rem calc(1.25rem + env(safe-area-inset-bottom));
+      }
+
+      .stock-shell {
+        gap: 0.5rem;
+      }
+
+      .stock-header,
+      .manual-card .stock-card-header,
+      .manual-field label {
+        display: none;
+      }
+
+      .manual-card {
+        gap: 0.2rem;
+      }
+
+      .manual-card > .action-row {
+        justify-content: center;
+      }
+
+      .camera-toggle-btn {
+        display: inline-flex;
+      }
+
+      .stock-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .desktop-log-card.is-empty {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body class="stock-page">
+  <main>
+    <div class="topbar">
+      <div class="sidebar-brand">
+        <span class="sidebar-brand-mark">CM</span>
+        <div class="sidebar-brand-text">
+          <strong>Cô Mập</strong>
+          <span>Fashion</span>
+        </div>
+        <span class="mobile-page-title">Kiểm Kho</span>
+        <button class="mobile-nav-toggle" type="button" aria-label="Mở menu" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
+        </button>
+      </div>
+      <nav class="header-nav" aria-label="Điều hướng">
+        <a href="location.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-5.5-4.2-5.5-9.25A5.5 5.5 0 0 1 12 6.25a5.5 5.5 0 0 1 5.5 5.5C17.5 16.8 12 21 12 21Z"></path><circle cx="12" cy="11.75" r="2.25"></circle></svg>
+          <span class="nav-text">Vị trí</span>
+        </a>
+        <a href="thongtindonhang.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"></rect><path d="M8 9h8"></path><path d="M8 13h5"></path></svg>
+          <span class="nav-text">Đơn hàng</span>
+        </a>
+        <a href="bochang.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5h10v10H5z"></path><path d="M15 11h2.5l1.5 2v5H15"></path><circle cx="8.5" cy="18.5" r="1.5"></circle><circle cx="16.5" cy="18.5" r="1.5"></circle></svg>
+          <span class="nav-text">Đóng hàng</span>
+        </a>
+        <a href="hangbom.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h8"></path><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"></path><path d="M6 7h12l-1 12H7L6 7Z"></path></svg>
+          <span class="nav-text">Hàng hoàn</span>
+        </a>
+        <a href="inmaqr.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="6" height="6"></rect><rect x="13" y="5" width="6" height="6"></rect><rect x="5" y="13" width="6" height="6"></rect><path d="M14 14h1"></path><path d="M18 14h1"></path><path d="M14 18h5"></path><path d="M18 15v3"></path></svg>
+          <span class="nav-text">In Mã QR</span>
+        </a>
+        <a href="kiemkho.html" class="header-link active">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"></path><path d="M7 7v10h10V7"></path><path d="M9.5 11.5h5"></path><path d="M9.5 14.5h3"></path></svg>
+          <span class="nav-text">Kiểm Kho</span>
+        </a>
+      </nav>
+      <div class="sidebar-meta">Cô Mập Fashion</div>
+    </div>
+    <button class="mobile-nav-backdrop" type="button" aria-label="Đóng menu"></button>
+
+    <section class="stock-shell">
+      <header class="stock-header">
+        <p class="stock-kicker">Vận Hành</p>
+        <h1 class="stock-title">Kiểm Kho</h1>
+      </header>
+
+      <section class="stock-grid">
+        <div class="stock-column">
+          <article class="stock-card manual-card">
+            <div class="stock-card-header">
+              <div>
+                <h2>Nhập mã</h2>
+              </div>
+            </div>
+            <div class="manual-field">
+              <label for="manualInput">Mã QR / serial</label>
+              <div class="manual-line">
+                <button id="manualSubmitBtn" type="button" aria-label="Gửi mã kiểm kho">
+                  <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7"></circle>
+                    <path d="M20 20L16.65 16.65"></path>
+                  </svg>
+                </button>
+                <input id="manualInput" type="text" inputmode="text" enterkeyhint="send" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" lang="en" translate="no" autofocus placeholder="Ví dụ: A512-M" />
+              </div>
+            </div>
+            <div class="action-row">
+              <button class="action-btn camera-toggle-btn" id="openCameraBtn" type="button">Bật camera</button>
+            </div>
+            <section class="camera-panel" id="cameraPanel" hidden>
+              <div id="reader" class="camera-reader"></div>
+              <p class="camera-hint">Đưa QR vào khung để quét. Bấm đóng khi không dùng.</p>
+              <div class="action-row">
+                <button class="action-btn" id="closeCameraBtn" type="button">Đóng camera</button>
+              </div>
+            </section>
+          </article>
+        </div>
+
+        <div class="stock-column">
+          <article class="stock-card data-card desktop-log-card is-empty">
+            <div class="stock-card-header">
+              <div>
+                <h2>Nhật ký quét</h2>
+              </div>
+            </div>
+            <div class="meta">
+              <span class="pill">Lần quét gần nhất</span>
+              <span class="count" id="scanCount">0 dòng</span>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:44px">#</th>
+                    <th>Mã QR</th>
+                    <th>Thời gian</th>
+                    <th>Ghi chú</th>
+                  </tr>
+                </thead>
+                <tbody id="logBody">
+                  <tr id="emptyRow">
+                    <td class="table-empty" colspan="4">Chưa có dòng nào được thêm.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="status-bar" id="status">Chưa khởi động</div>
+          </article>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const LAST_PAGE_KEY = 'cmf:lastPage';
+      localStorage.setItem(LAST_PAGE_KEY, 'kiemkho.html');
+
+      const WEBHOOK_URL = "https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/kiem_khoCM";
+      const statusEl = document.getElementById('status');
+      const scanCountEl = document.getElementById('scanCount');
+      const logBody = document.getElementById('logBody');
+      const desktopLogCard = document.querySelector('.desktop-log-card');
+      const manualInput = document.getElementById('manualInput');
+      const manualSubmitBtn = document.getElementById('manualSubmitBtn');
+      const openCameraBtn = document.getElementById('openCameraBtn');
+      const closeCameraBtn = document.getElementById('closeCameraBtn');
+      const cameraPanel = document.getElementById('cameraPanel');
+      let emptyRow = document.getElementById('emptyRow');
+
+      let totalScans = 0;
+      const DEDUPE_MS = 1200;
+      let manualLastCode = null;
+      let manualLastTs = 0;
+      let manualInFlight = false;
+      let qrScanner = null;
+      let lastScannedCode = null;
+      let lastScannedAt = 0;
+      let permissionGranted = false;
+
+      const isIosSafari = (() => {
+        const ua = navigator.userAgent;
+        const iOS = /iPad|iPhone|iPod/.test(ua) || (ua.includes('Mac') && 'ontouchend' in document);
+        const safari = /^((?!chrome|android).)*safari/i.test(ua);
+        return iOS && safari;
+      })();
+
+      function setRowNote(cells, note, state) {
+        cells.forEach((cell) => {
+          if (!cell) return;
+          cell.textContent = note;
+          cell.className = `log-note ${state}`;
+        });
+      }
+
+      function addLogEntry(code, note = "Đang kiểm", state = "pending") {
+        if (emptyRow) {
+          emptyRow.remove();
+          emptyRow = null;
+        }
+        desktopLogCard?.classList.remove('is-empty');
+
+        const buildRow = () => {
+          const row = document.createElement('tr');
+          const idxCell = document.createElement('td');
+          idxCell.textContent = totalScans;
+          const codeCell = document.createElement('td');
+          codeCell.textContent = code;
+          const timeCell = document.createElement('td');
+          timeCell.textContent = new Date().toLocaleString('vi-VN');
+          const noteCell = document.createElement('td');
+          setRowNote([noteCell], note, state);
+          row.append(idxCell, codeCell, timeCell, noteCell);
+          return { row, noteCell };
+        };
+
+        const desktop = buildRow();
+        if (logBody.firstChild) logBody.insertBefore(desktop.row, logBody.firstChild);
+        else logBody.appendChild(desktop.row);
+
+        return {
+          desktopNoteCell: desktop.noteCell,
+        };
+      }
+
+      function hasWebhookResult(data) {
+        if (Array.isArray(data)) return data.length > 0;
+        if (data && typeof data === 'object') return Object.keys(data).length > 0;
+        return data !== null && data !== undefined && data !== "";
+      }
+
+      async function sendToN8n(code, source = "iphone-web-qr") {
+        const payload = { code, ts: new Date().toISOString(), source };
+
+        try {
+          statusEl.textContent = "Đang gửi...";
+          const res = await fetch(WEBHOOK_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          let data = null;
+          try {
+            data = await res.json();
+          } catch {
+            data = null;
+          }
+          const ok = res.ok && hasWebhookResult(data);
+          const msg = ok ? "Webhook trả về hợp lệ" : (res.ok ? "Không có dữ liệu hợp lệ" : ("Lỗi HTTP: " + res.status));
+          statusEl.textContent = msg;
+          return ok;
+        } catch (e) {
+          const msg = "Không gửi được: " + e.message;
+          statusEl.textContent = msg;
+          return false;
+        }
+      }
+
+      function focusManualInput() {
+        if (!manualInput) return;
+        try { manualInput.focus({ preventScroll: true }); } catch { manualInput.focus(); }
+        manualInput.select?.();
+      }
+
+      function formatDisplayQrCode(value) {
+        const raw = String(value || "").trim();
+        const parts = raw.split('-');
+        if (parts.length >= 3) {
+          return parts.slice(0, -1).join('-');
+        }
+        return raw;
+      }
+
+      function processCode(fullCode, source) {
+        const cleaned = String(fullCode || "").trim();
+        const displayCode = formatDisplayQrCode(cleaned);
+        if (!cleaned) {
+          statusEl.textContent = "Vui lòng nhập mã trước khi gửi";
+          manualInput.focus();
+          return;
+        }
+        if (manualInFlight) return;
+        const now = Date.now();
+        if (cleaned === manualLastCode && (now - manualLastTs) < DEDUPE_MS) {
+          statusEl.textContent = "Mã trùng, đã bỏ qua";
+          return;
+        }
+        manualLastCode = cleaned;
+        manualLastTs = now;
+        manualInFlight = true;
+        totalScans += 1;
+        scanCountEl.textContent = totalScans + " dòng";
+        const logEntry = addLogEntry(displayCode, "Đang kiểm", "pending");
+        sendToN8n(cleaned, source).then((ok) => {
+          if (ok) {
+            setRowNote([logEntry.desktopNoteCell], "✓ Thành công", "success");
+          } else {
+            setRowNote([logEntry.desktopNoteCell], "✕ Sai", "error");
+          }
+        }).finally(() => {
+          manualInFlight = false;
+        });
+      }
+
+      function submitManual() {
+        const fullCode = String(manualInput.value || "").trim();
+        if (!fullCode) {
+          statusEl.textContent = "Vui lòng nhập mã trước khi gửi";
+          manualInput.focus();
+          return;
+        }
+        manualInput.value = "";
+        manualInput.focus();
+        processCode(fullCode, "manual");
+      }
+
+      function ensureSecureCameraContext() {
+        const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        if (location.protocol === 'https:' || isLocalhost) return true;
+        statusEl.textContent = "Camera chỉ hoạt động trên HTTPS hoặc localhost";
+        return false;
+      }
+
+      async function requestCameraPermission() {
+        if (!navigator.mediaDevices?.getUserMedia) {
+          throw new Error("Trình duyệt không hỗ trợ camera.");
+        }
+        if (!isIosSafari || permissionGranted) return;
+        let stream = null;
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: { exact: "environment" },
+              width: { ideal: 1280 },
+              height: { ideal: 720 }
+            },
+            audio: false
+          });
+        } catch {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: { ideal: "environment" },
+              width: { ideal: 1280 },
+              height: { ideal: 720 }
+            },
+            audio: false
+          });
+        }
+        stream.getTracks().forEach((track) => track.stop());
+        permissionGranted = true;
+      }
+
+      async function closeCamera() {
+        cameraPanel.hidden = true;
+        cameraPanel.classList.remove('is-open');
+        if (!qrScanner) return;
+        try {
+          await qrScanner.stop();
+          await qrScanner.clear();
+        } catch {
+        } finally {
+          qrScanner = null;
+        }
+      }
+
+      async function openCamera() {
+        if (window.innerWidth > 980) return;
+        if (typeof Html5Qrcode === 'undefined') {
+          statusEl.textContent = "Camera chưa sẵn sàng";
+          return;
+        }
+        if (!ensureSecureCameraContext()) return;
+        cameraPanel.hidden = false;
+        cameraPanel.classList.add('is-open');
+        if (qrScanner) return;
+        qrScanner = new Html5Qrcode("reader");
+        try {
+          await requestCameraPermission();
+          const onScanSuccess = async (decodedText) => {
+            const now = Date.now();
+            if (decodedText === lastScannedCode && now - lastScannedAt < DEDUPE_MS) return;
+            lastScannedCode = decodedText;
+            lastScannedAt = now;
+            processCode(decodedText, "camera");
+          };
+
+          const baseConfig = {
+            fps: 10,
+            qrbox: { width: 220, height: 220 },
+            disableFlip: true,
+            experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+            videoConstraints: {
+              facingMode: { ideal: "environment" },
+              width: { ideal: 1280 },
+              height: { ideal: 720 }
+            }
+          };
+
+          try {
+            await qrScanner.start({ facingMode: "environment" }, baseConfig, onScanSuccess);
+          } catch {
+            const cameras = await Html5Qrcode.getCameras();
+            const backCamera = cameras.find((cam) => /back|rear|environment/gi.test(cam.label || ""));
+            const selectedCamera = backCamera?.id || cameras[0]?.id;
+            if (!selectedCamera) throw new Error("Không tìm thấy camera");
+            await qrScanner.start(selectedCamera, baseConfig, onScanSuccess);
+          }
+
+          statusEl.textContent = "Camera đã bật";
+        } catch (error) {
+          const message = error?.message ? `Không mở được camera: ${error.message}` : "Không mở được camera";
+          statusEl.textContent = message;
+          await closeCamera();
+        }
+      }
+
+      manualSubmitBtn?.addEventListener('click', submitManual);
+      manualInput?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.repeat) {
+          e.preventDefault();
+          submitManual();
+        }
+      });
+      openCameraBtn?.addEventListener('click', openCamera);
+      closeCameraBtn?.addEventListener('click', closeCamera);
+      focusManualInput();
+
+      window.addEventListener('pageshow', () => {
+        focusManualInput();
+      });
+      window.addEventListener('pagehide', () => {
+        closeCamera();
+      });
+    });
+  </script>
+  <script>
+    (() => {
+      const topbar = document.querySelector('.topbar');
+      const toggle = document.querySelector('.mobile-nav-toggle');
+      const nav = document.querySelector('.header-nav');
+      const backdrop = document.querySelector('.mobile-nav-backdrop');
+      if (!topbar || !toggle || !nav || !backdrop) return;
+      const closeMenu = () => {
+        topbar.classList.remove('nav-open');
+        document.body.classList.remove('mobile-nav-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      };
+      const openMenu = () => {
+        topbar.classList.add('nav-open');
+        document.body.classList.add('mobile-nav-open');
+        toggle.setAttribute('aria-expanded', 'true');
+      };
+      toggle.addEventListener('click', () => {
+        if (topbar.classList.contains('nav-open')) closeMenu();
+        else openMenu();
+      });
+      backdrop.addEventListener('click', closeMenu);
+      nav.addEventListener('click', (event) => {
+        if (event.target.closest('a')) closeMenu();
+      });
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 899) closeMenu();
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeMenu();
+      });
+    })();
+  </script>
+</body>
+
+</html>

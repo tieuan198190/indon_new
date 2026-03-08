@@ -25,6 +25,8 @@
       --container: 1400px;
       --nav-h: 56px;
       --hairline: rgba(0, 0, 0, 0.12);
+      --shell-pad-x: clamp(3rem, 5vw, 4rem);
+      --shell-pad-y: clamp(2.25rem, 3vw, 3rem);
     }
 
     .scroll-shadow {
@@ -43,75 +45,8 @@
       overflow-x: hidden;
     }
 
-    /* --- Top Header (Minimal) --- */
-    .topbar {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      padding: 0.5rem 1.5rem;
-      z-index: 50;
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      border-bottom: none;
-      pointer-events: none;
-      background: transparent;
-      height: auto;
-    }
-
-    .topbar>* {
-      pointer-events: auto;
-    }
-
-    .header-nav {
-      display: flex;
-      gap: 1.5rem;
-      pointer-events: auto;
-    }
-
-    .header-link {
-      text-decoration: none;
-      color: #000;
-      font-size: 0.95rem;
-      font-weight: 500;
-      position: relative;
-      transition: opacity 0.2s;
-      display: flex;
-      align-items: center;
-    }
-
-    .header-link::before {
-      content: '';
-      width: 4px;
-      height: 4px;
-      background: #000;
-      border-radius: 50%;
-      position: absolute;
-      left: -10px;
-      opacity: 0;
-      transform: scale(0);
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .header-link:hover {
-      opacity: 0.7;
-    }
-
-    .header-link:hover::before,
-    .header-link.active::before {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    @media (max-width: 600px) {
-      .header-nav {
-        display: none;
-      }
-    }
-
     #app-shell {
-      padding-top: 2.5rem;
+      padding-top: var(--shell-pad-y);
     }
 
     .page-actions {
@@ -123,10 +58,6 @@
 
     .page-actions .ghost-btn {
       margin-top: 0;
-    }
-
-    body.detail-mode .topbar {
-      display: none;
     }
 
     .status-badge {
@@ -649,13 +580,6 @@
 
 
 
-    body.score-ui .topbar {
-      background: transparent;
-      border-bottom: none;
-      backdrop-filter: none;
-      -webkit-backdrop-filter: none;
-    }
-
     body.score-ui main {
       display: flex;
       flex-direction: column;
@@ -689,8 +613,8 @@
 
     body.score-ui .main-date-card {
       max-width: 720px;
-      margin: 0 auto;
-      text-align: center;
+      margin: 0;
+      text-align: left;
     }
 
     body.score-ui #main-date-card {
@@ -700,12 +624,12 @@
     }
 
     body.score-ui .date-select-grid {
-      justify-content: center;
+      justify-content: flex-start;
     }
 
     @media (min-width: 480px) {
       body.score-ui .main-date-actions {
-        justify-content: center;
+        justify-content: flex-start;
       }
     }
 
@@ -730,8 +654,8 @@
 
     body.score-ui .main-date-card {
       max-width: 980px;
-      margin: 0 auto;
-      text-align: center;
+      margin: 0;
+      text-align: left;
     }
 
     body.score-ui .main-date-card::after {
@@ -749,8 +673,8 @@
       color: var(--score-muted);
       font-size: 1.05rem;
       max-width: 60ch;
-      margin-left: auto;
-      margin-right: auto;
+      margin-left: 0;
+      margin-right: 0;
     }
 
     body.score-ui input,
@@ -1743,6 +1667,41 @@
       max-width: 600px;
     }
 
+    .quick-action-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      width: min(100%, 720px);
+    }
+
+    .quick-action-btn {
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      background: #fff;
+      border-radius: 20px;
+      padding: 0.9rem 1rem;
+      text-align: left;
+      min-height: 74px;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .quick-action-btn:hover {
+      border-color: rgba(15, 23, 42, 0.24);
+      background: #f8fafc;
+    }
+
+    .quick-action-btn strong,
+    .quick-action-btn span {
+      display: block;
+    }
+
+    .quick-action-btn span {
+      margin-top: 0.25rem;
+      color: #64748b;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
     body.score-ui .detail-nav-arrow {
       display: none;
     }
@@ -1806,20 +1765,523 @@
       gap: 0.4rem;
       font-weight: 500;
     }
+
+    /* ---- Unified Operations UI: align Hang Bom with Don Hang / Vi Tri ---- */
+    body.score-ui {
+      background: #F5F5F7;
+      color: #1D1D1F;
+    }
+
+    body.score-ui main {
+      display: block;
+      min-height: auto;
+      padding-bottom: 0;
+    }
+
+    body.score-ui #app-shell {
+      width: 100%;
+      max-width: 1320px;
+      margin-left: 0;
+      margin-right: 0;
+      padding-top: 0.75rem;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      padding-bottom: 2.25rem;
+    }
+
+    body.score-ui .main-date-card,
+    body.score-ui #main-date-card {
+      width: min(100%, 760px);
+      margin: 0;
+      padding: 0.25rem 0 0 !important;
+      text-align: left;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    body.score-ui .main-title {
+      font-size: clamp(2.1rem, 4.1vw, 3rem) !important;
+      line-height: 1.05;
+      font-weight: 600 !important;
+      letter-spacing: -0.03em !important;
+      color: #1D1D1F;
+      text-transform: none;
+    }
+
+    body.score-ui .main-subtitle,
+    body.score-ui .current-day-label {
+      color: #6E6E73;
+    }
+
+    body.score-ui .date-select-grid {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(90px, 132px)) !important;
+      justify-content: start !important;
+      gap: 0.85rem !important;
+      max-width: none !important;
+      margin: 0 !important;
+    }
+
+    body.score-ui .minimal-select,
+    body.score-ui .date-select-grid select {
+      min-height: 0;
+      padding: 0 0 0.7rem !important;
+      border: none !important;
+      border-bottom: 1px solid #D2D2D7 !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      color: #1D1D1F;
+      text-align: left;
+      font-size: 1rem !important;
+      font-weight: 500;
+      box-shadow: none !important;
+    }
+
+    body.score-ui .minimal-select:focus,
+    body.score-ui .date-select-grid select:focus {
+      border-bottom-color: #1D1D1F !important;
+    }
+
+    body.score-ui .main-date-actions {
+      justify-content: flex-start !important;
+      gap: 0.85rem !important;
+      margin-top: 1.25rem;
+    }
+
+    body.score-ui .ui-btn,
+    body.score-ui #detail-section .page-actions button,
+    body.score-ui .quick-action-btn {
+      min-height: 44px;
+      border-radius: 16px !important;
+      font-size: 0.95rem !important;
+      font-weight: 600;
+      box-shadow: none !important;
+      animation: none !important;
+    }
+
+    body.score-ui .ui-btn {
+      padding: 0.8rem 1.1rem !important;
+    }
+
+    body.score-ui #detail-section {
+      position: static;
+      display: grid;
+      gap: 0.7rem;
+      width: min(100%, 1100px);
+      margin: 0 auto 0;
+      min-height: 0;
+      padding: 0;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      overflow: visible;
+    }
+
+    body.score-ui .detail-header-overlay {
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: auto;
+      width: auto;
+      padding-top: 0;
+      margin-bottom: 0;
+      justify-content: flex-end;
+      z-index: 2;
+    }
+
+    body.score-ui .detail-center-content {
+      display: block;
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    body.score-ui #order-scan-block,
+    body.score-ui #order-detail-content {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+    }
+
+    body.score-ui #order-scan-block {
+      align-items: stretch;
+      max-width: 640px;
+      margin: 0;
+    }
+
+    body.score-ui #order-scan-block .lookup-form {
+      max-width: none !important;
+      margin: 0 0 1.25rem !important;
+    }
+
+    body.score-ui #order-scan-form,
+    body.score-ui #product-scan-form {
+      display: grid !important;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      padding: 0 0 0.8rem !important;
+      border-bottom: 1px solid #D2D2D7 !important;
+    }
+
+    body.score-ui #order-scan-form button[type="submit"] {
+      width: 2.25rem;
+      height: 2.25rem;
+      min-width: 0;
+      padding: 0;
+      border: none;
+      border-radius: 999px;
+      background: transparent !important;
+      color: #1D1D1F !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: none !important;
+    }
+
+    body.score-ui #order-scan-form button[type="submit"] svg {
+      width: 1.35rem;
+      height: 1.35rem;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    body.score-ui #order-scan-input,
+    body.score-ui #product-scan-input,
+    body.score-ui #order-search-input {
+      width: 100%;
+      border: none !important;
+      padding: 0 !important;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: #1D1D1F !important;
+      font-family: "Inter", sans-serif !important;
+      font-size: clamp(1rem, 1.45vw, 1.2rem) !important;
+      font-weight: 400 !important;
+      line-height: 1.2;
+      text-align: left !important;
+    }
+
+    body.score-ui #order-scan-input::placeholder,
+    body.score-ui #product-scan-input::placeholder,
+    body.score-ui #order-search-input::placeholder {
+      color: #6E6E73 !important;
+    }
+
+    body.score-ui .search-label {
+      display: none;
+    }
+
+    body.score-ui .quick-action-grid {
+      width: 100%;
+      grid-template-columns: repeat(auto-fit, minmax(180px, max-content));
+      gap: 0.55rem;
+      margin-bottom: 0.75rem;
+    }
+
+    body.score-ui .quick-action-btn {
+      background: #FFFFFF;
+      border: 1px solid #E5E5EA;
+      color: #1D1D1F;
+    }
+
+    body.score-ui .quick-action-btn[hidden] {
+      display: none !important;
+    }
+
+    body.score-ui .quick-action-btn:hover {
+      background: #FAFAFB;
+      border-color: #D2D2D7;
+    }
+
+    body.score-ui .quick-action-btn span {
+      color: #6E6E73;
+    }
+
+    body.score-ui .quick-action-btn {
+      min-height: 0;
+      padding: 0.7rem 0.9rem;
+      border-radius: 18px !important;
+    }
+
+    body.score-ui .quick-action-btn strong {
+      font-size: 0.95rem;
+      line-height: 1.2;
+    }
+
+    body.score-ui .quick-action-btn span {
+      margin-top: 0.18rem;
+      font-size: 0.82rem;
+      line-height: 1.25;
+    }
+
+    body.score-ui #day-summary-bar {
+      width: 100%;
+      margin-top: 0.35rem;
+      text-align: left;
+    }
+
+    body.score-ui #day-summary-bar .day-summary-inner {
+      display: block;
+    }
+
+    body.score-ui .day-summary-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      width: 100%;
+      margin: 0;
+      text-align: left;
+      justify-items: stretch;
+    }
+
+    body.score-ui .day-stat {
+      background: #FFFFFF;
+      border: 1px solid #E5E5EA;
+      border-radius: 22px;
+      padding: 1rem 1rem 0.95rem;
+      min-width: 0;
+    }
+
+    body.score-ui .day-stat-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      color: #6E6E73;
+    }
+
+    body.score-ui .day-stat-value {
+      margin-top: 0.2rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+    }
+
+    body.score-ui .mt-10.flex.justify-center {
+      justify-content: flex-start !important;
+      margin-top: 1rem !important;
+    }
+
+    body.score-ui #scan-feedback,
+    body.score-ui #day-banner {
+      border-radius: 20px !important;
+      border: 1px solid #E5E5EA !important;
+      background: #FAFAFB !important;
+    }
+
+    body.score-ui .detail-layout {
+      grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+      gap: 1.25rem;
+      max-width: none;
+    }
+
+    body.score-ui .detail-left,
+    body.score-ui .detail-right {
+      min-width: 0;
+    }
+
+    body.score-ui .detail-kicker,
+    body.score-ui .detail-subhead,
+    body.score-ui .note-label {
+      color: #6E6E73 !important;
+    }
+
+    body.score-ui .detail-order-code {
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      font-weight: 600;
+      color: #1D1D1F;
+    }
+
+    body.score-ui .detail-shell,
+    body.score-ui #order-placeholder,
+    body.score-ui #order-list,
+    body.score-ui #order-list-pane {
+      background: #FFFFFF !important;
+      border: 1px solid #E5E5EA !important;
+      border-radius: 28px !important;
+      box-shadow: none !important;
+    }
+
+    body.score-ui .detail-shell {
+      align-items: stretch;
+      justify-content: flex-start;
+      padding: 1rem;
+      gap: 0.85rem;
+    }
+
+    body.score-ui .detail-shell .detail-block {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    body.score-ui #order-list-pane {
+      padding: 1rem;
+    }
+
+    body.score-ui #order-controls {
+      margin-bottom: 0.9rem;
+    }
+
+    body.score-ui #order-search-input {
+      padding-bottom: 0.7rem !important;
+      border-bottom: 1px solid #D2D2D7 !important;
+    }
+
+    body.score-ui #product-card-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.75rem;
+      margin-top: 0;
+      align-content: start;
+    }
+
+    body.score-ui .product-card-item {
+      min-height: 96px;
+      border-radius: 22px;
+      background: #F5F5F7;
+      border: 1px solid #E5E5EA;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #1D1D1F;
+      padding: 0.9rem;
+      text-align: center;
+      word-break: break-word;
+    }
+
+    body.score-ui .product-card-item.is-scanned {
+      background: #EEF6F0;
+      border-color: #CFE5D6;
+      color: #1D1D1F;
+    }
+
+    body.score-ui .note-card {
+      background: #FAFAFB !important;
+      border: 1px solid #ECECF0 !important;
+      border-radius: 20px !important;
+      padding: 1rem 1.1rem !important;
+    }
+
+    body.score-ui .note-value {
+      font-size: 1rem !important;
+      line-height: 1.55;
+      font-weight: 500 !important;
+      color: #1D1D1F !important;
+    }
+
+    body.score-ui .detail-footer-actions {
+      position: static;
+      transform: none;
+      margin-top: 1rem;
+      justify-content: flex-start;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    body.score-ui .detail-footer-actions .detail-action-btn {
+      border: 1px solid #E5E5EA;
+      border-radius: 999px;
+      padding: 0.7rem 1rem;
+      background: #FFFFFF;
+      color: #1D1D1F;
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    body.score-ui .detail-footer-actions .detail-action-btn:hover {
+      text-decoration: none;
+      background: #FAFAFB;
+    }
+
+    body.score-ui #change-day-button {
+      border: 1px solid #E5E5EA;
+      border-radius: 999px;
+      padding: 0.7rem 1rem;
+      background: #FFFFFF;
+      color: #1D1D1F;
+    }
+
+    @media (max-width: 899px) {
+      body.score-ui #app-shell {
+        padding-top: 0.75rem;
+      }
+
+      body.score-ui .date-select-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      }
+
+      body.score-ui .detail-layout {
+        grid-template-columns: 1fr;
+      }
+
+      body.score-ui #order-scan-block,
+      body.score-ui #order-detail-content {
+        padding: 1rem;
+        border-radius: 24px;
+      }
+
+      body.score-ui .quick-action-grid {
+        grid-template-columns: 1fr;
+      }
+
+      body.score-ui .day-summary-stats {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
 <body class="min-h-screen score-ui">
   <main>
     <div class="topbar">
+      <div class="sidebar-brand">
+        <span class="sidebar-brand-mark">CM</span>
+        <div class="sidebar-brand-text">
+          <strong>Cô Mập</strong>
+          <span>Fashion</span>
+        </div>
+        <span class="mobile-page-title">Hàng hoàn</span>
+        <button class="mobile-nav-toggle" type="button" aria-label="Mở menu" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
+        </button>
+      </div>
       <nav class="header-nav" aria-label="Điều hướng">
-        <a href="index.html" class="header-link">Home</a>
-        <a href="location.html" class="header-link">Vị trí</a>
-        <a href="thongtindonhang.html" class="header-link">Đơn hàng</a>
-        <a href="bochang.html" class="header-link">Đóng hàng</a>
-        <a href="hangbom.html" class="header-link active">Hàng hoàn</a>
+        <a href="location.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-5.5-4.2-5.5-9.25A5.5 5.5 0 0 1 12 6.25a5.5 5.5 0 0 1 5.5 5.5C17.5 16.8 12 21 12 21Z"></path><circle cx="12" cy="11.75" r="2.25"></circle></svg>
+          <span class="nav-text">Vị trí</span>
+        </a>
+        <a href="thongtindonhang.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"></rect><path d="M8 9h8"></path><path d="M8 13h5"></path></svg>
+          <span class="nav-text">Đơn hàng</span>
+        </a>
+        <a href="bochang.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5h10v10H5z"></path><path d="M15 11h2.5l1.5 2v5H15"></path><circle cx="8.5" cy="18.5" r="1.5"></circle><circle cx="16.5" cy="18.5" r="1.5"></circle></svg>
+          <span class="nav-text">Đóng hàng</span>
+        </a>
+        <a href="hangbom.html" class="header-link active">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h8"></path><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"></path><path d="M6 7h12l-1 12H7L6 7Z"></path></svg>
+          <span class="nav-text">Hàng hoàn</span>
+        </a>
+        <a href="inmaqr.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="6" height="6"></rect><rect x="13" y="5" width="6" height="6"></rect><rect x="5" y="13" width="6" height="6"></rect><path d="M14 14h1"></path><path d="M18 14h1"></path><path d="M14 18h5"></path><path d="M18 15v3"></path></svg>
+          <span class="nav-text">In Mã QR</span>
+        </a>
+        <a href="kiemkho.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"></path><path d="M7 7v10h10V7"></path><path d="M9.5 11.5h5"></path><path d="M9.5 14.5h3"></path></svg>
+          <span class="nav-text">Kiểm Kho</span>
+        </a>
       </nav>
+      <div class="sidebar-meta">Cô Mập Fashion</div>
     </div>
+    <button class="mobile-nav-backdrop" type="button" aria-label="Đóng menu"></button>
     <div id="app-shell" class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
       <!-- Old Actions Removed -->
       <div id="day-banner" class="hidden"></div>
@@ -1832,13 +2294,13 @@
         </div>
 
         <div class="date-select-grid"
-          style="display: flex; justify-content: center; gap: 1rem; max-width: 400px; margin: 0 auto;">
+          style="display: flex; justify-content: flex-start; gap: 1rem; max-width: 400px; margin: 0;">
           <select id="day-select" class="minimal-select"></select>
           <select id="month-select" class="minimal-select"></select>
           <select id="year-select" class="minimal-select"></select>
         </div>
 
-        <div class="main-date-actions" style="display: flex; justify-content: center; gap: 1rem;">
+        <div class="main-date-actions" style="display: flex; justify-content: flex-start; gap: 1rem;">
           <button id="load-day-button" type="button"
             class="ui-btn inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-black text-white font-semibold shadow-sm hover:opacity-80 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
             <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -1889,14 +2351,18 @@
         <!-- Center Content -->
         <div class="detail-center-content">
           <div id="order-scan-block" class="order-scan-block">
-            <div class="lookup-form" style="max-width: 600px; width: 100%; margin-bottom: 2rem;">
+            <div class="lookup-form" style="width: 100%; margin-bottom: 0;">
               <form id="order-scan-form" autocomplete="off"
                 style="border-bottom: 1px solid #e5e5e5; padding-bottom: 0.5rem;">
                 <label class="search-label" for="order-scan-input">Mã vận đơn</label>
-                <input id="order-scan-input" type="text" placeholder="Nhập mã vận đơn (VD: NVS637614631)"
-                  style="border: none; text-align: center; font-size: 1.8rem; flex: 1; outline: none;" />
-                <button type="submit"
-                  style="background: #000; color: #fff; border-radius: 99px; padding: 0.8rem 1.5rem;">Tra cứu</button>
+                <button type="submit" aria-label="Tra cứu vận đơn">
+                  <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7"></circle>
+                    <path d="M20 20L16.65 16.65"></path>
+                  </svg>
+                </button>
+                <input id="order-scan-input" type="text" placeholder="Nhập hoặc quét mã vận đơn"
+                  style="border: none; text-align: left; font-size: 1.8rem; flex: 1; outline: none;" />
               </form>
             </div>
             <div id="day-summary-bar" data-animate>
@@ -2217,8 +2683,14 @@
       const uploadSubmitButton = $('upload-submit-button');
       const uploadSubmitLabel = $('upload-submit-label');
       const uploadCloseButton = $('upload-close-button');
+      const STORAGE_KEYS = {
+        lastDate: 'cmf:hangbom:lastDate',
+        recentOrders: 'cmf:hangbom:recentOrders',
+        lastPage: 'cmf:lastPage',
+      };
 
       $('year-label').textContent = new Date().getFullYear();
+      localStorage.setItem(STORAGE_KEYS.lastPage, 'hangbom.html');
 
       const initialState = {
         currentDate: '',
@@ -2259,6 +2731,29 @@
       const statusFilterButtons = Array.from(document.querySelectorAll('[data-order-status-filter]'));
 
       const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+      const safeReadStorage = (key, fallback = '') => {
+        try {
+          const value = localStorage.getItem(key);
+          return value ?? fallback;
+        } catch {
+          return fallback;
+        }
+      };
+      const safeWriteStorage = (key, value) => {
+        try {
+          localStorage.setItem(key, value);
+        } catch { }
+      };
+      const pushRecentOrderCode = (orderCode) => {
+        if (!orderCode) return;
+        let current = [];
+        try {
+          const parsed = JSON.parse(safeReadStorage(STORAGE_KEYS.recentOrders, '[]'));
+          current = Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+        } catch { }
+        const next = [orderCode, ...current.filter((item) => item !== orderCode)].slice(0, 8);
+        safeWriteStorage(STORAGE_KEYS.recentOrders, JSON.stringify(next));
+      };
 
       const enableCubertoSmoothScroll = (element) => {
         if (!element) return;
@@ -2843,6 +3338,7 @@
       const setSelectedOrder = (orderCode) => {
         const order = findOrder(orderCode);
         if (!order) return;
+        pushRecentOrderCode(orderCode);
         setState({ selectedOrderCode: orderCode });
         focusProductInput();
         if (shouldHydrateOrder(order)) hydrateOrderDetails(order.orderCode);
@@ -3568,6 +4064,7 @@
             showDetailPanel: true,
             dateLocked: true,
           });
+          safeWriteStorage(STORAGE_KEYS.lastDate, dateStr);
           focusDefaultInput();
         } catch (err) {
           if (requestHandle !== loadRequestHandle) return;
@@ -3871,7 +4368,6 @@
           setState({ orderControlsVisible: !state.orderControlsVisible });
         });
       }
-
       ['pointerdown', 'touchstart', 'touchend', 'click'].forEach((evt) => {
         window.addEventListener(evt, enableAutoFocus, { passive: true });
       });
@@ -3881,7 +4377,52 @@
 
       render();
       focusDefaultInput();
+      const savedDate = safeReadStorage(STORAGE_KEYS.lastDate, '');
+      if (savedDate) {
+        const [year, month, day] = savedDate.split('-');
+        if (year && month && day) {
+          applyDatePartsToSelectors({ year, month, day });
+          if (uploadDayInput) uploadDayInput.value = savedDate;
+        }
+        const today = formatDateParts(getVietnamTodayParts());
+        if (savedDate === today) {
+          loadOrdersForDate(savedDate);
+        }
+      }
     });
+  </script>
+  <script>
+    (() => {
+      const topbar = document.querySelector('.topbar');
+      const toggle = document.querySelector('.mobile-nav-toggle');
+      const nav = document.querySelector('.header-nav');
+      const backdrop = document.querySelector('.mobile-nav-backdrop');
+      if (!topbar || !toggle || !nav || !backdrop) return;
+      const closeMenu = () => {
+        topbar.classList.remove('nav-open');
+        document.body.classList.remove('mobile-nav-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      };
+      const openMenu = () => {
+        topbar.classList.add('nav-open');
+        document.body.classList.add('mobile-nav-open');
+        toggle.setAttribute('aria-expanded', 'true');
+      };
+      toggle.addEventListener('click', () => {
+        if (topbar.classList.contains('nav-open')) closeMenu();
+        else openMenu();
+      });
+      backdrop.addEventListener('click', closeMenu);
+      nav.addEventListener('click', (event) => {
+        if (event.target.closest('a')) closeMenu();
+      });
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 899) closeMenu();
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeMenu();
+      });
+    })();
   </script>
 </body>
 

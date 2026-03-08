@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>In Mã QR - Cô Mập Fashion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    body.qr-page {
+      --sidebar-width: 14%;
+      --shell-pad-x: clamp(3rem, 5vw, 4rem);
+      --shell-pad-y: clamp(2.25rem, 3vw, 3rem);
+      background: #F5F5F7;
+      color: #1D1D1F;
+    }
+
+    .qr-page main {
+      display: block;
+      width: calc(100% - var(--sidebar-width));
+      max-width: none;
+      height: auto;
+      max-height: none;
+      padding: var(--shell-pad-y) var(--shell-pad-x);
+    }
+
+    .qr-shell {
+      width: min(100%, 1180px);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .qr-header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      padding-top: 0.15rem;
+    }
+
+    .qr-kicker {
+      margin: 0;
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #6E6E73;
+    }
+
+    .qr-title {
+      margin: 0;
+      font-size: clamp(2.3rem, 4.2vw, 3.9rem);
+      line-height: 0.96;
+      letter-spacing: -0.05em;
+      font-weight: 700;
+    }
+
+    .qr-subtitle {
+      margin: 0;
+      max-width: 60ch;
+      color: #6E6E73;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .qr-tab-nav {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 0.3rem;
+    }
+
+    .qr-tab-button {
+      min-height: 46px;
+      padding: 0.8rem 1.2rem;
+      border-radius: 999px;
+      border: 1px solid #D2D2D7;
+      background: rgba(255, 255, 255, 0.88);
+      color: #6E6E73;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .qr-tab-button[aria-selected="true"] {
+      color: #1D1D1F;
+      border-color: #1D1D1F;
+      background: #FFFFFF;
+    }
+
+    .qr-tab-button:focus-visible {
+      outline: 3px solid rgba(0, 113, 227, 0.18);
+      outline-offset: 2px;
+    }
+
+    .tab-panel {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      align-items: stretch;
+    }
+
+    .tab-panel[hidden] {
+      display: none !important;
+    }
+
+    .tab-panel > * {
+      min-width: 0;
+    }
+
+    .qr-panel-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-width: 0;
+      height: 100%;
+    }
+
+    .qr-card {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #E5E5EA;
+      border-radius: 28px;
+      padding: 1.2rem;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      height: 100%;
+    }
+
+    .qr-card h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.8rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .input-grid.input-grid-vertical {
+      grid-template-columns: 1fr;
+    }
+
+    .hasize-form {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.8rem;
+      align-items: end;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.45rem;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #6E6E73;
+    }
+
+    .qr-page input,
+    .qr-page select {
+      width: 100%;
+      min-height: 48px;
+      padding: 0.85rem 0.95rem;
+      border-radius: 18px;
+      border: 1px solid #D2D2D7;
+      background: #FFFFFF;
+      color: #1D1D1F;
+      font: inherit;
+      box-shadow: none;
+    }
+
+    .qr-page input:focus,
+    .qr-page select:focus {
+      outline: none;
+      border-color: #1D1D1F;
+    }
+
+    .actions,
+    .hasize-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .actions.single-action {
+      justify-content: flex-start;
+    }
+
+    .qr-panel-stack > .qr-card:first-child {
+      flex: 1;
+    }
+
+    .btn-primary,
+    .btn-outline {
+      min-height: 46px;
+      padding: 0.8rem 1.25rem;
+      border-radius: 999px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      border: none;
+      background: #1D1D1F;
+      color: #FFFFFF;
+    }
+
+    .btn-outline {
+      border: 1px solid #D2D2D7;
+      background: #FFFFFF;
+      color: #1D1D1F;
+    }
+
+    .btn-primary:disabled,
+    .btn-outline:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary.is-loading,
+    .btn-outline.is-loading {
+      position: relative;
+      padding-right: 2.5rem;
+    }
+
+    .btn-primary.is-loading::after,
+    .btn-outline.is-loading::after {
+      content: "";
+      position: absolute;
+      right: 0.9rem;
+      top: 50%;
+      width: 15px;
+      height: 15px;
+      margin-top: -7.5px;
+      border-radius: 999px;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      border-top-color: transparent;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .btn-outline.is-loading::after {
+      border-color: rgba(29, 29, 31, 0.25);
+      border-top-color: transparent;
+    }
+
+    .table-summary {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.8rem;
+      font-size: 0.9rem;
+      color: #6E6E73;
+    }
+
+    .table-wrapper {
+      border: 1px solid #E5E5EA;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #FFFFFF;
+    }
+
+    .qr-page table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.94rem;
+    }
+
+    .qr-page th,
+    .qr-page td {
+      padding: 0.9rem 0.95rem;
+      text-align: left;
+      border-bottom: 1px solid #ECECEF;
+    }
+
+    .qr-page th {
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #6E6E73;
+      background: #FAFAFB;
+    }
+
+    .qr-page tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 1.3rem;
+      color: #6E6E73;
+    }
+
+    .status-line {
+      margin-top: 0.85rem;
+      padding: 0.9rem 1rem;
+      border-radius: 18px;
+      border: 1px solid #D2D2D7;
+      background: #FFFFFF;
+      color: #1D1D1F;
+      font-size: 0.92rem;
+    }
+
+    .status-line.info {
+      color: #0F5E9C;
+      background: rgba(2, 132, 199, 0.08);
+      border-color: rgba(2, 132, 199, 0.2);
+    }
+
+    .status-line.success {
+      color: #167A39;
+      background: rgba(22, 163, 74, 0.08);
+      border-color: rgba(22, 163, 74, 0.2);
+    }
+
+    .status-line.error {
+      color: #C02D52;
+      background: rgba(225, 29, 72, 0.08);
+      border-color: rgba(225, 29, 72, 0.2);
+    }
+
+    .helper {
+      margin: 0.8rem 0 0;
+      color: #6E6E73;
+      font-size: 0.9rem;
+    }
+
+    .qr-card .actions.single-action,
+    .qr-card .helper,
+    .qr-card #statusBox {
+      margin-top: auto;
+    }
+
+    .layout-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .layout-grid,
+    .hasize-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 0.8rem;
+    }
+
+    .hasize-card {
+      display: flex;
+      gap: 0.9rem;
+      padding: 1rem;
+      border-radius: 24px;
+      border: 1px solid #E5E5EA;
+      background: #FFFFFF;
+    }
+
+    .hasize-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .hasize-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .hasize-meta span {
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      background: #F5F5F7;
+      font-size: 0.84rem;
+      color: #6E6E73;
+    }
+
+    .hasize-qr {
+      width: 122px;
+      min-width: 122px;
+      border-left: 1px dashed #D2D2D7;
+      padding-left: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 0.84rem;
+      color: #6E6E73;
+      text-align: center;
+    }
+
+    .hasize-qr img {
+      width: 102px;
+      height: 102px;
+      object-fit: contain;
+    }
+
+    .label-page {
+      width: 105mm;
+      max-width: 100%;
+      height: 22mm;
+      border: 1px solid #D2D2D7;
+      border-radius: 10px;
+      background: #fff;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .label-page::after {
+      content: attr(data-page);
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-size: 0.65rem;
+      color: #6E6E73;
+    }
+
+    .label-cell {
+      flex: 1;
+      min-width: 35mm;
+      max-width: calc(100% / 3);
+      border-right: 1px dashed rgba(15, 23, 42, 0.15);
+      display: flex;
+      padding: 0;
+      align-items: center;
+      height: 22mm;
+    }
+
+    .label-cell:last-child {
+      border-right: none;
+    }
+
+    .label-cell.is-blank {
+      background: repeating-linear-gradient(45deg, #f1f5f9 0, #f1f5f9 6px, #fff 6px, #fff 12px);
+      justify-content: center;
+      font-size: 0.8rem;
+      color: #6E6E73;
+      font-style: italic;
+    }
+
+    .label-qr {
+      width: 21mm;
+      min-width: 21mm;
+      height: 22mm;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      border-right: 1px solid rgba(15, 23, 42, 0.08);
+      position: relative;
+      padding: 0;
+    }
+
+    .label-qr img {
+      width: 20mm;
+      height: 20mm;
+      object-fit: contain;
+    }
+
+    .label-qr .qr-fallback {
+      position: absolute;
+      inset: 0;
+      display: none;
+      font-size: 0.65rem;
+      color: #C02D52;
+      text-align: center;
+      line-height: 22mm;
+      background: repeating-linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0 6px, rgba(255, 255, 255, 0.5) 6px 12px);
+    }
+
+    .label-qr.qr-missing .qr-fallback {
+      display: block;
+    }
+
+    .label-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.1;
+      flex: 0 0 13mm;
+      width: 13mm;
+      max-width: 13mm;
+      height: 22mm;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .label-text-rotate {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transform: rotate(90deg);
+      transform-origin: center;
+      white-space: nowrap;
+    }
+
+    .label-text-rotate > * {
+      margin: 0;
+      line-height: 0.8;
+    }
+
+    .label-text-rotate .sep {
+      margin: -0.4mm 0;
+    }
+
+    .label-text .code {
+      font-weight: 700;
+      font-size: 1.22rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .label-text .size {
+      font-weight: 600;
+      font-size: 1.05rem;
+      text-transform: uppercase;
+    }
+
+    .skeleton-card {
+      min-height: 98px;
+      border-radius: 24px;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      background: linear-gradient(90deg, rgba(15, 23, 42, 0.04) 0%, rgba(15, 23, 42, 0.08) 40%, rgba(15, 23, 42, 0.04) 80%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s ease infinite;
+    }
+
+    [data-busy="true"] {
+      position: relative;
+    }
+
+    [data-busy="true"]::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.68);
+      backdrop-filter: blur(2px);
+      border-radius: inherit;
+    }
+
+    [data-busy="true"]::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 18px;
+      height: 18px;
+      margin-left: -9px;
+      margin-top: -9px;
+      border-radius: 999px;
+      border: 2px solid rgba(15, 23, 42, 0.18);
+      border-top-color: transparent;
+      animation: spin 0.8s linear infinite;
+      z-index: 1;
+    }
+
+    #printArea {
+      display: none;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: 200% 0;
+      }
+
+      100% {
+        background-position: -200% 0;
+      }
+    }
+
+    @media (max-width: 899px) {
+      .qr-page main {
+        width: 100%;
+        padding: 1rem 1rem calc(1.25rem + env(safe-area-inset-bottom));
+      }
+
+      .qr-shell {
+        width: 100%;
+      }
+
+      .tab-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .qr-card {
+        height: auto;
+      }
+
+      .hasize-form {
+        grid-template-columns: 1fr;
+      }
+
+      .hasize-qr {
+        width: 100%;
+        min-width: 0;
+        border-left: none;
+        border-top: 1px dashed #D2D2D7;
+        padding-left: 0;
+        padding-top: 0.85rem;
+      }
+    }
+
+    @page {
+      size: 105mm 22mm;
+      margin: 0;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .topbar,
+      .qr-shell {
+        display: none !important;
+      }
+
+      #printArea {
+        display: block;
+        margin: 0;
+      }
+
+      #printArea .label-page {
+        box-shadow: none;
+        border-radius: 0;
+      }
+
+      #printArea .label-page::after {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body class="qr-page">
+  <main>
+    <div class="topbar">
+      <div class="sidebar-brand">
+        <span class="sidebar-brand-mark">CM</span>
+        <div class="sidebar-brand-text">
+          <strong>Cô Mập</strong>
+          <span>Fashion</span>
+        </div>
+        <span class="mobile-page-title">In Mã QR</span>
+        <button class="mobile-nav-toggle" type="button" aria-label="Mở menu" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
+        </button>
+      </div>
+      <nav class="header-nav" aria-label="Điều hướng">
+        <a href="location.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-5.5-4.2-5.5-9.25A5.5 5.5 0 0 1 12 6.25a5.5 5.5 0 0 1 5.5 5.5C17.5 16.8 12 21 12 21Z"></path><circle cx="12" cy="11.75" r="2.25"></circle></svg>
+          <span class="nav-text">Vị trí</span>
+        </a>
+        <a href="thongtindonhang.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"></rect><path d="M8 9h8"></path><path d="M8 13h5"></path></svg>
+          <span class="nav-text">Đơn hàng</span>
+        </a>
+        <a href="bochang.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5h10v10H5z"></path><path d="M15 11h2.5l1.5 2v5H15"></path><circle cx="8.5" cy="18.5" r="1.5"></circle><circle cx="16.5" cy="18.5" r="1.5"></circle></svg>
+          <span class="nav-text">Đóng hàng</span>
+        </a>
+        <a href="hangbom.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h8"></path><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"></path><path d="M6 7h12l-1 12H7L6 7Z"></path></svg>
+          <span class="nav-text">Hàng hoàn</span>
+        </a>
+        <a href="inmaqr.html" class="header-link active">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="6" height="6"></rect><rect x="13" y="5" width="6" height="6"></rect><rect x="5" y="13" width="6" height="6"></rect><path d="M14 14h1"></path><path d="M18 14h1"></path><path d="M14 18h5"></path><path d="M18 15v3"></path></svg>
+          <span class="nav-text">In Mã QR</span>
+        </a>
+        <a href="kiemkho.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"></path><path d="M7 7v10h10V7"></path><path d="M9.5 11.5h5"></path><path d="M9.5 14.5h3"></path></svg>
+          <span class="nav-text">Kiểm Kho</span>
+        </a>
+      </nav>
+      <div class="sidebar-meta">Cô Mập Fashion</div>
+    </div>
+    <button class="mobile-nav-backdrop" type="button" aria-label="Đóng menu"></button>
+
+    <section class="qr-shell">
+      <header class="qr-header">
+        <p class="qr-kicker">Vận Hành</p>
+        <h1 class="qr-title" id="heroTitle">In Mã QR</h1>
+        <p class="qr-subtitle" id="heroSubtitle">Tạo tem QR, dàn trang để in và tạo QR hạ size trong cùng một màn hình.</p>
+        <div class="qr-tab-nav" role="tablist">
+          <button class="qr-tab-button" id="tab-trigger-labels" type="button" role="tab" aria-controls="tab-labels" aria-selected="true" data-tab-target="labels">In tem</button>
+          <button class="qr-tab-button" id="tab-trigger-hasize" type="button" role="tab" aria-controls="tab-hasize" aria-selected="false" data-tab-target="hasize">Hạ size</button>
+        </div>
+      </header>
+
+      <section class="tab-panel" data-tab-panel="labels" id="tab-labels">
+        <section class="qr-card">
+          <h2>Nhập dòng hàng</h2>
+          <div class="input-grid input-grid-vertical">
+            <div>
+              <label for="codeInput">Mã</label>
+              <input type="text" id="codeInput" placeholder="Ví dụ: A123" autocomplete="off">
+            </div>
+            <div>
+              <label for="sizeInput">Size</label>
+              <select id="sizeInput">
+                <option value="">Chọn size</option>
+                <option value="M">M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+                <option value="XXL">XXL</option>
+                <option value="XXXL">XXXL</option>
+              </select>
+            </div>
+            <div>
+              <label for="qtyInput">Số lượng</label>
+              <input type="number" id="qtyInput" placeholder=">= 1" min="1">
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn-primary" id="addItemBtn" type="button">Thêm dòng</button>
+            <button class="btn-outline" id="resetBtn" type="button">Reset</button>
+          </div>
+          <div id="formMessage" class="status-line info" role="status" hidden></div>
+        </section>
+
+        <div class="qr-panel-stack">
+          <section class="qr-card">
+            <div class="table-summary">
+              <span id="itemCounter">0 dòng</span>
+              <span id="qtyCounter">0 tem</span>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Mã</th>
+                    <th>Size</th>
+                    <th>Số lượng</th>
+                    <th>Ghi chú</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="itemsBody">
+                  <tr>
+                    <td colspan="6" class="empty-state">Chưa có dòng nào được thêm.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="actions single-action" style="margin-top: 0.9rem;">
+              <button class="btn-primary" id="sendWebhookBtn" type="button" disabled>Gửi</button>
+            </div>
+            <p id="sendHint" class="helper" hidden>Nhấn “Gửi” sau khi thêm đầy đủ dòng.</p>
+            <div id="statusBox" class="status-line info" hidden></div>
+          </section>
+
+          <section class="qr-card" id="layoutSection" hidden>
+            <div class="layout-header">
+              <div>
+                <h2>Bản dàn tem</h2>
+              </div>
+              <button class="btn-outline" id="printBtn" type="button" style="display: none;" disabled>In</button>
+            </div>
+            <div id="layoutPreview" class="layout-grid">
+              <div class="empty-state">Hãy nhấn “Gửi” để nhận tem.</div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-tab-panel="hasize" id="tab-hasize" hidden>
+        <section class="qr-card">
+          <div class="layout-header">
+            <div>
+              <h2>Hạ size nhanh</h2>
+            </div>
+            <div class="hasize-actions">
+              <button class="btn-outline" id="hasizePrintBtn" type="button" style="display: none;" disabled>In</button>
+              <button class="btn-outline" id="hasizeClearBtn" type="button">Xóa danh sách</button>
+            </div>
+          </div>
+          <div class="hasize-form">
+            <div>
+              <label for="hasizeInput">Serial / mã QR</label>
+              <input type="text" id="hasizeInput" placeholder="Quét hoặc nhập serial" autocomplete="off">
+            </div>
+            <button class="btn-primary" id="hasizeSubmitBtn" type="button">Tạo QR hạ size</button>
+          </div>
+          <div id="hasizeStatus" class="status-line info" role="status">Quét sản phẩm cần hạ để nhận QR mới.</div>
+        </section>
+
+        <section class="qr-card">
+          <div class="table-summary">
+            <span id="hasizeCounter">0 QR hạ size</span>
+          </div>
+          <div id="hasizeResults" class="hasize-grid">
+            <div class="empty-state">Chưa có QR hạ size nào.</div>
+          </div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <section id="printArea" aria-hidden="true"></section>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const LAST_PAGE_KEY = 'cmf:lastPage';
+      localStorage.setItem(LAST_PAGE_KEY, 'inmaqr.html');
+
+      const WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/import-items';
+      const HASIZE_WEBHOOK_URL = 'https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/hasize_hang';
+      const CODE_REGEX = /^[ANT]\d{3}$/i;
+      const ALLOWED_SIZES = ['M', 'L', 'XL', 'XXL', 'XXXL'];
+
+      const state = {
+        items: [],
+        hashes: [],
+        layoutReady: false,
+        loading: false
+      };
+
+      const hasizeState = {
+        entries: [],
+        loading: false
+      };
+
+      let labelPrintHTML = '';
+
+      const els = {
+        code: document.getElementById('codeInput'),
+        size: document.getElementById('sizeInput'),
+        qty: document.getElementById('qtyInput'),
+        addBtn: document.getElementById('addItemBtn'),
+        resetBtn: document.getElementById('resetBtn'),
+        formMessage: document.getElementById('formMessage'),
+        itemCounter: document.getElementById('itemCounter'),
+        qtyCounter: document.getElementById('qtyCounter'),
+        body: document.getElementById('itemsBody'),
+        sendBtn: document.getElementById('sendWebhookBtn'),
+        printBtn: document.getElementById('printBtn'),
+        statusBox: document.getElementById('statusBox'),
+        sendHint: document.getElementById('sendHint'),
+        heroTitle: document.getElementById('heroTitle'),
+        heroSubtitle: document.getElementById('heroSubtitle'),
+        layoutSection: document.getElementById('layoutSection'),
+        layoutPreview: document.getElementById('layoutPreview'),
+        printArea: document.getElementById('printArea'),
+        tabButtons: document.querySelectorAll('[data-tab-target]'),
+        tabPanels: document.querySelectorAll('[data-tab-panel]'),
+        hasizeInput: document.getElementById('hasizeInput'),
+        hasizeSubmit: document.getElementById('hasizeSubmitBtn'),
+        hasizeClear: document.getElementById('hasizeClearBtn'),
+        hasizePrintBtn: document.getElementById('hasizePrintBtn'),
+        hasizeStatus: document.getElementById('hasizeStatus'),
+        hasizeCounter: document.getElementById('hasizeCounter'),
+        hasizeResults: document.getElementById('hasizeResults')
+      };
+
+      const hasizeSubmitLabel = els.hasizeSubmit?.textContent || 'Tạo QR hạ size';
+      const DEFAULT_TAB = 'labels';
+      const HERO_COPY = {
+        labels: {
+          title: 'In Mã QR',
+          subtitle: 'Tạo QR, dàn tem và in nhãn ngay trong giao diện vận hành hiện tại.'
+        },
+        hasize: {
+          title: 'Hạ size',
+          subtitle: 'Quét serial để tạo QR hạ size mới, thao tác nhanh và dễ kiểm soát.'
+        }
+      };
+
+      const flash = (element) => {
+        if (!element) return;
+        element.classList.remove('flash');
+        void element.offsetWidth;
+        element.classList.add('flash');
+        window.setTimeout(() => element.classList.remove('flash'), 320);
+      };
+
+      const setHidden = (element, hidden) => {
+        if (!element) return;
+        if (hidden) element.setAttribute('hidden', '');
+        else element.removeAttribute('hidden');
+      };
+
+      const setBusyStatus = (element, busy) => {
+        if (!element) return;
+        element.classList.toggle('is-busy', Boolean(busy));
+        element.setAttribute('aria-busy', String(Boolean(busy)));
+        if (busy) setHidden(element, false);
+      };
+
+      const setBusy = (element, busy) => {
+        if (!element) return;
+        if (busy) {
+          element.setAttribute('data-busy', 'true');
+          element.setAttribute('aria-busy', 'true');
+        } else {
+          element.removeAttribute('data-busy');
+          element.removeAttribute('aria-busy');
+        }
+      };
+
+      const buildSkeletonGrid = (count = 6) => {
+        const safeCount = Math.max(1, Math.min(12, Number(count) || 6));
+        return Array.from({ length: safeCount }, () => '<div class="skeleton-card" aria-hidden="true"></div>').join('');
+      };
+
+      const updateGlobalBusy = () => {
+        document.body.classList.toggle('global-busy', state.loading || hasizeState.loading);
+      };
+
+      const renderTotals = () => {
+        els.itemCounter.textContent = `${state.items.length} dòng`;
+        const qtyTotal = state.items.reduce((sum, item) => sum + item.qty, 0);
+        els.qtyCounter.textContent = `${qtyTotal} tem`;
+      };
+
+      const renderTable = () => {
+        if (!state.items.length) {
+          els.body.innerHTML = '<tr><td colspan="6" class="empty-state">Chưa có dòng nào được thêm.</td></tr>';
+          renderTotals();
+          return;
+        }
+
+        const rows = state.items.map((item, index) => {
+          const note = item.error ? `<span style="color:#C02D52;">${item.error}</span>` : '—';
+          return `
+            <tr data-id="${item.id}">
+              <td>${index + 1}</td>
+              <td>${item.code}</td>
+              <td>${item.size}</td>
+              <td>${item.qty}</td>
+              <td>${note}</td>
+              <td><button class="btn-outline" data-remove="${item.id}" type="button">Xóa</button></td>
+            </tr>
+          `;
+        }).join('');
+
+        els.body.innerHTML = rows;
+        renderTotals();
+      };
+
+      const setStatus = (type, message) => {
+        if (!els.statusBox) return;
+        const hasMessage = Boolean(message && String(message).trim());
+        setHidden(els.statusBox, !hasMessage);
+        if (!hasMessage) return;
+        els.statusBox.textContent = message;
+        els.statusBox.className = `status-line ${type}`;
+        flash(els.statusBox);
+      };
+
+      const setFormMessage = (type, message) => {
+        if (!els.formMessage) return;
+        const hasMessage = Boolean(message && String(message).trim());
+        setHidden(els.formMessage, !hasMessage);
+        if (!hasMessage) return;
+        els.formMessage.textContent = message;
+        els.formMessage.className = `status-line ${type}`;
+        flash(els.formMessage);
+        if (type !== 'error') {
+          window.setTimeout(() => {
+            if (els.formMessage?.textContent === message) setHidden(els.formMessage, true);
+          }, 900);
+        }
+      };
+
+      const setHasizeStatus = (type, message) => {
+        if (!els.hasizeStatus) return;
+        els.hasizeStatus.textContent = message;
+        els.hasizeStatus.className = `status-line ${type}`;
+        flash(els.hasizeStatus);
+      };
+
+      const updateButtons = () => {
+        const hasItems = state.items.length > 0;
+        els.sendBtn.disabled = !hasItems || state.loading;
+        els.sendBtn.classList.toggle('is-loading', state.loading);
+        els.sendBtn.setAttribute('aria-busy', String(Boolean(state.loading)));
+        setHidden(els.sendHint, !hasItems || state.loading);
+        updateGlobalBusy();
+      };
+
+      const updateHasizePrintButton = () => {
+        if (!els.hasizePrintBtn) return;
+        if (!hasizeState.entries.length) {
+          els.hasizePrintBtn.style.display = 'none';
+          els.hasizePrintBtn.disabled = true;
+          return;
+        }
+        els.hasizePrintBtn.style.display = '';
+        els.hasizePrintBtn.disabled = hasizeState.loading;
+      };
+
+      const updateHasizeControls = () => {
+        if (els.hasizeSubmit) {
+          els.hasizeSubmit.disabled = hasizeState.loading;
+          els.hasizeSubmit.textContent = hasizeState.loading ? 'Đang tạo...' : hasizeSubmitLabel;
+          els.hasizeSubmit.classList.toggle('is-loading', hasizeState.loading);
+        }
+        if (els.hasizeClear) {
+          els.hasizeClear.disabled = hasizeState.loading || hasizeState.entries.length === 0;
+        }
+        updateHasizePrintButton();
+        updateGlobalBusy();
+      };
+
+      const activateTab = (tabName = DEFAULT_TAB) => {
+        const hero = HERO_COPY[tabName] || HERO_COPY[DEFAULT_TAB];
+        if (els.heroTitle) els.heroTitle.textContent = hero.title;
+        if (els.heroSubtitle) els.heroSubtitle.textContent = hero.subtitle;
+
+        els.tabButtons.forEach((button) => {
+          const isActive = button.dataset.tabTarget === tabName;
+          button.setAttribute('aria-selected', String(isActive));
+        });
+
+        els.tabPanels.forEach((panel) => {
+          const isActive = panel.dataset.tabPanel === tabName;
+          if (isActive) panel.removeAttribute('hidden');
+          else panel.setAttribute('hidden', '');
+        });
+
+        if (tabName === 'hasize') {
+          requestAnimationFrame(() => els.hasizeInput?.focus());
+        }
+      };
+
+      const showPrintButton = () => {
+        els.printBtn.style.display = '';
+        els.printBtn.disabled = false;
+      };
+
+      const hidePrintButton = () => {
+        els.printBtn.style.display = 'none';
+        els.printBtn.disabled = true;
+      };
+
+      const sanitizeCode = (value) => value.trim().toUpperCase();
+      const sanitizeSize = (value) => value.trim().toUpperCase();
+      const sanitizeQty = (value) => Number.parseInt(value, 10) || 0;
+      const sanitizeSerial = (value) => value.trim().toUpperCase();
+
+      const validateItem = ({ code, size, qty }) => {
+        if (!code) return 'Vui lòng nhập mã.';
+        if (!CODE_REGEX.test(code)) return 'Mã phải bắt đầu bằng A/N/T + 3 số.';
+        if (!size) return 'Chọn size.';
+        if (!ALLOWED_SIZES.includes(size)) return 'Size chỉ nhận M, L, XL, XXL, XXXL.';
+        if (!Number.isInteger(qty) || qty < 1) return 'Số lượng phải là số nguyên ≥ 1.';
+        return '';
+      };
+
+      const cryptoId = () => {
+        if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+        return `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      };
+
+      const buildQrUrl = (value) => `https://quickchart.io/qr?size=200&margin=1&text=${encodeURIComponent(value)}`;
+
+      const resetForm = () => {
+        els.code.value = '';
+        els.size.value = '';
+        els.qty.value = '';
+        els.code.focus();
+      };
+
+      const resetAll = () => {
+        state.items = [];
+        state.hashes = [];
+        state.layoutReady = false;
+        state.loading = false;
+        renderTable();
+        els.layoutPreview.innerHTML = '<div class="empty-state">Hãy nhấn “Gửi” để nhận tem.</div>';
+        els.printArea.innerHTML = '';
+        labelPrintHTML = '';
+        els.layoutSection?.setAttribute('hidden', '');
+        hidePrintButton();
+        resetForm();
+        setStatus('', '');
+        setFormMessage('', '');
+        updateButtons();
+      };
+
+      const addItem = () => {
+        const code = sanitizeCode(els.code.value);
+        const size = sanitizeSize(els.size.value);
+        const qty = sanitizeQty(els.qty.value);
+        const validation = validateItem({ code, size, qty });
+
+        if (validation) {
+          setFormMessage('error', validation);
+          return;
+        }
+
+        state.items.push({ id: cryptoId(), code, size, qty, error: '' });
+        setFormMessage('success', 'Đã thêm vào bảng tạm.');
+        renderTable();
+        updateButtons();
+        resetForm();
+      };
+
+      const removeItem = (id) => {
+        state.items = state.items.filter((item) => item.id !== id);
+        renderTable();
+        updateButtons();
+      };
+
+      const validateAllRows = () => {
+        let hasError = false;
+        state.items = state.items.map((item) => {
+          const error = validateItem(item);
+          if (error) hasError = true;
+          return { ...item, error };
+        });
+        renderTable();
+        return !hasError;
+      };
+
+      const extractSerials = (payload) => {
+        if (!payload) return [];
+        const strings = [];
+        const collect = (value) => {
+          if (Array.isArray(value)) {
+            value.forEach((entry) => {
+              if (typeof entry === 'string') strings.push(entry);
+              else if (entry && typeof entry === 'object') {
+                collect(entry.serials);
+                collect(entry.hashes);
+              }
+            });
+          } else if (typeof value === 'string') {
+            strings.push(value);
+          } else if (value && typeof value === 'object') {
+            collect(value.serials);
+            collect(value.hashes);
+          }
+        };
+        collect(payload);
+        return strings.filter(Boolean);
+      };
+
+      const chunkLabels = (labels) => {
+        const pages = [];
+        for (let i = 0; i < labels.length; i += 3) pages.push(labels.slice(i, i + 3));
+        if (pages.length) {
+          const lastPage = pages[pages.length - 1];
+          while (lastPage.length < 3) lastPage.push({ blank: true });
+        }
+        return pages;
+      };
+
+      const renderQrCodes = (container) => {
+        const targets = container.querySelectorAll('.label-qr[data-qr]');
+        targets.forEach((node) => {
+          const value = node.dataset.qr;
+          const img = node.querySelector('img');
+          if (!value || !img) return;
+          node.classList.remove('qr-missing');
+          img.src = buildQrUrl(value);
+          img.alt = `QR ${value}`;
+          img.onload = () => node.classList.remove('qr-missing');
+          img.onerror = () => node.classList.add('qr-missing');
+        });
+      };
+
+      const parseHashes = () => {
+        const normalized = [];
+        state.hashes.forEach((entry) => {
+          if (typeof entry !== 'string') return;
+          const parts = entry.split('-');
+          const code = (parts.shift() || '').toUpperCase();
+          const size = (parts.shift() || '').toUpperCase();
+          const hash = (parts.join('-') || '').toUpperCase();
+          if (!code || !size) return;
+          const qrValue = hash ? `${code}-${size}-${hash}` : `${code}-${size}`;
+          normalized.push({ code, size, hash, value: qrValue });
+        });
+        return normalized;
+      };
+
+      const renderPages = (container, pages) => {
+        if (!pages.length) {
+          container.innerHTML = '<div class="empty-state">Chưa có bản dàn tem.</div>';
+          return;
+        }
+
+        const pageHtml = pages.map((labels, pageIndex) => {
+          const cells = labels.map((label) => {
+            if (label.blank) {
+              return '<div class="label-cell is-blank"><span>Tem trống</span></div>';
+            }
+            return `
+              <div class="label-cell">
+                <div class="label-qr" data-qr="${label.value}">
+                  <img alt="QR ${label.value}">
+                  <span class="qr-fallback">QR lỗi</span>
+                </div>
+                <div class="label-text">
+                  <div class="label-text-rotate">
+                    <span class="code">${label.code}</span>
+                    <span class="sep">-</span>
+                    <span class="size">${label.size}</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          return `<div class="label-page" data-page="Trang ${pageIndex + 1}">${cells}</div>`;
+        }).join('');
+
+        container.innerHTML = pageHtml;
+        renderQrCodes(container);
+        if (container === els.printArea) labelPrintHTML = container.innerHTML;
+      };
+
+      const buildLayout = () => {
+        if (!state.hashes.length) {
+          setStatus('error', 'Chưa có dữ liệu tem.');
+          return;
+        }
+
+        const labels = parseHashes();
+        const pages = chunkLabels(labels);
+        els.layoutSection?.removeAttribute('hidden');
+        renderPages(els.layoutPreview, pages);
+        renderPages(els.printArea, pages);
+        state.layoutReady = true;
+        showPrintButton();
+        setStatus('success', `Đã dàn ${labels.length} tem thành ${pages.length} trang.`);
+      };
+
+      const sendWebhook = async () => {
+        if (!validateAllRows()) {
+          setStatus('error', 'Có dòng chưa hợp lệ, vui lòng kiểm tra lại.');
+          return;
+        }
+
+        const payloadItems = state.items.map(({ code, size, qty }) => ({ code, size, qty }));
+        state.layoutReady = false;
+        hidePrintButton();
+        state.loading = true;
+        updateButtons();
+        setStatus('info', 'Đang gửi webhook...');
+        setBusyStatus(els.statusBox, true);
+        els.layoutSection?.removeAttribute('hidden');
+        els.layoutPreview.innerHTML = buildSkeletonGrid(6);
+
+        try {
+          const res = await fetch(WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: payloadItems })
+          });
+
+          if (!res.ok) {
+            const text = await res.text();
+            throw new Error(text || `Webhook trả về mã lỗi ${res.status}`);
+          }
+
+          const data = await res.json();
+          const hashes = extractSerials(data);
+          if (!hashes.length) throw new Error('Webhook không trả về serial/hash hợp lệ.');
+          state.hashes = hashes;
+          buildLayout();
+        } catch (error) {
+          console.error(error);
+          setStatus('error', error.message || 'Gửi webhook thất bại.');
+          els.layoutSection?.setAttribute('hidden', '');
+        } finally {
+          state.loading = false;
+          updateButtons();
+          setBusyStatus(els.statusBox, false);
+        }
+      };
+
+      const handlePrint = () => {
+        if (!state.layoutReady) {
+          setStatus('error', 'Chưa có bản dàn tem để in.');
+          return;
+        }
+        window.print();
+      };
+
+      const normalizeHasizeItem = (item, fallbackSerial) => {
+        if (!item && !fallbackSerial) return null;
+        const serial = sanitizeSerial(item?.serial || fallbackSerial || '');
+        if (!serial) return null;
+        return {
+          id: item?.id || cryptoId(),
+          sku: sanitizeCode(item?.sku || ''),
+          size: sanitizeSize(item?.size || ''),
+          serial,
+          status: item?.status || '',
+          orderCode: item?.order_code || '',
+          createdAt: item?.created_at || new Date().toISOString(),
+          hash: item?.hash || ''
+        };
+      };
+
+      const getHasizeQrValue = (entry) => entry.serial || [entry.sku, entry.size, entry.hash].filter(Boolean).join('-');
+
+      const buildHasizeCardHtml = (entry) => {
+        const qrValue = getHasizeQrValue(entry);
+        const sku = entry.sku || '—';
+        const sizeText = entry.size || '—';
+        return `
+          <article class="hasize-card">
+            <div class="hasize-details">
+              <div class="hasize-meta">
+                <span>SKU: ${sku}</span>
+                <span>Size: ${sizeText}</span>
+              </div>
+            </div>
+            <div class="hasize-qr">
+              <img src="${buildQrUrl(qrValue)}" alt="QR hạ size" loading="lazy">
+              <span>Quét để hạ size</span>
+            </div>
+          </article>
+        `;
+      };
+
+      const upsertHasizeEntries = (entries) => {
+        entries.forEach((entry) => {
+          const index = hasizeState.entries.findIndex((item) => item.serial === entry.serial);
+          if (index >= 0) hasizeState.entries[index] = entry;
+          else hasizeState.entries.unshift(entry);
+        });
+      };
+
+      const renderHasizeResults = () => {
+        if (!hasizeState.entries.length) {
+          els.hasizeResults.innerHTML = '<div class="empty-state">Chưa có QR hạ size nào.</div>';
+          els.hasizeCounter.textContent = '0 QR hạ size';
+          updateHasizePrintButton();
+          return;
+        }
+        els.hasizeCounter.textContent = `${hasizeState.entries.length} QR hạ size`;
+        els.hasizeResults.innerHTML = hasizeState.entries.map((entry) => buildHasizeCardHtml(entry)).join('');
+        updateHasizePrintButton();
+      };
+
+      const clearHasizeResults = () => {
+        hasizeState.entries = [];
+        renderHasizeResults();
+        setHasizeStatus('info', 'Đã xóa danh sách QR hạ size.');
+        updateHasizeControls();
+      };
+
+      const buildHasizePrintLayout = () => {
+        if (!hasizeState.entries.length) return '';
+        const labels = hasizeState.entries.map((entry) => ({
+          code: entry.sku || '—',
+          size: entry.size || '',
+          value: getHasizeQrValue(entry)
+        }));
+        const pages = chunkLabels(labels);
+        return pages.map((labelsOnPage, pageIndex) => {
+          const cells = labelsOnPage.map((label) => {
+            if (label.blank) return '<div class="label-cell is-blank"><span>Tem trống</span></div>';
+            return `
+              <div class="label-cell">
+                <div class="label-qr" data-qr="${label.value}">
+                  <img alt="QR ${label.value}">
+                  <span class="qr-fallback">QR lỗi</span>
+                </div>
+                <div class="label-text">
+                  <div class="label-text-rotate">
+                    <span class="code">${label.code}</span>
+                    <span class="sep">-</span>
+                    <span class="size">${label.size}</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+          return `<div class="label-page" data-page="Trang ${pageIndex + 1}">${cells}</div>`;
+        }).join('');
+      };
+
+      const restoreLabelPrintArea = () => {
+        if (state.layoutReady && labelPrintHTML) {
+          els.printArea.innerHTML = labelPrintHTML;
+        } else if (!state.layoutReady) {
+          els.printArea.innerHTML = '';
+        }
+      };
+
+      const handleHasizePrint = () => {
+        if (!hasizeState.entries.length) {
+          setHasizeStatus('error', 'Chưa có QR hạ size để in.');
+          return;
+        }
+        const layout = buildHasizePrintLayout();
+        if (!layout) {
+          setHasizeStatus('error', 'Chưa có QR hạ size để in.');
+          return;
+        }
+        setHasizeStatus('info', 'Đang mở hộp thoại in QR hạ size...');
+        els.printArea.innerHTML = layout;
+        renderQrCodes(els.printArea);
+        let cleanedUp = false;
+        const cleanup = () => {
+          if (cleanedUp) return;
+          cleanedUp = true;
+          restoreLabelPrintArea();
+          setHasizeStatus('success', 'Đã chuẩn bị xong bản in QR hạ size.');
+          window.removeEventListener('afterprint', cleanup);
+          window.removeEventListener('focus', cleanup);
+        };
+        window.addEventListener('afterprint', cleanup);
+        window.addEventListener('focus', cleanup);
+        window.print();
+      };
+
+      const handleHasizeSubmit = async () => {
+        const serial = sanitizeSerial(els.hasizeInput?.value || '');
+        if (!serial) {
+          setHasizeStatus('error', 'Vui lòng quét hoặc nhập serial.');
+          els.hasizeInput?.focus();
+          return;
+        }
+
+        hasizeState.loading = true;
+        updateHasizeControls();
+        setHasizeStatus('info', 'Đang tạo QR hạ size...');
+        setBusyStatus(els.hasizeStatus, true);
+        setBusy(els.hasizeResults, true);
+
+        try {
+          const response = await fetch(HASIZE_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ serial })
+          });
+
+          if (!response.ok) {
+            const text = await response.text();
+            throw new Error(text || `Webhook trả về mã lỗi ${response.status}`);
+          }
+
+          const payload = await response.json();
+          const list = Array.isArray(payload) ? payload : [payload];
+          const normalized = list.map((item) => normalizeHasizeItem(item, serial)).filter(Boolean);
+          if (!normalized.length) throw new Error('Webhook không trả về thông tin serial hợp lệ.');
+
+          upsertHasizeEntries(normalized);
+          renderHasizeResults();
+          setHasizeStatus('success', `Đã tạo ${normalized.length} QR hạ size.`);
+          els.hasizeInput.value = '';
+          els.hasizeInput.focus();
+        } catch (error) {
+          console.error(error);
+          setHasizeStatus('error', error.message || 'Không tạo được QR hạ size.');
+        } finally {
+          hasizeState.loading = false;
+          updateHasizeControls();
+          setBusyStatus(els.hasizeStatus, false);
+          setBusy(els.hasizeResults, false);
+        }
+      };
+
+      els.addBtn.addEventListener('click', addItem);
+      els.resetBtn.addEventListener('click', resetAll);
+      els.sendBtn.addEventListener('click', sendWebhook);
+      els.printBtn.addEventListener('click', handlePrint);
+      els.hasizeSubmit?.addEventListener('click', handleHasizeSubmit);
+      els.hasizeClear?.addEventListener('click', clearHasizeResults);
+      els.hasizePrintBtn?.addEventListener('click', handleHasizePrint);
+
+      els.body.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-remove]');
+        if (button) removeItem(button.getAttribute('data-remove'));
+      });
+
+      [els.code, els.size, els.qty].forEach((input) => {
+        input?.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            addItem();
+          }
+        });
+      });
+
+      els.hasizeInput?.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          handleHasizeSubmit();
+        }
+      });
+
+      els.tabButtons.forEach((button) => {
+        button.addEventListener('click', () => activateTab(button.dataset.tabTarget));
+      });
+
+      activateTab(DEFAULT_TAB);
+      hidePrintButton();
+      renderTable();
+      renderHasizeResults();
+      updateButtons();
+      updateHasizeControls();
+    });
+  </script>
+  <script>
+    (() => {
+      const topbar = document.querySelector('.topbar');
+      const toggle = document.querySelector('.mobile-nav-toggle');
+      const nav = document.querySelector('.header-nav');
+      const backdrop = document.querySelector('.mobile-nav-backdrop');
+      if (!topbar || !toggle || !nav || !backdrop) return;
+      const closeMenu = () => {
+        topbar.classList.remove('nav-open');
+        document.body.classList.remove('mobile-nav-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      };
+      const openMenu = () => {
+        topbar.classList.add('nav-open');
+        document.body.classList.add('mobile-nav-open');
+        toggle.setAttribute('aria-expanded', 'true');
+      };
+      toggle.addEventListener('click', () => {
+        if (topbar.classList.contains('nav-open')) closeMenu();
+        else openMenu();
+      });
+      backdrop.addEventListener('click', closeMenu);
+      nav.addEventListener('click', (event) => {
+        if (event.target.closest('a')) closeMenu();
+      });
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 899) closeMenu();
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeMenu();
+      });
+    })();
+  </script>
+</body>
+
+</html>

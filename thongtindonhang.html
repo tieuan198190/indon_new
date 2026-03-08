@@ -10,101 +10,505 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="app.css">
   <style>
+    body.order-page {
+      --sidebar-width: 14%;
+      --search-form-width: min(100%, 640px);
+      --search-form-offset: 2.4rem;
+      --shell-pad-x: clamp(3rem, 5vw, 4rem);
+      --shell-pad-y: clamp(2.25rem, 3vw, 3rem);
+      background: #F5F5F7;
+      color: #1D1D1F;
+    }
+
+    .order-page main {
+      max-width: 1320px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .order-page .lookup-form {
+      position: relative;
+      width: var(--search-form-width);
+      margin-left: 0;
+      margin-right: 0;
+      margin-top: var(--search-form-offset);
+      margin-bottom: 0;
+      justify-self: start;
+      align-self: start;
+    }
+
+    .order-page #lookup-form {
+      width: 100%;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 1rem;
+      padding: 0 0 0.75rem;
+      border-bottom: 1px solid #D2D2D7;
+    }
+
+    .order-page #lookup-form:focus-within {
+      border-bottom-color: #1D1D1F;
+    }
+
+    .order-page #order-input {
+      border: none;
+      padding: 0;
+      background: transparent;
+      font-family: "Inter", sans-serif;
+      font-size: clamp(1.15rem, 1.8vw, 1.55rem);
+      font-weight: 400;
+      line-height: 1.2;
+      text-align: left;
+      color: #1D1D1F;
+      width: 100%;
+    }
+
+    .order-page #order-input::placeholder {
+      font-family: "Inter", sans-serif;
+      font-size: inherit;
+      line-height: inherit;
+      color: #6E6E73;
+      font-weight: 400;
+    }
+
+    .order-page #order-input:focus {
+      border-bottom: none;
+    }
+
+    .order-page #lookup-btn {
+      width: 2.25rem;
+      height: 2.25rem;
+      min-width: 0;
+      padding: 0;
+      border: none;
+      border-radius: 999px;
+      background: transparent;
+      color: #1D1D1F;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: none;
+      transform: none;
+      margin: 0;
+    }
+
+    .order-page #lookup-btn:hover,
+    .order-page #lookup-btn:active {
+      background: transparent;
+      color: #1D1D1F;
+      transform: none;
+    }
+
+    .order-page #lookup-btn svg {
+      width: 1.35rem;
+      height: 1.35rem;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .order-page .mobile-inline-submit {
+      display: none;
+    }
+
+    @media (max-width: 899px) {
+      .order-page .lookup-form {
+        margin-top: 0.8rem;
+      }
+
+      .order-page #lookup-form {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 0.75rem;
+        align-items: end;
+      }
+
+      .order-page #lookup-btn {
+        display: none;
+      }
+
+      .order-page .mobile-inline-submit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 72px;
+        height: 42px;
+        padding: 0 1rem;
+        border: none;
+        border-radius: 999px;
+        background: #1D1D1F;
+        color: #FFFFFF;
+        font-size: 0.85rem;
+        font-weight: 600;
+        line-height: 1;
+      }
+
+      .order-page #order-input {
+        min-height: 42px;
+      }
+    }
+
+    .order-page .result-card {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.15rem;
+      width: min(100%, 1100px);
+      margin: 0.9rem auto 0;
+      align-items: start;
+    }
+
+    .order-page .location-panel {
+      padding-top: 0.1rem;
+      text-align: left;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .order-page .location-panel-header {
+      align-items: flex-start;
+      gap: 0.4rem;
+      margin-bottom: 0;
+    }
+
+    .order-page .location-label {
+      margin: 0;
+      font-size: 0.78rem;
+      line-height: 1.2;
+      letter-spacing: 0.08em;
+    }
+
+    .order-page .location-text {
+      font-size: clamp(2.8rem, 4.7vw, 4.8rem);
+      line-height: 0.94;
+      margin: 0;
+    }
+
+    .order-page .order-meta {
+      margin-top: 0.2rem;
+      font-size: 1rem;
+      color: #6E6E73;
+    }
+
+    .order-page .items-wrap {
+      width: 100%;
+      position: relative;
+    }
+
+    .order-page #items-panel {
+      width: 100%;
+    }
+
+    .order-page #items-panel>.location-label {
+      margin-bottom: 1rem;
+    }
+
+    .order-page .items-surface {
+      background: #FFFFFF;
+      border: 1px solid #D2D2D7;
+      border-radius: 20px;
+      padding: 0.8rem 1.15rem;
+      min-height: 0;
+      overflow: hidden;
+      aspect-ratio: auto;
+    }
+
     /* Table Minimalist overrides */
     .clean-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.9rem;
+      font-size: 0.94rem;
     }
 
     .clean-table th {
       text-align: left;
       font-weight: 500;
-      color: #888;
-      padding: 0.75rem 0;
-      border-bottom: 1px solid #eee;
-      font-size: 0.8rem;
+      color: #6E6E73;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid #D2D2D7;
+      font-size: 0.78rem;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.08em;
     }
 
     .clean-table td {
       padding: 1rem 0;
-      border-bottom: 1px solid #f9f9f9;
+      border-bottom: 1px solid #ECECEF;
+      vertical-align: top;
+    }
+
+    .clean-table tbody tr {
+      min-height: 168px;
     }
 
     .clean-table tr:last-child td {
       border-bottom: none;
     }
 
-    /* Camera container integration */
-    #camera-container {
-      position: relative;
-      background: #000;
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-      width: 100%;
-      height: 100%;
-      min-height: 300px;
+    .item-cell {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      min-height: 0;
     }
 
-    video {
-      width: 100%;
-      height: 100%;
+    .item-copy {
+      min-width: 0;
+    }
+
+    .item-code {
+      font-weight: 600;
+      color: #1D1D1F;
+      line-height: 1.2;
+      font-size: 1.1rem;
+    }
+
+    .item-sub {
+      color: #6E6E73;
+      font-size: 0.88rem;
+      margin-top: 0.22rem;
+    }
+
+    .order-page .item-thumb {
+      width: 108px;
+      height: 144px;
+      min-width: 108px;
+      min-height: 144px;
+      max-width: 108px;
+      max-height: 144px;
+      border-radius: 14px;
       object-fit: cover;
+      object-position: center top;
+      display: block;
+      background: #FFFFFF;
+      border: 1px solid #D2D2D7;
+      flex-shrink: 0;
     }
 
-    .camera-overlay {
-      position: absolute;
-      inset: 0;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      margin: 2rem;
-      border-radius: 12px;
-      pointer-events: none;
+    .order-page .item-thumb-placeholder {
+      width: 108px;
+      height: 144px;
+      min-width: 108px;
+      min-height: 144px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #FFFFFF;
+      border: 1px solid #D2D2D7;
+      color: #6E6E73;
+      font-size: 0.66rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    .clean-table th.location-col {
+      width: 34%;
+      text-align: left;
+    }
+
+    .item-location {
+      text-align: left;
+      font-weight: 600;
+      color: #1D1D1F;
+      white-space: normal;
+      width: 34%;
+      max-width: 240px;
+      min-width: 160px;
+      line-height: 1.3;
+      font-size: 1rem;
+      padding-left: 0.75rem;
+    }
+
+    @media (min-width: 900px) {
+      .order-page main {
+        width: calc(100% - var(--sidebar-width));
+        max-width: none;
+        align-items: start;
+      }
+
+      .order-page .lookup-form {
+        grid-column: 1 / 2;
+        width: 100%;
+        max-width: none;
+        margin-left: 0;
+        margin-right: 0;
+        margin-top: 0;
+      }
+
+      .order-page .result-card {
+        grid-column: 1 / -1;
+        width: 100%;
+        max-width: none;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(2rem, 4vw, 4rem);
+        margin-top: 0.9rem;
+        align-items: start;
+      }
+
+      .order-page .location-panel {
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+        min-width: 0;
+        padding-top: 0.2rem;
+      }
+
+      .order-page .location-panel-header {
+        width: min(100%, 520px);
+        gap: 0.75rem;
+      }
+
+      .order-page .location-text {
+        font-size: clamp(4.3rem, 5.8vw, 6rem);
+        line-height: 0.9;
+      }
+
+      .order-page .order-meta {
+        font-size: 1.05rem;
+      }
+
+      .order-page .items-wrap {
+        min-width: 0;
+        display: flex;
+        justify-content: flex-end;
+        padding-top: 0.2rem;
+      }
+
+      .order-page #items-panel {
+        width: min(100%, 540px);
+      }
+
+      .order-page .items-surface {
+        border-radius: 24px;
+        padding: 0.95rem 1.25rem;
+      }
+
+      .order-page .clean-table th {
+        padding-top: 0.8rem;
+        padding-bottom: 0.8rem;
+      }
+    }
+
+    .order-page .item-thumb,
+    .order-page .items-surface .item-thumb {
+      width: 108px !important;
+      height: 144px !important;
     }
 
     .note-box {
       background: #fffbeb;
       border: 1px solid #fcd34d;
       color: #92400e;
-      padding: 1rem;
+      padding: 0.7rem 0.85rem;
       border-radius: var(--radius-sm);
-      margin-top: 1rem;
-      font-size: 0.9rem;
+      margin-top: 0.6rem;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 899px) {
+      .order-page .result-card {
+        gap: 1rem;
+      }
+
+      .order-page .location-text {
+        font-size: clamp(2.4rem, 12vw, 3.6rem);
+      }
+
+      .clean-table th.location-col,
+      .item-location {
+        width: auto;
+        min-width: 0;
+      }
+
+      .order-page .item-thumb,
+      .order-page .items-surface .item-thumb,
+      .order-page .item-thumb-placeholder {
+        width: 84px !important;
+        height: 112px !important;
+        min-width: 84px;
+        min-height: 112px;
+      }
+
+      .item-cell {
+        min-height: 118px;
+      }
+    }
+
+    .order-page footer {
+      display: none;
     }
   </style>
 </head>
 
-<body>
+<body class="order-page">
   <main>
     <div class="topbar">
+      <div class="sidebar-brand">
+        <span class="sidebar-brand-mark">CM</span>
+        <div class="sidebar-brand-text">
+          <strong>Cô Mập</strong>
+          <span>Fashion</span>
+        </div>
+        <span class="mobile-page-title">Đơn hàng</span>
+        <button class="mobile-nav-toggle" type="button" aria-label="Mở menu" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
+        </button>
+      </div>
       <nav class="header-nav">
-        <a href="index.html" class="header-link">Home</a>
-        <a href="location.html" class="header-link">Vị trí</a>
-        <a href="thongtindonhang.html" class="header-link active">Đơn hàng</a>
-        <a href="bochang.html" class="header-link">Đóng hàng</a>
-        <a href="hangbom.html" class="header-link">Hàng hoàn</a>
+        <a href="location.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-5.5-4.2-5.5-9.25A5.5 5.5 0 0 1 12 6.25a5.5 5.5 0 0 1 5.5 5.5C17.5 16.8 12 21 12 21Z"></path><circle cx="12" cy="11.75" r="2.25"></circle></svg>
+          <span class="nav-text">Vị trí</span>
+        </a>
+        <a href="thongtindonhang.html" class="header-link active">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"></rect><path d="M8 9h8"></path><path d="M8 13h5"></path></svg>
+          <span class="nav-text">Đơn hàng</span>
+        </a>
+        <a href="bochang.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5h10v10H5z"></path><path d="M15 11h2.5l1.5 2v5H15"></path><circle cx="8.5" cy="18.5" r="1.5"></circle><circle cx="16.5" cy="18.5" r="1.5"></circle></svg>
+          <span class="nav-text">Đóng hàng</span>
+        </a>
+        <a href="hangbom.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h8"></path><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"></path><path d="M6 7h12l-1 12H7L6 7Z"></path></svg>
+          <span class="nav-text">Hàng hoàn</span>
+        </a>
+        <a href="inmaqr.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="6" height="6"></rect><rect x="13" y="5" width="6" height="6"></rect><rect x="5" y="13" width="6" height="6"></rect><path d="M14 14h1"></path><path d="M18 14h1"></path><path d="M14 18h5"></path><path d="M18 15v3"></path></svg>
+          <span class="nav-text">In Mã QR</span>
+        </a>
+        <a href="kiemkho.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"></path><path d="M7 7v10h10V7"></path><path d="M9.5 11.5h5"></path><path d="M9.5 14.5h3"></path></svg>
+          <span class="nav-text">Kiểm Kho</span>
+        </a>
       </nav>
+      <div class="sidebar-meta">Cô Mập Fashion</div>
     </div>
+    <button class="mobile-nav-backdrop" type="button" aria-label="Đóng menu"></button>
 
     <!-- Search -->
     <div class="lookup-form">
       <form id="lookup-form" autocomplete="off">
         <label class="sr-only" for="order-input">Mã đơn hàng</label>
-        <div class="input-group" style="width: 100%; border:none;">
-          <input id="order-input" type="text" placeholder="Nhập mã đơn hoặc quét..." autocomplete="off" />
-          <!-- Optional Camera Toggle Button -->
-          <button type="button" id="camera-btn" style="width: auto; background: none; color: #000; padding: 0.5rem;">
-            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-              <circle cx="12" cy="13" r="4" />
-            </svg>
-          </button>
-        </div>
-        <button type="submit" id="lookup-btn">Tra cứu</button>
+        <button type="submit" id="lookup-btn" aria-label="Tra cứu đơn hàng">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M20 20L16.65 16.65"></path>
+          </svg>
+        </button>
+        <input id="order-input" type="text" placeholder="Nhập mã đơn hàng hoặc quét..." autocomplete="off" autofocus />
+        <button type="submit" class="mobile-inline-submit">Tìm</button>
       </form>
     </div>
-
     <div class="status-bar" id="status-bar" hidden></div>
 
     <section id="result-card" class="result-card" hidden>
@@ -114,42 +518,26 @@
           <p class="location-label">Thông tin đơn hàng</p>
           <div id="order-info-content">
             <p class="location-text" id="display-order-code">---</p>
-            <p style="margin-top: 0.5rem; font-size: 1.1rem;" id="display-customer">---</p>
+            <p class="order-meta" id="display-customer">---</p>
 
             <div id="note-container" class="note-box" hidden>
-              <strong>Ghi chú:</strong> <span id="display-note"></span>
-            </div>
-
-            <div style="margin-top: 2rem;">
-              <p class="location-label">Trạng thái</p>
-              <div id="display-status" style="font-size: 1.2rem; font-weight: 500;">---</div>
+              <strong>Ghi chú nội bộ:</strong> <span id="display-note"></span>
             </div>
           </div>
         </div>
       </article>
 
-      <!-- Right: Items or Camera -->
-      <article style="width: 100%; position: relative;">
-        <!-- Camera View (Toggled) -->
-        <div id="camera-panel" hidden
-          style="background: black; border-radius: 8px; overflow: hidden; height: 400px; position:relative;">
-          <video id="video-preview" muted playsinline></video>
-          <div class="camera-overlay"></div>
-          <button type="button" id="close-camera" class="ghost-btn"
-            style="position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%); background: white; color: black; border: none; margin: 0;">Đóng
-            Camera</button>
-        </div>
-
+      <!-- Right: Items -->
+      <article class="items-wrap">
         <!-- Items List -->
         <div id="items-panel">
           <div class="location-label">Chi tiết sản phẩm</div>
-          <div class="product-visual"
-            style="height: auto; min-height: 200px; background: white; border: 1px solid #f2f2f2; border-radius: 8px; padding: 1rem; aspect-ratio: auto;">
+          <div class="items-surface">
             <table class="clean-table">
               <thead>
                 <tr>
-                  <th>Sản phẩm</th>
-                  <th style="text-align: right;">SL</th>
+                  <th>Mã sản phẩm</th>
+                  <th class="location-col">Vị trí</th>
                 </tr>
               </thead>
               <tbody id="items-table-body">
@@ -165,7 +553,8 @@
   </main>
 
   <script>
-    const API_URL = "https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/thongtindonhang";
+    const API_URL = "https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/thongtin_don";
+    const LAST_PAGE_KEY = 'cmf:lastPage';
 
     const lookupForm = document.getElementById('lookup-form');
     const orderInput = document.getElementById('order-input');
@@ -175,18 +564,12 @@
     const displayCode = document.getElementById('display-order-code');
     const displayCustomer = document.getElementById('display-customer');
     const displayNote = document.getElementById('display-note');
+
+    orderInput.focus();
     const noteContainer = document.getElementById('note-container');
-    const displayStatus = document.getElementById('display-status');
     const itemsTableBody = document.getElementById('items-table-body');
-
-    const cameraBtn = document.getElementById('camera-btn');
-    const cameraPanel = document.getElementById('camera-panel');
     const itemsPanel = document.getElementById('items-panel');
-    const videoPreview = document.getElementById('video-preview');
-    const closeCameraBtn = document.getElementById('close-camera');
-
-    let stream = null;
-    let barcodeDetector = null;
+    localStorage.setItem(LAST_PAGE_KEY, 'thongtindonhang.html');
 
     document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -203,13 +586,13 @@
       try {
         const res = await fetch(API_URL, {
           method: 'POST',
-          body: JSON.stringify({ message: code, text: code }), // Supporting legacy payloads
+          body: JSON.stringify({ message: code, text: code, orderCode: code }),
           headers: { 'Content-Type': 'application/json' }
         });
         const data = await res.json();
-        const order = Array.isArray(data) ? data[0] : data;
+        const order = normalizeOrderPayload(data);
 
-        if (!order || (!order.order_code && !order.ma_don_hang)) throw new Error('Không tìm thấy đơn hàng');
+        if (!order || !order.orderId) throw new Error('Không tìm thấy đơn hàng');
 
         renderOrder(order);
         updateStatus('', 'idle');
@@ -218,105 +601,109 @@
       }
     }
 
+    function normalizeOrderPayload(payload) {
+      const list = Array.isArray(payload) ? payload : [payload];
+      const order = list.find((item) => item && typeof item === 'object') || null;
+      if (!order) return null;
+
+      return {
+        orderId: order.orderId || '',
+        description: order.description || '',
+        privateDescription: order.privateDescription || '',
+        products: Array.isArray(order.products) ? order.products : []
+      };
+    }
+
     function renderOrder(data) {
       resultCard.hidden = false;
       itemsPanel.hidden = false;
-      cameraPanel.hidden = true;
-      stopCamera();
 
-      displayCode.textContent = data.order_code || data.ma_don_hang || '---';
-      displayCustomer.textContent = data.customer_name || data.ten_khach_hang || '';
+      displayCode.textContent = data.orderId || '---';
+      displayCustomer.textContent = data.description || `${data.products.length} sản phẩm`;
 
-      const note = data.note || data.ghi_chu;
-      if (note) {
-        displayNote.textContent = note;
+      if (data.privateDescription) {
+        displayNote.textContent = data.privateDescription;
         noteContainer.hidden = false;
       } else {
         noteContainer.hidden = true;
       }
 
-      displayStatus.textContent = data.status || data.trang_thai || 'Đã đồng bộ';
-
-      // Items
       itemsTableBody.innerHTML = '';
-      const lines = data.line_items || data.san_pham || [];
+      const lines = data.products || [];
       lines.forEach(line => {
         const row = document.createElement('tr');
+        const imageMarkup = line.productImage
+          ? `<img class="item-thumb" src="${line.productImage}" alt="${line.productCode || 'Sản phẩm'}">`
+          : `<span class="item-thumb-placeholder">No image</span>`;
         row.innerHTML = `
                  <td>
-                    <div style="font-weight: 500;">${line.sku || line.ma_san_pham}</div>
-                    <div style="color: #888; font-size: 0.8rem;">${line.name || line.ten_san_pham || ''}</div>
+                    <div class="item-cell">
+                      ${imageMarkup}
+                      <div class="item-copy">
+                        <div class="item-code">${line.productCode || '---'}</div>
+                      </div>
+                    </div>
                  </td>
-                 <td style="text-align: right; font-weight: 600;">${line.quantity || line.so_luong}</td>
+                 <td class="item-location">${line.locate || '-'}</td>
              `;
         itemsTableBody.appendChild(row);
       });
-    }
 
-    // Camera Handling
-    async function startCamera() {
-      if (!('BarcodeDetector' in window)) {
-        alert('Trình duyệt không hỗ trợ quét mã vạch.');
-        return;
+      if (!lines.length) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>
+            <div style="font-weight: 500;">Không có sản phẩm</div>
+            <div style="color: #6E6E73; font-size: 0.8rem;">Webhook không trả về danh sách sản phẩm</div>
+          </td>
+          <td style="text-align: right; font-weight: 600;">-</td>
+        `;
+        itemsTableBody.appendChild(row);
       }
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        videoPreview.srcObject = stream;
-        await videoPreview.play();
-
-        cameraPanel.hidden = false;
-        itemsPanel.hidden = true;
-        resultCard.hidden = false; // Show result card container to show camera
-
-        barcodeDetector = new BarcodeDetector({ formats: ['qr_code', 'code_128', 'code_39'] });
-        detectLoop();
-      } catch (e) {
-        alert('Không thể mở camera: ' + e.message);
-      }
-    }
-
-    function stopCamera() {
-      if (stream) {
-        stream.getTracks().forEach(t => t.stop());
-        stream = null;
-      }
-      cameraPanel.hidden = true;
-      itemsPanel.hidden = false;
-    }
-
-    async function detectLoop() {
-      if (!stream) return;
-      try {
-        const barcodes = await barcodeDetector.detect(videoPreview);
-        if (barcodes.length > 0) {
-          const code = barcodes[0].rawValue;
-          playSound();
-          orderInput.value = code;
-          stopCamera();
-          fetchOrder(code);
-          return;
-        }
-      } catch (e) { }
-      requestAnimationFrame(detectLoop);
-    }
-
-    function playSound() {
-      // Simple beep could go here
     }
 
     lookupForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const code = orderInput.value.trim();
-      if (code) fetchOrder(code);
+      if (code) {
+        orderInput.value = '';
+        fetchOrder(code);
+      }
     });
 
-    cameraBtn.addEventListener('click', () => {
-      if (stream) stopCamera();
-      else startCamera();
-    });
-
-    closeCameraBtn.addEventListener('click', stopCamera);
-
+  </script>
+  <script>
+    (() => {
+      const topbar = document.querySelector('.topbar');
+      const toggle = document.querySelector('.mobile-nav-toggle');
+      const nav = document.querySelector('.header-nav');
+      const backdrop = document.querySelector('.mobile-nav-backdrop');
+      if (!topbar || !toggle || !nav || !backdrop) return;
+      const closeMenu = () => {
+        topbar.classList.remove('nav-open');
+        document.body.classList.remove('mobile-nav-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      };
+      const openMenu = () => {
+        topbar.classList.add('nav-open');
+        document.body.classList.add('mobile-nav-open');
+        toggle.setAttribute('aria-expanded', 'true');
+      };
+      toggle.addEventListener('click', () => {
+        if (topbar.classList.contains('nav-open')) closeMenu();
+        else openMenu();
+      });
+      backdrop.addEventListener('click', closeMenu);
+      nav.addEventListener('click', (event) => {
+        if (event.target.closest('a')) closeMenu();
+      });
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 899) closeMenu();
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeMenu();
+      });
+    })();
   </script>
 </body>
 
