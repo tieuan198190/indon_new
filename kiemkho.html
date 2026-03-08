@@ -328,6 +328,50 @@
       border: 1px dashed rgba(29, 29, 31, 0.14);
     }
 
+    .camera-reader-wrap {
+      position: relative;
+    }
+
+    .scan-feedback {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.18s ease;
+    }
+
+    .scan-feedback.is-visible {
+      opacity: 1;
+    }
+
+    .scan-feedback-badge {
+      width: 72px;
+      height: 72px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(5, 150, 105, 0.94);
+      color: #FFFFFF;
+      box-shadow: 0 12px 30px rgba(5, 150, 105, 0.3);
+      transform: scale(0.92);
+      transition: transform 0.18s ease;
+    }
+
+    .scan-feedback.is-visible .scan-feedback-badge {
+      transform: scale(1);
+    }
+
+    .scan-feedback-badge svg {
+      width: 34px;
+      height: 34px;
+      stroke: currentColor;
+      stroke-width: 2.4;
+      fill: none;
+    }
+
     .camera-hint {
       margin: 0;
       font-size: 0.9rem;
@@ -447,7 +491,14 @@
               <button class="action-btn camera-toggle-btn" id="openCameraBtn" type="button">Bật camera</button>
             </div>
             <section class="camera-panel" id="cameraPanel" hidden>
-              <div id="reader" class="camera-reader"></div>
+              <div class="camera-reader-wrap">
+                <div id="reader" class="camera-reader"></div>
+                <div class="scan-feedback" id="scanFeedback" aria-hidden="true">
+                  <div class="scan-feedback-badge">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 9.5 17 19 7.5"></path></svg>
+                  </div>
+                </div>
+              </div>
               <p class="camera-hint">Đưa QR vào khung để quét. Bấm đóng khi không dùng.</p>
             </section>
           </article>
@@ -503,6 +554,7 @@
       const manualSubmitBtn = document.getElementById('manualSubmitBtn');
       const openCameraBtn = document.getElementById('openCameraBtn');
       const cameraPanel = document.getElementById('cameraPanel');
+      const scanFeedback = document.getElementById('scanFeedback');
       let emptyRow = document.getElementById('emptyRow');
 
       let totalScans = 0;
@@ -514,6 +566,7 @@
       let lastScannedCode = null;
       let lastScannedAt = 0;
       let permissionGranted = false;
+      let scanFeedbackTimer = null;
 
       const isIosSafari = (() => {
         const ua = navigator.userAgent;
@@ -608,19 +661,28 @@
         return raw;
       }
 
+      function showScanFeedback() {
+        if (!scanFeedback) return;
+        if (scanFeedbackTimer) window.clearTimeout(scanFeedbackTimer);
+        scanFeedback.classList.add('is-visible');
+        scanFeedbackTimer = window.setTimeout(() => {
+          scanFeedback.classList.remove('is-visible');
+        }, 900);
+      }
+
       function processCode(fullCode, source) {
         const cleaned = String(fullCode || "").trim();
         const displayCode = formatDisplayQrCode(cleaned);
         if (!cleaned) {
           statusEl.textContent = "Vui lòng nhập mã trước khi gửi";
           manualInput.focus();
-          return;
+          return false;
         }
-        if (manualInFlight) return;
+        if (manualInFlight) return false;
         const now = Date.now();
         if (cleaned === manualLastCode && (now - manualLastTs) < DEDUPE_MS) {
           statusEl.textContent = "Mã trùng, đã bỏ qua";
-          return;
+          return false;
         }
         manualLastCode = cleaned;
         manualLastTs = now;
@@ -637,6 +699,7 @@
         }).finally(() => {
           manualInFlight = false;
         });
+        return true;
       }
 
       function submitManual() {
@@ -720,7 +783,8 @@
             if (decodedText === lastScannedCode && now - lastScannedAt < DEDUPE_MS) return;
             lastScannedCode = decodedText;
             lastScannedAt = now;
-            processCode(decodedText, "camera");
+            const accepted = processCode(decodedText, "camera");
+            if (accepted) showScanFeedback();
           };
 
           const baseConfig = {
