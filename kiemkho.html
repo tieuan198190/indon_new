@@ -300,6 +300,18 @@
       font-weight: 600;
     }
 
+    .status-bar[data-state="success"] {
+      color: #059669;
+      text-align: center;
+      font-size: 1.15rem;
+    }
+
+    .status-bar[data-state="error"] {
+      color: #DC2626;
+      text-align: center;
+      font-size: 1.15rem;
+    }
+
     .desktop-log-card .status-bar {
       margin-top: auto;
     }
@@ -575,6 +587,12 @@
         return iOS && safari;
       })();
 
+      function setStatus(value, state = "") {
+        statusEl.textContent = value;
+        if (state) statusEl.dataset.state = state;
+        else delete statusEl.dataset.state;
+      }
+
       function setRowNote(cells, note, state) {
         cells.forEach((cell) => {
           if (!cell) return;
@@ -623,7 +641,7 @@
         const payload = { code, ts: new Date().toISOString(), source };
 
         try {
-          statusEl.textContent = "Đang gửi...";
+          setStatus("…");
           const res = await fetch(WEBHOOK_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -636,12 +654,10 @@
             data = null;
           }
           const ok = res.ok && hasWebhookResult(data);
-          const msg = ok ? "Webhook trả về hợp lệ" : (res.ok ? "Không có dữ liệu hợp lệ" : ("Lỗi HTTP: " + res.status));
-          statusEl.textContent = msg;
+          setStatus(ok ? "✓" : "✕", ok ? "success" : "error");
           return ok;
         } catch (e) {
-          const msg = "Không gửi được: " + e.message;
-          statusEl.textContent = msg;
+          setStatus("✕", "error");
           return false;
         }
       }
@@ -674,14 +690,14 @@
         const cleaned = String(fullCode || "").trim();
         const displayCode = formatDisplayQrCode(cleaned);
         if (!cleaned) {
-          statusEl.textContent = "Vui lòng nhập mã trước khi gửi";
+          setStatus("Vui lòng nhập mã trước khi gửi");
           manualInput.focus();
           return false;
         }
         if (manualInFlight) return false;
         const now = Date.now();
         if (cleaned === manualLastCode && (now - manualLastTs) < DEDUPE_MS) {
-          statusEl.textContent = "Mã trùng, đã bỏ qua";
+          setStatus("Mã trùng, đã bỏ qua");
           return false;
         }
         manualLastCode = cleaned;
@@ -705,7 +721,7 @@
       function submitManual() {
         const fullCode = String(manualInput.value || "").trim();
         if (!fullCode) {
-          statusEl.textContent = "Vui lòng nhập mã trước khi gửi";
+          setStatus("Vui lòng nhập mã trước khi gửi");
           manualInput.focus();
           return;
         }
@@ -717,7 +733,7 @@
       function ensureSecureCameraContext() {
         const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
         if (location.protocol === 'https:' || isLocalhost) return true;
-        statusEl.textContent = "Camera chỉ hoạt động trên HTTPS hoặc localhost";
+        setStatus("Camera chỉ hoạt động trên HTTPS hoặc localhost");
         return false;
       }
 
@@ -767,7 +783,7 @@
       async function openCamera() {
         if (window.innerWidth > 980) return;
         if (typeof Html5Qrcode === 'undefined') {
-          statusEl.textContent = "Camera chưa sẵn sàng";
+          setStatus("Camera chưa sẵn sàng");
           return;
         }
         if (!ensureSecureCameraContext()) return;
@@ -809,10 +825,10 @@
             await qrScanner.start(selectedCamera, baseConfig, onScanSuccess);
           }
 
-          statusEl.textContent = "Camera đã bật";
+          setStatus("Camera đã bật");
         } catch (error) {
           const message = error?.message ? `Không mở được camera: ${error.message}` : "Không mở được camera";
-          statusEl.textContent = message;
+          setStatus(message);
           await closeCamera();
         }
       }
