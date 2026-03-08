@@ -122,13 +122,45 @@
       display: none;
     }
 
+    .order-page .mobile-camera-submit,
+    .order-page .mobile-camera-panel {
+      display: none;
+    }
+
+    .order-page .mobile-camera-panel {
+      margin-top: 0.9rem;
+      padding: 0.9rem;
+      border: 1px solid #D2D2D7;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.92);
+    }
+
+    .order-page .camera-reader {
+      width: 100%;
+      min-height: 240px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #FAFAFB;
+      border: 1px dashed rgba(29, 29, 31, 0.14);
+    }
+
+    .order-page .camera-hint {
+      margin: 0.75rem 0 0;
+      color: #6E6E73;
+      font-size: 0.88rem;
+    }
+
     @media (max-width: 899px) {
+      .order-page {
+        --mobile-order-action-size: 54px;
+      }
+
       .order-page .lookup-form {
         margin-top: 0.8rem;
       }
 
       .order-page #lookup-form {
-        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-columns: minmax(0, 1fr) var(--mobile-order-action-size) var(--mobile-order-action-size);
         gap: 0.75rem;
         align-items: end;
       }
@@ -137,20 +169,60 @@
         display: none;
       }
 
-      .order-page .mobile-inline-submit {
+      .order-page .mobile-inline-submit,
+      .order-page .mobile-camera-submit {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-width: 72px;
+        width: 100% !important;
+        min-width: 0;
+        max-width: none;
         height: 42px;
-        padding: 0 1rem;
-        border: none;
+        min-height: 42px;
+        padding: 0 !important;
+        margin: 0;
+        border: 1px solid #1D1D1F;
         border-radius: 999px;
         background: #1D1D1F;
         color: #FFFFFF;
+        box-sizing: border-box;
+        appearance: none;
+        -webkit-appearance: none;
+        transform: none !important;
+      }
+
+      .order-page .mobile-inline-submit {
         font-size: 0.85rem;
         font-weight: 600;
         line-height: 1;
+      }
+
+      .order-page .mobile-camera-submit svg {
+        width: 18px;
+        height: 18px;
+        stroke: currentColor;
+        stroke-width: 2;
+        fill: none;
+      }
+
+      .order-page .mobile-inline-submit:hover,
+      .order-page .mobile-inline-submit:active,
+      .order-page .mobile-camera-submit:hover,
+      .order-page .mobile-camera-submit:active {
+        transform: none;
+      }
+
+      .order-page .mobile-camera-panel.is-open {
+        display: block;
+      }
+
+      .order-page #lookup-form.camera-active {
+        grid-template-columns: 1fr auto;
+      }
+
+      .order-page #lookup-form.camera-active #order-input,
+      .order-page #lookup-form.camera-active .mobile-inline-submit {
+        display: none;
       }
 
       .order-page #order-input {
@@ -421,6 +493,14 @@
         gap: 1rem;
       }
 
+      .order-page .location-panel {
+        padding: 0;
+        border: none;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+      }
+
       .order-page .location-text {
         font-size: clamp(2.4rem, 12vw, 3.6rem);
       }
@@ -507,7 +587,14 @@
         </button>
         <input id="order-input" type="text" placeholder="Nhập mã đơn hàng hoặc quét..." autocomplete="off" autofocus />
         <button type="submit" class="mobile-inline-submit">Tìm</button>
+        <button type="button" class="mobile-camera-submit" id="openCameraBtn" aria-label="Bật camera">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Z"></path><circle cx="12" cy="12" r="3.2"></circle></svg>
+        </button>
       </form>
+      <div class="mobile-camera-panel" id="cameraPanel" hidden>
+        <div id="reader" class="camera-reader"></div>
+        <p class="camera-hint">Đưa mã QR đơn hàng vào khung. Quét xong sẽ tự tắt camera.</p>
+      </div>
     </div>
     <div class="status-bar" id="status-bar" hidden></div>
 
@@ -552,12 +639,15 @@
     <footer>&copy; <span id="year"></span> Kho vận hành.</footer>
   </main>
 
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script>
     const API_URL = "https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/thongtin_don";
     const LAST_PAGE_KEY = 'cmf:lastPage';
 
     const lookupForm = document.getElementById('lookup-form');
     const orderInput = document.getElementById('order-input');
+    const openCameraBtn = document.getElementById('openCameraBtn');
+    const cameraPanel = document.getElementById('cameraPanel');
     const statusBar = document.getElementById('status-bar');
     const resultCard = document.getElementById('result-card');
 
@@ -570,6 +660,18 @@
     const itemsTableBody = document.getElementById('items-table-body');
     const itemsPanel = document.getElementById('items-panel');
     localStorage.setItem(LAST_PAGE_KEY, 'thongtindonhang.html');
+    let qrScanner = null;
+    let lastScannedCode = null;
+    let lastScannedAt = 0;
+    let permissionGranted = false;
+    const DEDUPE_MS = 1200;
+
+    const isIosSafari = (() => {
+      const ua = navigator.userAgent;
+      const iOS = /iPad|iPhone|iPod/.test(ua) || (ua.includes('Mac') && 'ontouchend' in document);
+      const safari = /^((?!chrome|android).)*safari/i.test(ua);
+      return iOS && safari;
+    })();
 
     document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -579,6 +681,99 @@
       statusBar.dataset.variant = type;
       statusBar.hidden = false;
       if (type !== 'loading') setTimeout(() => statusBar.hidden = true, 3000);
+    }
+
+    function ensureSecureCameraContext() {
+      const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+      if (location.protocol === 'https:' || isLocalhost) return true;
+      updateStatus('Camera chỉ hoạt động trên HTTPS hoặc localhost', 'error');
+      return false;
+    }
+
+    async function requestCameraPermission() {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error('Trình duyệt không hỗ trợ camera.');
+      }
+      if (!isIosSafari || permissionGranted) return;
+      let stream = null;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { exact: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false
+        });
+      } catch {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false
+        });
+      }
+      stream.getTracks().forEach((track) => track.stop());
+      permissionGranted = true;
+    }
+
+    async function closeCamera() {
+      cameraPanel.hidden = true;
+      cameraPanel.classList.remove('is-open');
+      lookupForm.classList.remove('camera-active');
+      if (openCameraBtn) openCameraBtn.setAttribute('aria-label', 'Bật camera');
+      if (!qrScanner) return;
+      try {
+        await qrScanner.stop();
+        await qrScanner.clear();
+      } catch {
+      } finally {
+        qrScanner = null;
+      }
+    }
+
+    async function openCamera() {
+      if (window.innerWidth > 899) return;
+      if (typeof Html5Qrcode === 'undefined') {
+        updateStatus('Camera chưa sẵn sàng', 'error');
+        return;
+      }
+      if (!ensureSecureCameraContext()) return;
+      cameraPanel.hidden = false;
+      cameraPanel.classList.add('is-open');
+      lookupForm.classList.add('camera-active');
+      if (openCameraBtn) openCameraBtn.setAttribute('aria-label', 'Đóng camera');
+      if (qrScanner) return;
+      qrScanner = new Html5Qrcode('reader');
+      try {
+        await requestCameraPermission();
+        const onScanSuccess = async (decodedText) => {
+          const now = Date.now();
+          if (decodedText === lastScannedCode && now - lastScannedAt < DEDUPE_MS) return;
+          lastScannedCode = decodedText;
+          lastScannedAt = now;
+          await closeCamera();
+          fetchOrder(decodedText);
+        };
+        const baseConfig = {
+          fps: 10,
+          qrbox: { width: 220, height: 220 },
+          disableFlip: true,
+          experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+          videoConstraints: {
+            facingMode: { ideal: 'environment' },
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        };
+        try {
+          await qrScanner.start({ facingMode: 'environment' }, baseConfig, onScanSuccess);
+        } catch {
+          const cameras = await Html5Qrcode.getCameras();
+          const backCamera = cameras.find((cam) => /back|rear|environment/gi.test(cam.label || ''));
+          const selectedCamera = backCamera?.id || cameras[0]?.id;
+          if (!selectedCamera) throw new Error('Không tìm thấy camera');
+          await qrScanner.start(selectedCamera, baseConfig, onScanSuccess);
+        }
+        updateStatus('Camera đã bật', 'loading');
+      } catch (error) {
+        updateStatus(error?.message || 'Không mở được camera', 'error');
+        await closeCamera();
+      }
     }
 
     async function fetchOrder(code) {
@@ -669,6 +864,18 @@
         orderInput.value = '';
         fetchOrder(code);
       }
+    });
+
+    openCameraBtn?.addEventListener('click', () => {
+      if (lookupForm.classList.contains('camera-active')) {
+        closeCamera();
+      } else {
+        openCamera();
+      }
+    });
+
+    window.addEventListener('pagehide', () => {
+      closeCamera();
     });
 
   </script>
