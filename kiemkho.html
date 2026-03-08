@@ -449,9 +449,6 @@
             <section class="camera-panel" id="cameraPanel" hidden>
               <div id="reader" class="camera-reader"></div>
               <p class="camera-hint">Đưa QR vào khung để quét. Bấm đóng khi không dùng.</p>
-              <div class="action-row">
-                <button class="action-btn" id="closeCameraBtn" type="button">Đóng camera</button>
-              </div>
             </section>
           </article>
         </div>
@@ -505,7 +502,6 @@
       const manualInput = document.getElementById('manualInput');
       const manualSubmitBtn = document.getElementById('manualSubmitBtn');
       const openCameraBtn = document.getElementById('openCameraBtn');
-      const closeCameraBtn = document.getElementById('closeCameraBtn');
       const cameraPanel = document.getElementById('cameraPanel');
       let emptyRow = document.getElementById('emptyRow');
 
@@ -694,6 +690,7 @@
       async function closeCamera() {
         cameraPanel.hidden = true;
         cameraPanel.classList.remove('is-open');
+        if (openCameraBtn) openCameraBtn.textContent = "Bật camera";
         if (!qrScanner) return;
         try {
           await qrScanner.stop();
@@ -713,6 +710,7 @@
         if (!ensureSecureCameraContext()) return;
         cameraPanel.hidden = false;
         cameraPanel.classList.add('is-open');
+        if (openCameraBtn) openCameraBtn.textContent = "Đóng camera";
         if (qrScanner) return;
         qrScanner = new Html5Qrcode("reader");
         try {
@@ -762,8 +760,13 @@
           submitManual();
         }
       });
-      openCameraBtn?.addEventListener('click', openCamera);
-      closeCameraBtn?.addEventListener('click', closeCamera);
+      openCameraBtn?.addEventListener('click', () => {
+        if (cameraPanel.classList.contains('is-open')) {
+          closeCamera();
+        } else {
+          openCamera();
+        }
+      });
       focusManualInput();
 
       window.addEventListener('pageshow', () => {
