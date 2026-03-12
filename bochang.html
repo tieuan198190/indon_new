@@ -3,22 +3,22 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Đóng Hàng - Cô Mập Fashion</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="app.css">
   <style>
     /* Page specific overrides for Packing */
     body.packing-page {
       --sidebar-width: 14%;
-      --search-form-width: min(100%, 640px);
-      --search-form-offset: 2.4rem;
+      --search-form-width: min(100%, 780px);
+      --search-form-offset: 1.6rem;
       --shell-pad-x: clamp(3rem, 5vw, 4rem);
       --shell-pad-y: clamp(2.25rem, 3vw, 3rem);
-      background: #F5F5F7;
-      color: #1D1D1F;
+      background: #FAFAFA;
+      color: #111111;
     }
 
     .packing-page main {
@@ -53,12 +53,16 @@
       grid-template-columns: auto minmax(0, 1fr);
       align-items: center;
       gap: 1rem;
-      padding: 0 0 0.75rem;
-      border-bottom: 1px solid #D2D2D7;
+      padding: 1rem 1.2rem;
+      border: 1px solid #EBEBEB;
+      border-radius: 16px;
+      background: #FFFFFF;
+      box-shadow: none;
     }
 
     .packing-page #scan-form:focus-within {
-      border-bottom-color: #1D1D1F;
+      border-color: #111111;
+      box-shadow: none;
     }
 
     .packing-page #scan-input {
@@ -68,10 +72,10 @@
       background: transparent;
       font-family: "Inter", sans-serif;
       font-size: clamp(1.15rem, 1.8vw, 1.55rem);
-      font-weight: 400;
+      font-weight: 500;
       line-height: 1.2;
       text-align: left;
-      color: #1D1D1F;
+      color: #111111;
       outline: none;
     }
 
@@ -79,19 +83,19 @@
       font-family: "Inter", sans-serif;
       font-size: inherit;
       line-height: inherit;
-      color: #6E6E73;
+      color: #888888;
       font-weight: 400;
     }
 
     .packing-page #scan-form button[type="submit"] {
-      width: 2.25rem;
-      height: 2.25rem;
+      width: 2.75rem;
+      height: 2.75rem;
       min-width: 0;
       padding: 0;
-      border: none;
+      border: 0;
       border-radius: 999px;
-      background: transparent;
-      color: #1D1D1F;
+      background: #111111;
+      color: #fff;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -100,57 +104,704 @@
     }
 
     .packing-page #scan-form button[type="submit"] svg {
-      width: 1.35rem;
-      height: 1.35rem;
+      width: 1.1rem;
+      height: 1.1rem;
       stroke: currentColor;
       stroke-width: 2;
       fill: none;
     }
 
-    .packing-status {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    .packing-code {
-      font-size: 3.5rem;
-      font-weight: 300;
-      line-height: 1;
-    }
-
-    .packing-progress {
-      font-size: 1.5rem;
-      color: #888;
-      font-weight: 300;
-    }
-
-    .line-item {
+    .packing-layout {
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 1.5rem;
+      width: 100%;
+      max-width: none;
+    }
+
+    .packing-overview {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      padding: 1.6rem 1.8rem;
+      border-radius: 20px;
+      background: #FFFFFF;
+      border: 1px solid #EBEBEB;
+      box-shadow: none;
+    }
+
+    .packing-overview::before {
+      content: "";
+      position: absolute;
+      inset: auto -10% -45% auto;
+      width: 260px;
+      height: 260px;
+      border-radius: 999px;
+      background: none;
+      pointer-events: none;
+    }
+
+    .packing-overview-top {
+      display: flex;
       align-items: flex-start;
-      padding: 1rem;
-      border-bottom: 1px solid #f2f2f2;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
     }
 
-    .line-item.completed {
-      background: #f9fffb;
+    .packing-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      min-width: 0;
     }
 
-    .line-sku {
-      font-size: 0.9rem;
+    .packing-status-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      align-items: center;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      min-height: 28px;
+      padding: 0.35rem 0.8rem;
+      border-radius: 999px;
       text-transform: uppercase;
-      color: #888;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
+      font-size: 0.72rem;
+      font-weight: 700;
     }
 
-    .line-size {
-      font-size: 1.2rem;
+    .status-pill.primary {
+      background: #F5F5F5;
+      color: #111111;
+    }
+
+    .status-pill.warn {
+      background: rgba(245, 158, 11, 0.14);
+      color: #b45309;
+    }
+
+    .status-pill.success {
+      background: rgba(16, 185, 129, 0.14);
+      color: #047857;
+    }
+
+    .status-pill.neutral {
+      background: rgba(210, 210, 215, 0.14);
+      color: #475569;
+    }
+
+    .packing-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: currentColor;
+      opacity: 0.8;
+    }
+
+    .packing-heading {
+      margin: 0;
+      font-size: clamp(1.45rem, 2.6vw, 2rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      color: #111111;
+    }
+
+    .packing-subtext {
+      margin: 0;
+      font-size: 0.96rem;
+      color: #888888;
       font-weight: 500;
     }
 
-    .line-qty {
-      font-size: 1.5rem;
-      font-weight: 300;
+    .packing-note-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      margin-top: 0.2rem;
+    }
+
+    .packing-private-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      max-width: 680px;
+      padding: 0.9rem 1rem;
+      border-radius: 18px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.22);
+      color: #92400e;
+    }
+
+    .packing-private-note-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #f59e0b;
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 900;
+    }
+
+    .packing-private-note-copy {
+      min-width: 0;
+    }
+
+    .packing-private-note-label {
+      margin: 0;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #b45309;
+    }
+
+    .packing-private-note-text {
+      margin: 0.2rem 0 0;
+      font-size: 0.92rem;
+      font-weight: 700;
+      line-height: 1.45;
+      color: #78350f;
+      white-space: pre-wrap;
+    }
+
+    .packing-progress-panel {
+      width: min(100%, 360px);
+      align-self: center;
+    }
+
+    .packing-progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.55rem;
+      font-size: 0.88rem;
+      color: #888888;
+      font-weight: 700;
+    }
+
+    .packing-progress-bar {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(210, 210, 215, 0.18);
+    }
+
+    .packing-progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: #111111;
+      transition: width 0.35s ease;
+    }
+
+    .packing-main-grid {
+      display: grid;
+      width: 100%;
+      grid-template-columns: minmax(560px, 1fr) 320px;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    .packing-panel {
+      min-width: 0;
+      border-radius: 20px;
+      background: #FFFFFF;
+      border: 1px solid #EBEBEB;
+      box-shadow: none;
+    }
+
+    .packing-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.4rem 1.4rem 0;
+    }
+
+    .packing-panel-title {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #111111;
+    }
+
+    .packing-panel-subtitle {
+      margin: 0.2rem 0 0;
+      font-size: 0.88rem;
+      color: #888888;
+    }
+
+    .packing-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      font-size: 0.76rem;
+      color: #888888;
+      font-weight: 700;
+    }
+
+    .packing-legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .packing-legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      padding: 1.25rem 1.4rem 1.4rem;
+    }
+
+    .product-card-item {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(210, 210, 215, 0.16);
+      background: #FFFFFF;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .product-card-item:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    .product-card-item.is-complete {
+      border-color: rgba(16, 185, 129, 0.24);
+    }
+
+    .product-card-item.is-partial {
+      border-color: rgba(245, 158, 11, 0.28);
+    }
+
+    .product-card-item.is-pending {
+      border-color: rgba(210, 210, 215, 0.2);
+    }
+
+    .product-card-visual {
+      position: relative;
+      aspect-ratio: 3 / 4;
+      padding: 1rem;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-start;
+      background: rgba(29, 29, 31, 0.04);
+    }
+
+    .product-card-visual::before {
+      content: "";
+      position: absolute;
+      inset: 14% 12% auto auto;
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.46);
+      transform: rotate(18deg);
+    }
+
+    .product-card-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .product-card-visual.has-image::before {
+      display: none;
+    }
+
+    .product-card-visual.has-image::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(29, 29, 31, 0.02) 0%, rgba(29, 29, 31, 0.58) 100%);
+    }
+
+    .product-card-code {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 70px;
+      min-height: 70px;
+      padding: 0.75rem;
+      border-radius: 22px;
+      background: rgba(29, 29, 31, 0.8);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      box-shadow: 0 12px 24px rgba(29, 29, 31, 0.16);
+    }
+
+    .product-card-badge {
+      position: absolute;
+      left: 1rem;
+      bottom: 1rem;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0.32rem 0.7rem;
+      border-radius: 999px;
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .product-card-badge.complete {
+      background: #10b981;
+    }
+
+    .product-card-badge.partial {
+      background: #f59e0b;
+    }
+
+    .product-card-badge.pending {
+      background: #6E6E73;
+    }
+
+    .product-card-body {
+      padding: 1rem 1rem 1.05rem;
+    }
+
+    .product-card-name {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #111111;
+    }
+
+    .product-card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.35rem;
+      font-size: 0.88rem;
+      color: #888888;
+      font-weight: 600;
+    }
+
+    .product-card-qty {
+      font-weight: 800;
+    }
+
+    .product-card-qty.complete {
+      color: #059669;
+    }
+
+    .product-card-qty.partial {
+      color: #d97706;
+    }
+
+    .product-card-qty.pending {
+      color: #94a3b8;
+    }
+
+    .product-card-track {
+      margin-top: 0.8rem;
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(210, 210, 215, 0.16);
+      overflow: hidden;
+    }
+
+    .product-card-track-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+    }
+
+    .product-card-track-fill.complete {
+      background: #10b981;
+    }
+
+    .product-card-track-fill.partial {
+      background: #f59e0b;
+    }
+
+    .product-card-track-fill.pending {
+      background: #cbd5e1;
+    }
+
+    .packing-empty {
+      min-height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      color: #94a3b8;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .packing-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-width: 0;
+    }
+
+    .scan-highlight {
+      position: relative;
+      overflow: hidden;
+      padding: 1.4rem;
+    }
+
+    .scan-highlight::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 4px;
+      background: linear-gradient(90deg, #10b981, #34d399);
+    }
+
+    .scan-highlight[data-variant="error"]::before {
+      background: linear-gradient(90deg, #ef4444, #f97316);
+    }
+
+    .scan-highlight[data-variant="idle"]::before {
+      background: linear-gradient(90deg, #94a3b8, #cbd5e1);
+    }
+
+    .scan-highlight-icon {
+      width: 52px;
+      height: 52px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.14);
+      color: #059669;
+      font-size: 1.3rem;
+      font-weight: 900;
+    }
+
+    .scan-highlight[data-variant="error"] .scan-highlight-icon {
+      background: rgba(239, 68, 68, 0.12);
+      color: #dc2626;
+    }
+
+    .scan-highlight[data-variant="idle"] .scan-highlight-icon {
+      background: rgba(210, 210, 215, 0.12);
+      color: #888888;
+    }
+
+    .scan-highlight-title {
+      margin: 0.9rem 0 0;
+      font-size: 1.05rem;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      color: #111111;
+    }
+
+    .scan-highlight-code {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      margin-top: 0.5rem;
+      padding: 0.42rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.12);
+      color: #047857;
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    .scan-highlight[data-variant="error"] .scan-highlight-code {
+      background: rgba(239, 68, 68, 0.12);
+      color: #b91c1c;
+    }
+
+    .scan-highlight[data-variant="idle"] .scan-highlight-code {
+      background: rgba(210, 210, 215, 0.12);
+      color: #475569;
+    }
+
+    .scan-highlight-note {
+      margin: 0.75rem 0 0;
+      font-size: 0.78rem;
+      color: #888888;
+      font-weight: 600;
+    }
+
+    .history-panel {
+      overflow: hidden;
+    }
+
+    .history-header {
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid rgba(210, 210, 215, 0.16);
+      background: #FAFAFA;
+      font-size: 0.84rem;
+      font-weight: 800;
+      color: #888888;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.95rem 1.15rem;
+      border-bottom: 1px solid rgba(210, 210, 215, 0.12);
+    }
+
+    .history-item:last-child {
+      border-bottom: 0;
+    }
+
+    .history-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+
+    .history-icon.success {
+      background: rgba(16, 185, 129, 0.14);
+      color: #059669;
+    }
+
+    .history-icon.error {
+      background: rgba(239, 68, 68, 0.12);
+      color: #dc2626;
+    }
+
+    .history-copy {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .history-code {
+      margin: 0;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #111111;
+      word-break: break-word;
+    }
+
+    .history-time {
+      margin: 0.18rem 0 0;
+      font-size: 0.7rem;
+      color: #888888;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .action-grid {
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    .action-btn {
+      min-height: 52px;
+      border: 0;
+      border-radius: 18px;
+      padding: 0.95rem 1rem;
+      font-size: 0.88rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: transform 0.18s ease, opacity 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .action-btn:active {
+      transform: translateY(0);
+    }
+
+    .action-btn.primary {
+      color: #fff;
+      background: #111111;
+      box-shadow: none;
+    }
+
+    .action-btn.danger {
+      color: #fff;
+      background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+      box-shadow: none;
+    }
+
+    .action-btn.neutral {
+      color: #444444;
+      background: #F0F0F0;
+    }
+
+    .packing-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      z-index: 200;
+      min-width: min(92vw, 360px);
+      max-width: 420px;
+      padding: 1rem 1.15rem;
+      border-radius: 16px;
+      background: rgba(29, 29, 31, 0.94);
+      color: #fff;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .packing-popup-title {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+    }
+
+    .action-btn.secondary {
+      color: #444444;
+      background: rgba(229, 229, 234, 0.86);
+    }
+
+    .packing-status {
+      text-align: left;
+      margin: 0;
     }
 
     /* Desktop split specific */
@@ -162,65 +813,49 @@
       }
 
       .packing-page #scan-form-container {
-        grid-column: 1 / 2;
         width: var(--search-form-width);
         max-width: none;
         margin-left: 0;
         margin-right: 0;
         margin-top: 0;
       }
-
-      .packing-page .result-card {
-        grid-column: 1 / -1;
-        width: 100%;
-        max-width: none;
-        grid-template-columns: 1fr 1fr;
-        gap: clamp(2rem, 4vw, 4rem);
-        align-items: start;
-        margin-top: 0.9rem;
-      }
-
-      .packing-page .location-panel {
-        display: flex;
-        align-items: flex-start;
-        justify-content: flex-start;
-        padding-top: 0.2rem;
-      }
-
-      .packing-page .location-panel-header {
-        width: min(100%, 520px);
-        align-items: flex-start;
-        text-align: left;
-      }
-
-      .packing-page .location-label {
-        margin: 0;
-        font-size: 0.78rem;
-        line-height: 1.2;
-        letter-spacing: 0.08em;
-      }
-
-      .packing-page #result-container > article:last-child {
-        width: 100% !important;
-        display: flex;
-        justify-content: flex-end;
-      }
-
-      .packing-page #list-container {
-        width: min(100%, 540px);
-        min-height: 400px;
-        border-radius: 24px;
-        padding: 0.95rem 1.25rem;
-      }
-
-      .packing-status {
-        text-align: left;
-      }
     }
 
     @media (max-width: 899px) {
+      body.packing-page {
+        --shell-pad-x: 1rem;
+        --shell-pad-y: 1rem;
+      }
+
       .packing-page #scan-form-container {
         margin-top: 0.8rem;
+      }
+
+      .packing-overview-top {
+        flex-direction: column;
+      }
+
+      .packing-progress-panel {
+        width: 100%;
+      }
+
+      .packing-main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .packing-panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .products-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 1240px) {
+      .packing-main-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -240,7 +875,7 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
         </button>
       </div>
-      <nav class="header-nav">
+      <nav class="header-nav" aria-label="Điều hướng">
         <a href="location.html" class="header-link">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-5.5-4.2-5.5-9.25A5.5 5.5 0 0 1 12 6.25a5.5 5.5 0 0 1 5.5 5.5C17.5 16.8 12 21 12 21Z"></path><circle cx="12" cy="11.75" r="2.25"></circle></svg>
           <span class="nav-text">Vị trí</span>
@@ -285,50 +920,102 @@
     </div>
 
     <div class="status-bar" id="status-bar" data-variant="idle" hidden></div>
+    <div class="packing-popup" id="completed-popup" hidden>
+      <p class="packing-popup-title" id="completed-popup-message">Đơn này đã bốc xong</p>
+    </div>
 
     <!-- Main Content Split -->
-    <section id="result-container" class="result-card" hidden>
+    <section id="result-container" class="packing-layout" hidden>
+      <article class="packing-overview">
+        <div class="packing-overview-top">
+          <div class="packing-title-group">
+            <div class="packing-status-row">
+              <span class="status-pill primary" id="primary-status-pill">
+                <span class="packing-status-dot"></span>
+                Đang đối soát
+              </span>
+              <span class="status-pill warn">Đơn đóng hàng</span>
+            </div>
 
-      <!-- Left Side: Status / Big Code -->
-      <article class="location-panel"> <!-- Reusing class for layout -->
-        <div class="location-panel-header">
-          <p class="location-label">Trạng thái</p>
+            <div id="idle-view">
+              <h2 class="packing-heading">Sẵn sàng quét đơn mới</h2>
+              <p class="packing-subtext">Nhập mã đơn hàng hoặc quét mã để bắt đầu.</p>
+            </div>
 
-          <!-- Idle State -->
-          <div id="idle-view">
-            <p class="location-text" style="font-size: 2rem; color: #ccc;">Sẵn sàng</p>
+            <div id="loading-view" hidden>
+              <h2 class="packing-heading">Đang tải dữ liệu đơn hàng...</h2>
+              <p class="packing-subtext">Hệ thống đang đối chiếu danh sách sản phẩm.</p>
+            </div>
+
+            <div id="order-info-view" hidden>
+              <h2 class="packing-heading">Mã đơn: <span id="order-code-display">---</span></h2>
+              <div class="packing-note-stack">
+                <p class="packing-subtext" id="order-description-display" hidden></p>
+                <div class="packing-private-note" id="private-description-panel" hidden>
+                  <span class="packing-private-note-icon">!</span>
+                  <div class="packing-private-note-copy">
+                    <p class="packing-private-note-label">Ghi chú nội bộ</p>
+                    <p class="packing-private-note-text" id="private-description-display"></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="complete-view" hidden>
+              <h2 class="packing-heading">Đơn hàng đã hoàn thành</h2>
+              <p class="packing-subtext">Tất cả sản phẩm đã được quét đủ.</p>
+            </div>
           </div>
 
-          <!-- Loading State -->
-          <div id="loading-view" hidden>
-            <p class="location-text" style="font-size: 2rem;">Đang xử lý...</p>
-          </div>
-
-          <!-- Active Order State -->
-          <div id="order-info-view" hidden>
-            <p class="location-text" id="order-code-display">---</p>
-            <p class="location-text" id="order-progress-display"
-              style="font-size: 2rem; color: #888; margin-top: 0.5rem;">0/0</p>
-          </div>
-
-          <!-- Complete State -->
-          <div id="complete-view" hidden>
-            <p class="location-text" style="color: #10b981;">Hoàn thành</p>
-            <button id="reset-btn" class="primary-btn" style="margin-top: 2rem;">Đơn tiếp theo</button>
+          <div class="packing-progress-panel">
+            <div class="packing-progress-meta">
+              <span>Tiến độ tổng quát</span>
+              <span id="order-progress-display">0/0</span>
+            </div>
+            <div class="packing-progress-bar">
+              <div class="packing-progress-fill" id="overall-progress-fill"></div>
+            </div>
           </div>
         </div>
       </article>
 
-      <!-- Right Side: List -->
-      <article style="width: 100%;">
-        <div class="product-visual" id="list-container"
-          style="background: white; border: 1px solid #f2f2f2; height: auto; min-height: 400px; aspect-ratio: auto;">
-          <!-- Lines injected here -->
-          <div class="placeholder" id="list-placeholder" style="font-size: 1rem; color: #eee;">Danh sách trống</div>
-          <div id="lines-list"></div>
-        </div>
-      </article>
+      <div class="packing-main-grid">
+        <article class="packing-panel">
+          <div class="packing-panel-header">
+            <div>
+              <h3 class="packing-panel-title">Danh sách sản phẩm</h3>
+              <p class="packing-panel-subtitle" id="product-summary-text">0 loại sản phẩm</p>
+            </div>
+            <div class="packing-legend">
+              <span class="packing-legend-item"><span class="packing-legend-dot" style="background:#10b981;"></span>Đã đủ</span>
+              <span class="packing-legend-item"><span class="packing-legend-dot" style="background:#f59e0b;"></span>Còn thiếu</span>
+              <span class="packing-legend-item"><span class="packing-legend-dot" style="background:#cbd5e1;"></span>Chưa quét</span>
+            </div>
+          </div>
+          <div class="products-grid" id="lines-list"></div>
+          <div class="packing-empty" id="list-placeholder">Danh sách trống</div>
+        </article>
 
+        <aside class="packing-sidebar">
+          <article class="packing-panel scan-highlight" id="latest-scan-card" data-variant="idle">
+            <div class="scan-highlight-icon" id="latest-scan-icon">...</div>
+            <h3 class="scan-highlight-title" id="latest-scan-title">Chưa có lượt quét</h3>
+            <div class="scan-highlight-code" id="latest-scan-code">Chờ quét sản phẩm</div>
+            <p class="scan-highlight-note" id="latest-scan-note">Lịch sử quét sẽ hiển thị ngay tại đây.</p>
+          </article>
+
+          <article class="packing-panel history-panel">
+            <div class="history-header">Lịch sử quét</div>
+            <div class="history-list" id="scan-history-list"></div>
+            <div class="packing-empty" id="scan-history-empty" style="min-height:140px;">Chưa có lịch sử quét</div>
+          </article>
+
+          <div class="action-grid">
+            <button id="reload-btn" class="action-btn neutral" type="button">Quét đơn khác</button>
+            <button id="cancel-btn" class="action-btn danger" type="button">Hủy</button>
+          </div>
+        </aside>
+      </div>
     </section>
 
     <footer>&copy; <span id="year"></span> Kho vận hành.</footer>
@@ -344,6 +1031,8 @@
     const scanInput = document.getElementById('scan-input');
     const scanForm = document.getElementById('scan-form');
     const statusBar = document.getElementById('status-bar');
+    const completedPopup = document.getElementById('completed-popup');
+    const completedPopupMessage = document.getElementById('completed-popup-message');
 
     const idleView = document.getElementById('idle-view');
     const loadingView = document.getElementById('loading-view');
@@ -352,15 +1041,31 @@
 
     const orderCodeDisplay = document.getElementById('order-code-display');
     const progressDisplay = document.getElementById('order-progress-display');
+    const orderDescriptionDisplay = document.getElementById('order-description-display');
+    const privateDescriptionPanel = document.getElementById('private-description-panel');
+    const privateDescriptionDisplay = document.getElementById('private-description-display');
     const linesList = document.getElementById('lines-list');
     const listPlaceholder = document.getElementById('list-placeholder');
-    const resetBtn = document.getElementById('reset-btn');
+    const reloadBtn = document.getElementById('reload-btn');
+    const cancelBtn = document.getElementById('cancel-btn');
     const resultContainer = document.getElementById('result-container');
+    const overallProgressFill = document.getElementById('overall-progress-fill');
+    const productSummaryText = document.getElementById('product-summary-text');
+    const latestScanCard = document.getElementById('latest-scan-card');
+    const latestScanIcon = document.getElementById('latest-scan-icon');
+    const latestScanTitle = document.getElementById('latest-scan-title');
+    const latestScanCode = document.getElementById('latest-scan-code');
+    const latestScanNote = document.getElementById('latest-scan-note');
+    const scanHistoryList = document.getElementById('scan-history-list');
+    const scanHistoryEmpty = document.getElementById('scan-history-empty');
+    const primaryStatusPill = document.getElementById('primary-status-pill');
 
     let appState = 'IDLE';
     let currentOrder = null;
     let audioContext = null;
     let completeResetTimer = null;
+    let completedPopupTimer = null;
+    let scanHistory = [];
 
     document.getElementById('year').textContent = new Date().getFullYear();
     localStorage.setItem(LAST_PAGE_KEY, 'bochang.html');
@@ -405,19 +1110,82 @@
       if (state === 'ORDER') orderInfoView.hidden = false;
       if (state === 'COMPLETE') completeView.hidden = false;
 
+      if (state === 'COMPLETE') {
+        primaryStatusPill.className = 'status-pill success';
+        primaryStatusPill.innerHTML = '<span class="packing-status-dot"></span>Hoàn thành';
+      } else if (state === 'LOADING') {
+        primaryStatusPill.className = 'status-pill neutral';
+        primaryStatusPill.innerHTML = '<span class="packing-status-dot"></span>Đang tải';
+      } else {
+        primaryStatusPill.className = 'status-pill primary';
+        primaryStatusPill.innerHTML = '<span class="packing-status-dot"></span>Đang đối soát';
+      }
+
       scanInput.focus();
     }
 
     function resetCurrentOrder() {
-      if (currentOrder) {
-        fetch(RESET_WEBHOOK_URL, {
-          method: 'POST', body: JSON.stringify({ order_code: currentOrder.code }), headers: { 'Content-Type': 'application/json' }
-        }).catch(console.error);
-      }
       currentOrder = null;
+      scanHistory = [];
       linesList.innerHTML = '';
       listPlaceholder.hidden = false;
+      overallProgressFill.style.width = '0%';
+      progressDisplay.textContent = '0/0';
+      orderDescriptionDisplay.hidden = true;
+      orderDescriptionDisplay.textContent = '';
+      privateDescriptionPanel.hidden = true;
+      privateDescriptionDisplay.textContent = '';
+      productSummaryText.textContent = '0 loại sản phẩm';
+      renderScanHistory();
+      setLatestScanState('idle');
       setView('IDLE');
+    }
+
+    async function cancelCurrentOrder() {
+      if (!currentOrder?.code) {
+        resetCurrentOrder();
+        window.location.reload();
+        return;
+      }
+
+      try {
+        const res = await fetch(RESET_WEBHOOK_URL, {
+          method: 'POST',
+          body: JSON.stringify({ order_code: currentOrder.code }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const payload = await res.json();
+        const firstItem = Array.isArray(payload) ? payload[0] : payload;
+        const resultData = firstItem?.result && typeof firstItem.result === 'object'
+          ? firstItem.result
+          : null;
+        const rawData = resultData || firstItem;
+        const data = rawData?.cancel_order && typeof rawData.cancel_order === 'object'
+          ? rawData.cancel_order
+          : rawData;
+
+        if (data?.ok && data?.code === 'order_cancelled') {
+          window.location.reload();
+          return;
+        }
+
+        if (data?.ok && data?.code === 'order_reset') {
+          showCompletedPopup('Đơn hàng đã bị huỷ');
+          resetCurrentOrder();
+          setTimeout(() => window.location.reload(), 2500);
+          return;
+        }
+
+        const message = data?.message || 'Hủy đơn không thành công';
+        updateStatus(message, 'error');
+        setLatestScanState('error', message, message);
+        playSound('error');
+      } catch (error) {
+        const message = 'Không thể kết nối webhook hủy đơn';
+        updateStatus(message, 'error');
+        setLatestScanState('error', message, message);
+        playSound('error');
+      }
     }
 
     function scheduleNextOrderReset() {
@@ -437,6 +1205,114 @@
       setTimeout(() => statusBar.hidden = true, 3000);
     }
 
+    function showCompletedPopup(message) {
+      if (completedPopupTimer) {
+        clearTimeout(completedPopupTimer);
+        completedPopupTimer = null;
+      }
+      completedPopupMessage.textContent = message || 'Đơn này đã bốc xong';
+      completedPopup.hidden = false;
+      completedPopupTimer = setTimeout(() => {
+        completedPopup.hidden = true;
+        completedPopupTimer = null;
+      }, 5000);
+    }
+
+    function formatRelativeTime(index) {
+      if (index === 0) return 'Vừa xong';
+      return `${index + 1} lượt trước`;
+    }
+
+    function renderScanHistory() {
+      scanHistoryList.innerHTML = '';
+
+      if (!scanHistory.length) {
+        scanHistoryEmpty.hidden = false;
+        return;
+      }
+
+      scanHistoryEmpty.hidden = true;
+
+      scanHistory.slice(0, 5).forEach((entry, index) => {
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        item.innerHTML = `
+          <span class="history-icon ${entry.type === 'error' ? 'error' : 'success'}">${entry.type === 'error' ? '!' : '✓'}</span>
+          <div class="history-copy">
+            <p class="history-code">${entry.label}</p>
+            <p class="history-time">${formatRelativeTime(index)}</p>
+          </div>
+        `;
+        scanHistoryList.appendChild(item);
+      });
+    }
+
+    function pushScanHistory(label, type) {
+      scanHistory.unshift({ label, type });
+      renderScanHistory();
+    }
+
+    function setLatestScanState(variant, label = 'Chờ quét sản phẩm', note = 'Lịch sử quét sẽ hiển thị ngay tại đây.') {
+      latestScanCard.dataset.variant = variant;
+
+      if (variant === 'success') {
+        latestScanIcon.textContent = '✓';
+        latestScanTitle.textContent = 'Sản phẩm hợp lệ';
+      } else if (variant === 'error') {
+        latestScanIcon.textContent = '!';
+        latestScanTitle.textContent = 'Quét không hợp lệ';
+      } else {
+        latestScanIcon.textContent = '...';
+        latestScanTitle.textContent = 'Chưa có lượt quét';
+      }
+
+      latestScanCode.textContent = label;
+      latestScanNote.textContent = note;
+    }
+
+    function normalizeOrderPayload(payload, fallbackCode) {
+      const entries = Array.isArray(payload) ? payload : [payload];
+      const root = entries.find(item => item && typeof item === 'object') || null;
+      const summary = root?.upsert_order_and_open_session && typeof root.upsert_order_and_open_session === 'object'
+        ? root.upsert_order_and_open_session
+        : (entries.find(item => item && Array.isArray(item.lines) && item.order_code) || null);
+
+      if (!summary || !summary.order_code) return null;
+
+      const lines = (summary.lines || []).map(line => {
+        const sku = String(line.sku || '').trim().toUpperCase();
+        const size = String(line.size || '').trim().toUpperCase();
+        const qty = Number(line.qty) || 1;
+        const qtyScanned = Number(line.qty_scanned);
+        const picked = Number.isFinite(qtyScanned) ? qtyScanned : 0;
+
+        return {
+          ...line,
+          sku,
+          size,
+          qty,
+          picked: Math.max(0, Math.min(picked, qty))
+        };
+      });
+
+      return {
+        code: summary.order_code || fallbackCode,
+        sessionCode: summary.code || '',
+        sessionId: summary.session_id || '',
+        orderId: summary.order_id || '',
+        description: summary.description || '',
+        privateDescription: summary.privateDescription || '',
+        lines
+      };
+    }
+
+    function normalizePickPayload(payload) {
+      const root = Array.isArray(payload) ? payload[0] : payload;
+      if (!root || typeof root !== 'object') return null;
+      if (root.result && typeof root.result === 'object') return root.result;
+      return root;
+    }
+
     // Order Logic
     async function handleScan(code) {
       code = code.trim();
@@ -449,38 +1325,111 @@
           const res = await fetch(ORDER_WEBHOOK_URL, {
             method: 'POST', body: JSON.stringify({ order_code: code }), headers: { 'Content-Type': 'application/json' }
           });
-          const data = Array.isArray(await res.json()) ? (await res.json())[0] : (await res.json());
+          const payload = await res.json();
+          const root = Array.isArray(payload) ? payload[0] : payload;
 
-          if (!data || (!data.ok && !data.order_code)) throw new Error('Không tìm thấy đơn ' + code);
+          if (root && root.ok === false && root.code === 'already_completed') {
+            const message = root.message || 'Đơn này đã bốc xong';
+            showCompletedPopup(message);
+            updateStatus(message, 'error');
+            playSound('error');
+            setView('IDLE');
+            return;
+          }
+
+          const data = normalizeOrderPayload(payload, code);
+
+          if (!data || !data.code) throw new Error('Không tìm thấy đơn ' + code);
 
           currentOrder = {
-            code: data.order_code,
-            lines: (data.lines || []).map(l => ({ ...l, picked: 0, qty: Number(l.qty) || 1 }))
+            code: data.code || data.order_code,
+            description: data.description || '',
+            privateDescription: data.privateDescription || '',
+            lines: (data.lines || []).map(l => ({
+              ...l,
+              picked: Number.isFinite(l.picked) ? l.picked : 0,
+              qty: Number(l.qty) || 1
+            }))
           };
 
+          scanHistory = [];
           renderOrder();
+          renderScanHistory();
+          setLatestScanState('idle', currentOrder.code, 'Đơn hàng đã sẵn sàng để quét sản phẩm.');
           setView('ORDER');
           playSound('success');
 
         } catch (e) {
           updateStatus(e.message, 'error');
           playSound('error');
+          setLatestScanState('error', e.message, e.message);
           setView('IDLE');
         }
       } else if (appState === 'ORDER') {
         // Pick Product
         updateStatus('Đang xác thực...', 'loading');
         try {
-          // Mocking the pick call for UI speed, in reality wait for fetch
-          const sku = code.split('-')[0].toUpperCase();
-          const line = currentOrder.lines.find(l => l.sku === sku && l.picked < l.qty);
+          const pickRes = await fetch(PICK_WEBHOOK_URL, {
+            method: 'POST',
+            body: JSON.stringify({ order_code: currentOrder.code, product_code: code }),
+            headers: { 'Content-Type': 'application/json' }
+          });
+          const pickPayload = await pickRes.json();
+          const pickData = normalizePickPayload(pickPayload);
 
-          if (!line) throw new Error('Sản phẩm không khớp hoặc đã đủ');
+          if (!pickData) {
+            throw new Error('Webhook quét sản phẩm không trả dữ liệu hợp lệ');
+          }
+
+          if (!pickData.ok) {
+            const message = pickData.message || 'Sản phẩm không khớp hoặc đã đủ';
+
+            if (pickData.code === 'already_completed') {
+              showCompletedPopup(message || 'Đơn này đã bốc xong');
+              updateStatus(message, 'error');
+              playSound('error');
+              setView('IDLE');
+              resetCurrentOrder();
+              return;
+            }
+
+            if (pickData.code === 'order_cancelled') {
+              showCompletedPopup(message || 'Đơn này đã bị huỷ');
+              updateStatus(message, 'error');
+              playSound('error');
+              resetCurrentOrder();
+              setTimeout(() => window.location.reload(), 1800);
+              return;
+            }
+
+            throw new Error(message);
+          }
+
+          const matchedSku = String(pickData.sku || '').trim().toUpperCase();
+          const matchedSize = String(pickData.size || '').trim().toUpperCase();
+          const serialLabel = String(pickData.serial || code || '').trim();
+
+          if (!matchedSku) {
+            throw new Error('Webhook chưa trả về SKU hợp lệ');
+          }
+
+          const line = currentOrder.lines.find(l => {
+            if (String(l.sku || '').trim().toUpperCase() !== matchedSku || l.picked >= l.qty) return false;
+            return String(l.size || '').trim().toUpperCase() === matchedSize;
+          });
+
+          if (!line) throw new Error('Sản phẩm hợp lệ nhưng không tìm thấy trong đơn');
 
           line.picked++;
           renderOrder();
           playSound('scan');
-          updateStatus(`Đã pick ${sku}`, 'success');
+          updateStatus(pickData.message || `Đã pick ${matchedSku}`, 'success');
+          setLatestScanState(
+            'success',
+            `${matchedSku}${matchedSize ? ` - ${matchedSize}` : ''}`,
+            serialLabel ? `Serial: ${serialLabel}` : 'Sản phẩm đã được cập nhật vào đơn hàng.'
+          );
+          pushScanHistory(`${matchedSku}${matchedSize ? ` - ${matchedSize}` : ''}`, 'success');
 
           // Check complete
           if (currentOrder.lines.every(l => l.picked >= l.qty)) {
@@ -489,46 +1438,68 @@
             scheduleNextOrderReset();
           }
 
-          // In background send to server
-          fetch(PICK_WEBHOOK_URL, {
-            method: 'POST', body: JSON.stringify({ order_code: currentOrder.code, product_code: code }), headers: { 'Content-Type': 'application/json' }
-          }).catch(console.error);
-
         } catch (e) {
           updateStatus(e.message, 'error');
           playSound('error');
+          setLatestScanState('error', e.message, e.message);
+          pushScanHistory(e.message, 'error');
         }
       }
     }
 
     function renderOrder() {
       orderCodeDisplay.textContent = currentOrder.code;
+      orderDescriptionDisplay.textContent = currentOrder.description || '';
+      orderDescriptionDisplay.hidden = !currentOrder.description;
+      privateDescriptionDisplay.textContent = currentOrder.privateDescription || '';
+      privateDescriptionPanel.hidden = !currentOrder.privateDescription;
 
       let total = 0, picked = 0;
       linesList.innerHTML = '';
+      productSummaryText.textContent = `${currentOrder.lines.length} loại sản phẩm`;
 
       currentOrder.lines.forEach(line => {
         total += line.qty;
         picked += line.picked;
 
+        const progress = line.qty > 0 ? Math.min(100, Math.round((line.picked / line.qty) * 100)) : 0;
+        const state = line.picked >= line.qty ? 'complete' : (line.picked > 0 ? 'partial' : 'pending');
+        const badgeText = state === 'complete' ? 'Đã đủ' : (state === 'partial' ? `Còn thiếu ${line.qty - line.picked}` : 'Chưa quét');
+        const displayName = line.name || line.product_name || `Mẫu ${line.sku}`;
+
         const div = document.createElement('div');
-        div.className = `line-item ${line.picked >= line.qty ? 'completed' : ''}`;
+        div.className = `product-card-item is-${state}`;
         div.innerHTML = `
-                  <div>
-                      <div class="line-sku">${line.sku}</div>
-                      <div class="line-size">${line.size || ''}</div>
-                  </div>
-                  <div class="line-qty">${line.picked}/${line.qty}</div>
-              `;
+          <div class="product-card-visual ${line.image ? 'has-image' : ''}">
+            ${line.image ? `<img class="product-card-image" src="${line.image}" alt="${displayName}">` : ''}
+            <span class="product-card-code">${line.sku}</span>
+            <span class="product-card-badge ${state}">${badgeText}</span>
+          </div>
+          <div class="product-card-body">
+            <h4 class="product-card-name">${displayName}</h4>
+            <div class="product-card-meta">
+              <span>Size: <strong>${line.size || '--'}</strong></span>
+              <span class="product-card-qty ${state}">SL: ${line.picked}/${line.qty}</span>
+            </div>
+            <div class="product-card-track">
+              <div class="product-card-track-fill ${state}" style="width:${progress}%;"></div>
+            </div>
+          </div>
+        `;
         linesList.appendChild(div);
       });
 
       progressDisplay.textContent = `${picked}/${total}`;
-      listPlaceholder.hidden = true;
+      overallProgressFill.style.width = `${total ? Math.round((picked / total) * 100) : 0}%`;
+      listPlaceholder.hidden = currentOrder.lines.length > 0;
     }
 
-    resetBtn.addEventListener('click', () => {
-      resetCurrentOrder();
+    reloadBtn.addEventListener('click', () => {
+      window.location.reload();
+    });
+
+    cancelBtn.addEventListener('click', () => {
+      cancelCurrentOrder();
     });
 
     scanForm.addEventListener('submit', (e) => {
@@ -538,6 +1509,8 @@
     });
 
     // Init
+    renderScanHistory();
+    setLatestScanState('idle');
     setView('IDLE');
   </script>
   <script>

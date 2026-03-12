@@ -13,14 +13,14 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #ffffff;
-      --panel: #f2f2f2;
+      --bg: #FAFAFA;
+      --panel: #F5F5F5;
       --panel-strong: #ffffff;
       --border: rgba(0, 0, 0, 0.08);
-      --text: #000000;
+      --text: #111111;
       --muted: #888888;
-      --primary: #000000;
-      --accent: #000000;
+      --primary: #111111;
+      --accent: #111111;
       --radius-lg: 22px;
       --container: 1400px;
       --nav-h: 56px;
@@ -36,7 +36,7 @@
     body {
       -webkit-text-size-adjust: 100%;
       font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-      background: var(--color-bg, #ffffff);
+      background: var(--color-bg, #FAFAFA);
       color: var(--color-fg, #000000);
       display: flex;
       flex-direction: column;
@@ -68,7 +68,7 @@
     }
 
     body.detail-mode {
-      background: #ffffff;
+      background: #FAFAFA;
       overflow: hidden;
     }
 
@@ -112,7 +112,7 @@
     }
 
     .back-home-link:focus-visible {
-      outline: 3px solid rgba(107, 91, 255, 0.4);
+      outline: 3px solid rgba(29, 29, 31, 0.4);
       outline-offset: 3px;
     }
 
@@ -122,7 +122,7 @@
       gap: 0.4rem;
       padding: 0.4rem 0.85rem;
       border-radius: 32px;
-      background: rgba(107, 91, 255, 0.12);
+      background: #F5F5F5;
       color: var(--primary);
       font-weight: 600;
       font-size: 0.85rem;
@@ -156,10 +156,10 @@
     input,
     textarea,
     select {
-      background: rgba(246, 248, 255, 0.9);
-      border-color: rgba(148, 163, 184, 0.5);
-      border-radius: 18px;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      background: #FFFFFF;
+      border-color: #E5E5E5;
+      border-radius: 12px;
+      box-shadow: none;
     }
 
     input:focus,
@@ -173,13 +173,13 @@
     button.bg-indigo-600,
     button.bg-emerald-600 {
       border: none;
-      box-shadow: 0 14px 40px rgba(99, 102, 241, 0.25);
+      box-shadow: none;
     }
 
     .modern-card {
       background: #ffffff;
       border: 1px solid rgba(15, 23, 42, 0.08);
-      border-radius: 28px;
+      border-radius: 20px;
       padding: clamp(1.5rem, 3vw, 2rem);
       box-shadow: none;
       transition: transform 0.35s ease, box-shadow 0.35s ease;
@@ -192,8 +192,8 @@
     }
 
     .modern-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+      transform: none;
+      box-shadow: none;
     }
 
     @keyframes cubertoGlow {
@@ -222,11 +222,11 @@
 
       0%,
       100% {
-        box-shadow: 0 15px 30px rgba(99, 102, 241, 0.15);
+        box-shadow: 0 15px 30px rgba(29, 29, 31, 0.1);
       }
 
       50% {
-        box-shadow: 0 25px 45px rgba(99, 102, 241, 0.35);
+        box-shadow: 0 25px 45px rgba(29, 29, 31, 0.2);
       }
     }
 
@@ -257,7 +257,7 @@
       inset: 0;
       border-radius: inherit;
       border: 1px solid transparent;
-      background: linear-gradient(120deg, rgba(107, 91, 255, 0.35), rgba(45, 212, 191, 0.35));
+      background: none;
       opacity: 0;
       transition: opacity 0.35s ease;
       z-index: -1;
@@ -281,8 +281,7 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 20% 20%, rgba(107, 91, 255, 0.15), transparent 55%),
-        radial-gradient(circle at 80% 80%, rgba(45, 212, 191, 0.12), transparent 60%);
+      background: none;
       z-index: -1;
     }
 
@@ -1768,8 +1767,8 @@
 
     /* ---- Unified Operations UI: align Hang Bom with Don Hang / Vi Tri ---- */
     body.score-ui {
-      background: #F5F5F7;
-      color: #1D1D1F;
+      background: #FAFAFA;
+      color: #111111;
     }
 
     body.score-ui main {
@@ -1805,13 +1804,13 @@
       line-height: 1.05;
       font-weight: 600 !important;
       letter-spacing: -0.03em !important;
-      color: #1D1D1F;
+      color: #111111;
       text-transform: none;
     }
 
     body.score-ui .main-subtitle,
     body.score-ui .current-day-label {
-      color: #6E6E73;
+      color: #888888;
     }
 
     body.score-ui .date-select-grid {
@@ -1828,10 +1827,10 @@
       min-height: 0;
       padding: 0 0 0.7rem !important;
       border: none !important;
-      border-bottom: 1px solid #D2D2D7 !important;
+      border-bottom: 1px solid #E5E5E5 !important;
       border-radius: 0 !important;
       background: transparent !important;
-      color: #1D1D1F;
+      color: #111111;
       text-align: left;
       font-size: 1rem !important;
       font-weight: 500;
@@ -1840,7 +1839,7 @@
 
     body.score-ui .minimal-select:focus,
     body.score-ui .date-select-grid select:focus {
-      border-bottom-color: #1D1D1F !important;
+      border-bottom-color: #111111 !important;
     }
 
     body.score-ui .main-date-actions {
@@ -1926,7 +1925,7 @@
       gap: 1rem;
       width: 100%;
       padding: 0 0 0.8rem !important;
-      border-bottom: 1px solid #D2D2D7 !important;
+      border-bottom: 1px solid #E5E5E5 !important;
     }
 
     body.score-ui #order-scan-form button[type="submit"] {
@@ -1937,7 +1936,7 @@
       border: none;
       border-radius: 999px;
       background: transparent !important;
-      color: #1D1D1F !important;
+      color: #111111 !important;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -1961,7 +1960,7 @@
       background: transparent !important;
       border-radius: 0 !important;
       box-shadow: none !important;
-      color: #1D1D1F !important;
+      color: #111111 !important;
       font-family: "Inter", sans-serif !important;
       font-size: clamp(1rem, 1.45vw, 1.2rem) !important;
       font-weight: 400 !important;
@@ -1972,7 +1971,7 @@
     body.score-ui #order-scan-input::placeholder,
     body.score-ui #product-scan-input::placeholder,
     body.score-ui #order-search-input::placeholder {
-      color: #6E6E73 !important;
+      color: #888888 !important;
     }
 
     body.score-ui .search-label {
@@ -1988,8 +1987,8 @@
 
     body.score-ui .quick-action-btn {
       background: #FFFFFF;
-      border: 1px solid #E5E5EA;
-      color: #1D1D1F;
+      border: 1px solid #EBEBEB;
+      color: #111111;
     }
 
     body.score-ui .quick-action-btn[hidden] {
@@ -1997,12 +1996,12 @@
     }
 
     body.score-ui .quick-action-btn:hover {
-      background: #FAFAFB;
-      border-color: #D2D2D7;
+      background: #FAFAFA;
+      border-color: #E5E5E5;
     }
 
     body.score-ui .quick-action-btn span {
-      color: #6E6E73;
+      color: #888888;
     }
 
     body.score-ui .quick-action-btn {
@@ -2044,7 +2043,7 @@
 
     body.score-ui .day-stat {
       background: #FFFFFF;
-      border: 1px solid #E5E5EA;
+      border: 1px solid #EBEBEB;
       border-radius: 22px;
       padding: 1rem 1rem 0.95rem;
       min-width: 0;
@@ -2053,7 +2052,7 @@
     body.score-ui .day-stat-label {
       font-size: 0.72rem;
       letter-spacing: 0.14em;
-      color: #6E6E73;
+      color: #888888;
     }
 
     body.score-ui .day-stat-value {
@@ -2071,8 +2070,8 @@
     body.score-ui #scan-feedback,
     body.score-ui #day-banner {
       border-radius: 20px !important;
-      border: 1px solid #E5E5EA !important;
-      background: #FAFAFB !important;
+      border: 1px solid #EBEBEB !important;
+      background: #FAFAFA !important;
     }
 
     body.score-ui .detail-layout {
@@ -2089,13 +2088,13 @@
     body.score-ui .detail-kicker,
     body.score-ui .detail-subhead,
     body.score-ui .note-label {
-      color: #6E6E73 !important;
+      color: #888888 !important;
     }
 
     body.score-ui .detail-order-code {
       font-size: clamp(1.8rem, 3vw, 2.4rem);
       font-weight: 600;
-      color: #1D1D1F;
+      color: #111111;
     }
 
     body.score-ui .detail-shell,
@@ -2103,7 +2102,7 @@
     body.score-ui #order-list,
     body.score-ui #order-list-pane {
       background: #FFFFFF !important;
-      border: 1px solid #E5E5EA !important;
+      border: 1px solid #EBEBEB !important;
       border-radius: 28px !important;
       box-shadow: none !important;
     }
@@ -2131,7 +2130,7 @@
 
     body.score-ui #order-search-input {
       padding-bottom: 0.7rem !important;
-      border-bottom: 1px solid #D2D2D7 !important;
+      border-bottom: 1px solid #E5E5E5 !important;
     }
 
     body.score-ui #product-card-list {
@@ -2145,11 +2144,11 @@
     body.score-ui .product-card-item {
       min-height: 96px;
       border-radius: 22px;
-      background: #F5F5F7;
-      border: 1px solid #E5E5EA;
+      background: #FAFAFA;
+      border: 1px solid #EBEBEB;
       font-size: 1.05rem;
       font-weight: 600;
-      color: #1D1D1F;
+      color: #111111;
       padding: 0.9rem;
       text-align: center;
       word-break: break-word;
@@ -2158,11 +2157,11 @@
     body.score-ui .product-card-item.is-scanned {
       background: #EEF6F0;
       border-color: #CFE5D6;
-      color: #1D1D1F;
+      color: #111111;
     }
 
     body.score-ui .note-card {
-      background: #FAFAFB !important;
+      background: #FAFAFA !important;
       border: 1px solid #ECECF0 !important;
       border-radius: 20px !important;
       padding: 1rem 1.1rem !important;
@@ -2172,7 +2171,7 @@
       font-size: 1rem !important;
       line-height: 1.55;
       font-weight: 500 !important;
-      color: #1D1D1F !important;
+      color: #111111 !important;
     }
 
     body.score-ui .detail-footer-actions {
@@ -2185,11 +2184,11 @@
     }
 
     body.score-ui .detail-footer-actions .detail-action-btn {
-      border: 1px solid #E5E5EA;
+      border: 1px solid #EBEBEB;
       border-radius: 999px;
       padding: 0.7rem 1rem;
       background: #FFFFFF;
-      color: #1D1D1F;
+      color: #111111;
       text-transform: none;
       letter-spacing: 0;
       font-size: 0.92rem;
@@ -2198,15 +2197,15 @@
 
     body.score-ui .detail-footer-actions .detail-action-btn:hover {
       text-decoration: none;
-      background: #FAFAFB;
+      background: #FAFAFA;
     }
 
     body.score-ui #change-day-button {
-      border: 1px solid #E5E5EA;
+      border: 1px solid #EBEBEB;
       border-radius: 999px;
       padding: 0.7rem 1rem;
       background: #FFFFFF;
-      color: #1D1D1F;
+      color: #111111;
     }
 
     @media (max-width: 899px) {
