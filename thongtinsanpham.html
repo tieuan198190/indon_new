@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thông Tin Sản Phẩm - Cô Mập Fashion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    body.product-info-page {
+      --sidebar-width: 14%;
+      --shell-pad-x: clamp(3rem, 5vw, 4rem);
+      --shell-pad-y: clamp(2.25rem, 3vw, 3rem);
+      background: #f5f5f7;
+      color: #111111;
+    }
+
+    .product-info-page main {
+      max-width: 1480px;
+    }
+
+    .product-search-shell {
+      width: min(100%, 1240px);
+      margin-top: 1.6rem;
+    }
+
+    .product-search-form {
+      width: min(100%, 640px);
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 1rem;
+      padding: 0 0 0.75rem;
+      border-bottom: 1px solid #d8d8dc;
+    }
+
+    .product-search-form:focus-within {
+      border-bottom-color: #111111;
+    }
+
+    .product-search-button {
+      width: 2.25rem;
+      height: 2.25rem;
+      min-width: 0;
+      border: none;
+      background: #111111;
+      border-radius: 999px;
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .product-search-button svg {
+      width: 1.35rem;
+      height: 1.35rem;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .product-search-input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      padding: 0;
+      font-family: "Inter", sans-serif;
+      font-size: clamp(1.15rem, 1.8vw, 1.55rem);
+      font-weight: 400;
+      line-height: 1.2;
+      color: #111111;
+      outline: none;
+    }
+
+    .product-search-input::placeholder {
+      color: #8b8b8b;
+    }
+
+    .product-result {
+      margin-top: 1.5rem;
+      display: grid;
+      gap: 1rem;
+      width: 100%;
+    }
+
+    .product-card {
+      display: grid;
+      grid-template-columns: minmax(420px, 620px) minmax(360px, 1fr);
+      gap: 1.5rem;
+      align-items: start;
+      padding: 0;
+    }
+
+    .product-thumb {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      object-fit: cover;
+      border-radius: 32px;
+      background: #ededed;
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+    }
+
+    .product-thumb.empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9a9a9a;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .product-fields {
+      display: grid;
+      gap: 1rem;
+      align-content: start;
+      min-width: 0;
+      grid-template-rows: auto auto 1fr;
+    }
+
+    .product-panel {
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 1.5rem 1.65rem;
+      min-height: 136px;
+      display: flex;
+      align-items: center;
+      border-radius: 28px;
+      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.06);
+    }
+
+    .product-panel.is-status {
+      min-height: 100%;
+      align-items: flex-start;
+    }
+
+    .field-label {
+      margin: 0 0 0.45rem;
+      font-size: 0.78rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #8e8e93;
+    }
+
+    .field-value {
+      margin: 0;
+      font-size: clamp(1.2rem, 2.2vw, 1.55rem);
+      color: #1d1d1f;
+      line-height: 1.3;
+      overflow-wrap: anywhere;
+    }
+
+    .field-value.is-hero {
+      font-size: clamp(3.2rem, 4.8vw, 5rem);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+      font-weight: 700;
+    }
+
+    .field-value.is-status {
+      font-size: clamp(2.1rem, 3.1vw, 3.4rem);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      font-weight: 600;
+    }
+
+    .status-stack {
+      display: grid;
+      gap: 1rem;
+      width: 100%;
+    }
+
+    .status-reset-btn {
+      width: fit-content;
+      min-height: 42px;
+      padding: 0.8rem 1.1rem;
+      border: none;
+      border-radius: 999px;
+      background: #111111;
+      color: #ffffff;
+      font: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.18s ease;
+    }
+
+    .status-reset-btn:hover {
+      opacity: 0.9;
+    }
+
+    .status-reset-btn:disabled {
+      opacity: 0.5;
+      cursor: wait;
+    }
+
+    .status-bar {
+      margin-top: 1rem;
+    }
+
+    .empty-message {
+      color: #707070;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 899px) {
+      .product-search-shell {
+        margin-top: 0.8rem;
+      }
+
+      .product-search-button {
+        width: 2.25rem;
+        height: 2.25rem;
+      }
+
+      .product-search-form {
+        gap: 0.75rem;
+      }
+
+      .product-card {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+      }
+
+      .product-thumb {
+        width: min(220px, 100%);
+        border-radius: 24px;
+      }
+
+      .product-panel.is-status {
+        min-height: 180px;
+      }
+    }
+  </style>
+</head>
+
+<body class="product-info-page">
+  <main>
+    <div class="topbar">
+      <div class="sidebar-brand">
+        <span class="sidebar-brand-mark">CM</span>
+        <div class="sidebar-brand-text">
+          <strong>Cô Mập</strong>
+          <span>Fashion</span>
+        </div>
+        <span class="mobile-page-title">Thông tin SP</span>
+        <button class="mobile-nav-toggle" type="button" aria-label="Mở menu" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
+        </button>
+      </div>
+      <nav class="header-nav" aria-label="Điều hướng">
+        <a href="location.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-5.5-4.2-5.5-9.25A5.5 5.5 0 0 1 12 6.25a5.5 5.5 0 0 1 5.5 5.5C17.5 16.8 12 21 12 21Z"></path><circle cx="12" cy="11.75" r="2.25"></circle></svg>
+          <span class="nav-text">Vị trí</span>
+        </a>
+        <a href="thongtindonhang.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"></rect><path d="M8 9h8"></path><path d="M8 13h5"></path></svg>
+          <span class="nav-text">Đơn hàng</span>
+        </a>
+        <a href="thongtinsanpham.html" class="header-link active">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5 12 5l7 3.5v7L12 19l-7-3.5v-7Z"></path><path d="M12 12 5 8.5"></path><path d="M12 12l7-3.5"></path><path d="M12 12v7"></path></svg>
+          <span class="nav-text">Thông tin SP</span>
+        </a>
+        <a href="bochang.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5h10v10H5z"></path><path d="M15 11h2.5l1.5 2v5H15"></path><circle cx="8.5" cy="18.5" r="1.5"></circle><circle cx="16.5" cy="18.5" r="1.5"></circle></svg>
+          <span class="nav-text">Đóng hàng</span>
+        </a>
+        <a href="hangbom.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h8"></path><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"></path><path d="M6 7h12l-1 12H7L6 7Z"></path></svg>
+          <span class="nav-text">Hàng hoàn</span>
+        </a>
+        <a href="inmaqr.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="6" height="6"></rect><rect x="13" y="5" width="6" height="6"></rect><rect x="5" y="13" width="6" height="6"></rect><path d="M14 14h1"></path><path d="M18 14h1"></path><path d="M14 18h5"></path><path d="M18 15v3"></path></svg>
+          <span class="nav-text">In Mã QR</span>
+        </a>
+        <a href="kiemkho.html" class="header-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"></path><path d="M7 7v10h10V7"></path><path d="M9.5 11.5h5"></path><path d="M9.5 14.5h3"></path></svg>
+          <span class="nav-text">Kiểm Kho</span>
+        </a>
+      </nav>
+      <div class="sidebar-meta">Cô Mập Fashion</div>
+    </div>
+    <button class="mobile-nav-backdrop" type="button" aria-label="Đóng menu"></button>
+
+    <section class="product-search-shell">
+      <form id="lookup-form" class="product-search-form" autocomplete="off">
+        <button type="submit" class="product-search-button" aria-label="Tra cứu serial">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M20 20L16.65 16.65"></path>
+          </svg>
+        </button>
+        <input id="serial-input" class="product-search-input" type="text" placeholder="Nhập serial sản phẩm..." autocomplete="off" />
+      </form>
+
+      <div class="status-bar" id="status-bar" hidden></div>
+      <section id="result" class="product-result" hidden></section>
+    </section>
+  </main>
+
+  <script>
+    const API_URL = "https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/chitiet_sanpham";
+    const RESET_API_URL = "https://n8n-hongnhung198198-u40833.vm.elestio.app/webhook/reset_masanpham-chuaban";
+    const LAST_PAGE_KEY = "cmf:lastPage";
+    const REQUEST_TIMEOUT = 15000;
+
+    const form = document.getElementById("lookup-form");
+    const input = document.getElementById("serial-input");
+    const statusBar = document.getElementById("status-bar");
+    const result = document.getElementById("result");
+
+    localStorage.setItem(LAST_PAGE_KEY, "thongtinsanpham.html");
+    input.focus();
+
+    function updateStatus(message, type = "idle") {
+      if (!message) {
+        statusBar.hidden = true;
+        return;
+      }
+      statusBar.hidden = false;
+      statusBar.textContent = message;
+      statusBar.dataset.variant = type;
+    }
+
+    function parsePayloadText(rawText) {
+      if (!rawText) return [];
+      try {
+        return JSON.parse(rawText);
+      } catch {
+        throw new Error("Dữ liệu không hợp lệ.");
+      }
+    }
+
+    function normalizePayload(payload) {
+      const groups = Array.isArray(payload) ? payload : [payload];
+      const items = [];
+
+      groups.forEach((group) => {
+        const blocks = Array.isArray(group?.data) ? group.data : [];
+        const imageBlock = blocks.find((item) => item?.imageUrl);
+        const locationBlock = blocks.find((item) => item?.Location || item?.location);
+        const detailBlocks = blocks.filter((item) => item?.serial || item?.sku || item?.id);
+
+        detailBlocks.forEach((item) => {
+          items.push({
+            ...item,
+            imageUrl: item.imageUrl || imageBlock?.imageUrl || "",
+            location: item.location || locationBlock?.Location || locationBlock?.location || ""
+          });
+        });
+      });
+
+      return items;
+    }
+
+    function mapStatus(status) {
+      const normalized = String(status || "").trim().toUpperCase();
+      if (normalized === "DA_BOC") return "Sản phẩm đã được gắn vào mã khác.";
+      if (normalized === "CHUA_BAN" || normalized === "CHUA_BOC") return "Sẵn sàng";
+      return normalized || "-";
+    }
+
+    function shouldShowReset(status) {
+      return String(status || "").trim().toUpperCase() === "DA_BOC";
+    }
+
+    function parseResetStatus(payload) {
+      const item = Array.isArray(payload) ? payload[0] : payload;
+      return String(item?.status || "").trim().toUpperCase();
+    }
+
+    function renderResults(items) {
+      result.innerHTML = "";
+      result.hidden = false;
+
+      if (!items.length) {
+        result.innerHTML = '<p class="empty-message">Không có dữ liệu.</p>';
+        return;
+      }
+
+      items.forEach((item) => {
+        const card = document.createElement("article");
+        card.className = "product-card";
+        card.innerHTML = `
+          ${item.imageUrl
+            ? `<img class="product-thumb" src="${item.imageUrl}" alt="${item.sku || 'Sản phẩm'}">`
+            : `<div class="product-thumb empty">No image</div>`}
+          <div class="product-fields">
+            <div class="product-panel">
+              <div>
+                <p class="field-label">SKU - Size</p>
+                <p class="field-value is-hero">${item.sku || "-"}-${item.size || "-"}</p>
+              </div>
+            </div>
+            <div class="product-panel">
+              <div>
+                <p class="field-label">Vị trí</p>
+                <p class="field-value">${item.location || "-"}</p>
+              </div>
+            </div>
+            <div class="product-panel is-status">
+              <div class="status-stack">
+                <p class="field-label">Status</p>
+                <p class="field-value is-status" data-role="status-text">${mapStatus(item.status)}</p>
+                ${shouldShowReset(item.status)
+                  ? `<button class="status-reset-btn" type="button" data-action="reset-status" data-serial="${item.serial || ""}">Reset lại mã</button>`
+                  : ""}
+              </div>
+            </div>
+          </div>
+        `;
+        result.appendChild(card);
+      });
+    }
+
+    async function lookupSerial(value) {
+      const serial = String(value || "").trim();
+      if (!serial) {
+        updateStatus("Nhập serial.", "error");
+        result.hidden = true;
+        return;
+      }
+
+      updateStatus("Đang tra cứu...", "loading");
+
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            serial,
+            serials: [serial],
+            message: serial,
+            text: serial
+          }),
+          signal: controller.signal
+        });
+
+        const rawText = await response.text();
+        const payload = parsePayloadText(rawText);
+
+        if (!response.ok) {
+          throw new Error(`Lỗi ${response.status}`);
+        }
+
+        renderResults(normalizePayload(payload));
+        input.value = "";
+        input.focus();
+        updateStatus("", "idle");
+      } catch (error) {
+        result.hidden = true;
+        updateStatus(error?.name === "AbortError" ? "Quá thời gian." : (error?.message || "Không thể kết nối."), "error");
+      } finally {
+        window.clearTimeout(timeout);
+      }
+    }
+
+    async function resetSerialStatus(button) {
+      const serial = String(button.dataset.serial || "").trim();
+      if (!serial) return;
+
+      const stack = button.closest(".status-stack");
+      const statusText = stack?.querySelector('[data-role="status-text"]');
+      const originalText = button.textContent;
+
+      button.disabled = true;
+      button.textContent = "Đang reset...";
+
+      try {
+        const response = await fetch(RESET_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            serial,
+            serials: [serial],
+            message: serial,
+            text: serial
+          })
+        });
+
+        const rawText = await response.text();
+        const payload = parsePayloadText(rawText);
+
+        if (!response.ok) {
+          throw new Error(`Lỗi ${response.status}`);
+        }
+
+        const nextStatus = parseResetStatus(payload);
+        if (statusText) {
+          statusText.textContent = mapStatus(nextStatus);
+        }
+        button.remove();
+      } catch (error) {
+        button.disabled = false;
+        button.textContent = originalText;
+        updateStatus(error?.message || "Không thể reset mã.", "error");
+      }
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      lookupSerial(input.value);
+    });
+
+    result.addEventListener("click", (event) => {
+      const button = event.target.closest('[data-action="reset-status"]');
+      if (!button) return;
+      resetSerialStatus(button);
+    });
+  </script>
+  <script>
+    (() => {
+      const topbar = document.querySelector('.topbar');
+      const toggle = document.querySelector('.mobile-nav-toggle');
+      const nav = document.querySelector('.header-nav');
+      const backdrop = document.querySelector('.mobile-nav-backdrop');
+      if (!topbar || !toggle || !nav || !backdrop) return;
+      const closeMenu = () => {
+        topbar.classList.remove('nav-open');
+        document.body.classList.remove('mobile-nav-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      };
+      const openMenu = () => {
+        topbar.classList.add('nav-open');
+        document.body.classList.add('mobile-nav-open');
+        toggle.setAttribute('aria-expanded', 'true');
+      };
+      toggle.addEventListener('click', () => {
+        if (topbar.classList.contains('nav-open')) closeMenu();
+        else openMenu();
+      });
+      backdrop.addEventListener('click', closeMenu);
+      nav.addEventListener('click', (event) => {
+        if (event.target.closest('a')) closeMenu();
+      });
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 899) closeMenu();
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeMenu();
+      });
+    })();
+  </script>
+</body>
+
+</html>

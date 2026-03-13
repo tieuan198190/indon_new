@@ -1,4 +1,4 @@
-const CACHE_NAME = 'comap-pwa-cache-v1';
+const CACHE_NAME = 'comap-pwa-cache-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -8,6 +8,7 @@ const ASSETS = [
   './location_logo.jpeg',
   './thongtindonhang.html',
   './thongtindonhang_logo.jpeg',
+  './thongtinsanpham.html',
   './bochang.html',
   './bochang_logo.jpeg',
   './hangbom.html',
