@@ -3073,7 +3073,8 @@
       };
 
       const normalizeOrder = (raw) => {
-        const code = coalesce(raw?.order_code, raw?.MaDon, raw?.code, raw?.madon, raw?.tracking_code);
+        const codeRaw = coalesce(raw?.order_code, raw?.MaDon, raw?.code, raw?.madon, raw?.tracking_code);
+        const code = codeRaw == null ? '' : String(codeRaw).trim();
         let description = coalesce(raw?.description, raw?.ghi_chu, raw?.note, '');
         let privateNote = coalesce(raw?.private_description, raw?.private_note, raw?.internal_note, '');
         const enforcementRaw = (raw?.enforcement || '').toString().toLowerCase();
@@ -3101,7 +3102,8 @@
           ? Math.max(0, explicitRemaining)
           : Math.max(0, totalQty - scannedQty);
         const statusRaw = (raw?.status || '').toString().toLowerCase();
-        const suffixFlexible = FLEXIBLE_SUFFIXES.some((suffix) => code?.toUpperCase()?.endsWith(suffix));
+        const codeUpper = code.toUpperCase();
+        const suffixFlexible = FLEXIBLE_SUFFIXES.some((suffix) => codeUpper.endsWith(suffix));
         const flagFlexible = enforcementRaw === 'flexible' || enforcementRaw === 'relaxed';
         const flexible = flagFlexible || (!enforcementRaw && suffixFlexible);
         let status = 'pending';
